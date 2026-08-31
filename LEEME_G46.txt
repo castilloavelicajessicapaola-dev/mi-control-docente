@@ -1,0 +1,23 @@
+MI CONTROL DOCENTE G46 · PWA + GOOGLE DRIVE
+
+Novedad G46:
+- Conexión OAuth de navegador con Google Identity Services.
+- Permiso mínimo Google Drive: drive.file.
+- Guardado manual de un respaldo JSON en Google Drive.
+- Recuperación manual desde otro dispositivo con la misma cuenta.
+- La recuperación reutiliza el flujo seguro existente: revisar, combinar o reemplazar.
+- No hay sincronización automática ni sobrescritura silenciosa.
+- No se incluye ni se necesita secreto de cliente dentro de la PWA.
+
+PUBLICACIÓN EN GITHUB PAGES:
+1. Sustituye index.html, sw.js, manifest.webmanifest y la carpeta icons por los archivos de esta carpeta.
+2. Conserva la raíz del repositorio como fuente de GitHub Pages.
+3. Abre la app publicada y, en Configuración > Google Drive, pulsa Conectar Google Drive.
+4. Inicia sesión con el usuario de prueba configurado en Google Auth Platform.
+5. Pulsa Guardar respaldo en Drive.
+6. En otro dispositivo instala/abre la misma PWA, conecta la misma cuenta y pulsa Recuperar desde Drive.
+
+SEGURIDAD:
+- El ID de cliente OAuth es público por diseño en una aplicación web.
+- Nunca publiques el secreto del cliente OAuth. La PWA no lo usa.
+- Si un secreto se compartió accidentalmente, regénéralo o elimínalo en Google Cloud.
