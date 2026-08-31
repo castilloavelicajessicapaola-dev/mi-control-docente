@@ -1,0 +1,11 @@
+MI CONTROL DOCENTE G47 · DRIVE ESTABILIZADO
+
+- Mantiene DB_VERSION 12.
+- Muestra fecha y tamaño del respaldo remoto.
+- Agrega “Comprobar Drive”.
+- Detecta cambios remotos desde la última sincronización del dispositivo.
+- Evita que una base local vacía sobrescriba un respaldo remoto con registros.
+- Añade metadatos de dispositivo al respaldo, sin contraseñas ni secretos.
+- Mejora renovación de OAuth y mensajes de error.
+- Sincronización manual; no hay cambios silenciosos.
+- Scope: drive.file.

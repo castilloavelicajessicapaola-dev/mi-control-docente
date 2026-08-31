@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap" rel="stylesheet">
-  <!-- G46 · Google Identity Services para conexión explícita con Google Drive -->
+  <!-- G47 · Google Identity Services para conexión segura con Google Drive -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
@@ -2317,21 +2317,23 @@
                   <div>
                     <div class="flex items-center gap-2 flex-wrap">
                       <h4 class="font-bold text-base">Google Drive</h4>
-                      <span class="px-2 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-bold">G46 · Sincronización manual segura</span>
+                      <span class="px-2 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-bold">G47 · Drive estabilizado</span>
                     </div>
                     <p class="text-xs text-[#66767a] mt-1">Guarda un respaldo en tu Drive y recupéralo desde otro dispositivo usando la misma cuenta de Google.</p>
                   </div>
                   <span id="drive-connection-badge" class="shrink-0 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold">Desconectado</span>
                 </div>
                 <div id="drive-sync-status" class="rounded-2xl border border-[#d9e1da] bg-[#f7faf7] p-3 text-xs text-[#44565a]">Conecta tu cuenta para consultar o guardar el respaldo de Mi Control Docente.</div>
+                <div id="drive-remote-card" class="rounded-2xl border border-[#d9e1da] bg-white p-3 text-xs text-[#44565a]"><strong>Respaldo remoto:</strong> todavía no consultado en este dispositivo.</div>
                 <div class="flex flex-wrap gap-2">
                   <button type="button" id="drive-connect-btn" class="px-4 py-2.5 rounded-xl bg-blue-700 text-white text-sm font-bold" onclick="connectGoogleDrive()">Conectar Google Drive</button>
+                  <button type="button" id="drive-check-btn" class="px-4 py-2.5 rounded-xl border border-blue-300 text-blue-800 text-sm font-bold disabled:opacity-40" onclick="refreshDriveRemoteMetadata(true)" disabled>Comprobar Drive</button>
                   <button type="button" id="drive-upload-btn" class="px-4 py-2.5 rounded-xl bg-[#145b4b] text-white text-sm font-bold disabled:opacity-40" onclick="uploadBackupToDrive()" disabled>Guardar respaldo en Drive</button>
                   <button type="button" id="drive-download-btn" class="px-4 py-2.5 rounded-xl border border-[#145b4b] text-[#145b4b] text-sm font-bold disabled:opacity-40" onclick="loadBackupFromDrive()" disabled>Recuperar desde Drive</button>
                   <button type="button" id="drive-disconnect-btn" class="px-4 py-2.5 rounded-xl border border-[#c7d3c8] text-sm font-bold disabled:opacity-40" onclick="disconnectGoogleDrive()" disabled>Desconectar</button>
                 </div>
                 <div class="rounded-2xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">
-                  <strong>Protección contra pérdidas:</strong> la sincronización no es automática. “Guardar” envía una copia de los datos locales a Drive; “Recuperar” primero muestra el resumen y conserva el mismo proceso de restauración segura (combinar o reemplazar). La app solo solicita <code>drive.file</code> y no puede explorar todo tu Drive.
+                  <strong>Protección contra pérdidas:</strong> la sincronización sigue siendo manual. G47 detecta si el respaldo remoto cambió desde la última sincronización y evita que una base local vacía sobrescriba un respaldo con información. “Recuperar” siempre pasa por la revisión segura. La app solo solicita <code>drive.file</code> y no puede explorar todo tu Drive.
                 </div>
               </div>
 
@@ -11148,6 +11150,12 @@ function populateReportControls() {
         schema_version: DB_VERSION,
         created_at: new Date().toISOString(),
         school_year: localData.settings['school_year'] || '2026-2027',
+        sync_meta: {
+          source_installation_id: getDriveInstallationId(),
+          source_device_label: getDriveDeviceLabel(),
+          source_app_generation: 'G47',
+          source_url: location.origin + location.pathname
+        },
         records: {
           schools: localData.schools,
           groups: localData.groups,
@@ -11248,6 +11256,8 @@ function populateReportControls() {
           <p><strong>Versión de datos:</strong> ${escapeHTML(String(parsed.schema_version || '—'))}</p>
           <p><strong>Ciclo Escolar:</strong> ${escapeHTML(parsed.school_year || '—')}</p>
           <p><strong>Fecha de creación:</strong> ${escapeHTML(parsed.created_at || '—')}</p>
+          ${parsed.sync_meta?.source_device_label?`<p><strong>Dispositivo de origen:</strong> ${escapeHTML(parsed.sync_meta.source_device_label)}</p>`:''}
+          ${parsed.sync_meta?.source_app_generation?`<p><strong>Generación:</strong> ${escapeHTML(parsed.sync_meta.source_app_generation)}</p>`:''}
           <hr class="my-1">
           <p>• Escuelas: <strong>${(recs.schools || []).length}</strong></p>
           <p>• Grupos: <strong>${(recs.groups || []).length}</strong></p>
@@ -11793,7 +11803,14 @@ function populateReportControls() {
   </script>
 
   <script>
-    /* ==========================================================================\n       G46. GOOGLE DRIVE · SINCRONIZACIÓN MANUAL SEGURA\n       - OAuth para navegador con Google Identity Services.\n       - Alcance mínimo: drive.file.\n       - No se almacena secreto de cliente en la PWA.\n       - No hay escrituras automáticas: el docente decide Guardar o Recuperar.\n       ========================================================================== */
+    /* ==========================================================================
+       G47. GOOGLE DRIVE · ESTABILIZACIÓN MULTIDISPOSITIVO
+       - OAuth para navegador con Google Identity Services.
+       - Alcance mínimo: drive.file.
+       - Sin secreto de cliente en la PWA.
+       - Sincronización manual con ancla remota y protección anti-sobrescritura.
+       - DB_VERSION permanece 12.
+       ========================================================================== */
     const GOOGLE_DRIVE_CLIENT_ID = '346560442085-0lak56g7r7ng45nied65oe3pobtm6vg6.apps.googleusercontent.com';
     const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
     const GOOGLE_DRIVE_BACKUP_NAME = 'Mi_Control_Docente_Sync.json';
@@ -11802,19 +11819,93 @@ function populateReportControls() {
     let googleDriveTokenClient = null;
     let googleDriveTokenExpiresAt = 0;
     let googleDriveBusy = false;
+    let googleDriveRemoteFile = null;
 
-    function driveSetBusy(busy) {
-      googleDriveBusy = !!busy;
-      ['drive-connect-btn','drive-upload-btn','drive-download-btn','drive-disconnect-btn'].forEach(id => {
-        const el=document.getElementById(id); if(!el) return;
+    function getDriveInstallationId(){
+      const key='mi_control_docente_installation_id';
+      let id=localStorage.getItem(key);
+      if(!id){
+        id='dev-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+        localStorage.setItem(key,id);
+      }
+      return id;
+    }
+
+    function getDriveDeviceLabel(){
+      const ua=navigator.userAgent||'';
+      let platform='Dispositivo';
+      if(/Android/i.test(ua)) platform=/Mobile/i.test(ua)?'Android móvil':'Tablet Android';
+      else if(/Windows/i.test(ua)) platform='Windows';
+      else if(/iPhone/i.test(ua)) platform='iPhone';
+      else if(/iPad/i.test(ua)) platform='iPad';
+      else if(/Macintosh|Mac OS/i.test(ua)) platform='Mac';
+      else if(/Linux/i.test(ua)) platform='Linux';
+      const standalone=(window.matchMedia?.('(display-mode: standalone)')?.matches || window.navigator.standalone===true);
+      return `${platform} · ${standalone?'app instalada':'navegador'}`;
+    }
+
+    function driveFormatDate(value){
+      if(!value) return '—';
+      const d=new Date(value);
+      return Number.isNaN(d.getTime())?'—':d.toLocaleString('es-MX');
+    }
+
+    function driveFormatBytes(value){
+      const n=Number(value);
+      if(!Number.isFinite(n)||n<0) return '—';
+      if(n<1024) return `${n} B`;
+      if(n<1024*1024) return `${(n/1024).toFixed(1)} KB`;
+      return `${(n/1024/1024).toFixed(2)} MB`;
+    }
+
+    function countBackupRecords(backup){
+      const r=backup?.records||{};
+      const keys=['schools','groups','students','attendance','activities','activity_results','observations','plans','academic_closures','schedule','calendar_events','portfolio_evidence','assessment_instruments','instrument_results','document_records','school_year_archives','teacher_journal','weekly_reviews','family_contacts','recovery_plans'];
+      return keys.reduce((sum,k)=>sum+(Array.isArray(r[k])?r[k].length:0),0);
+    }
+
+    function countLocalMeaningfulRecords(){
+      return countBackupRecords({records:localData});
+    }
+
+    function driveSetBusy(busy){
+      googleDriveBusy=!!busy;
+      ['drive-connect-btn','drive-check-btn','drive-upload-btn','drive-download-btn','drive-disconnect-btn'].forEach(id=>{
+        const el=document.getElementById(id); if(!el)return;
         if(id==='drive-connect-btn') el.disabled=googleDriveBusy;
-        else el.disabled=googleDriveBusy || !googleDriveAccessToken;
+        else el.disabled=googleDriveBusy||!googleDriveAccessToken;
       });
     }
 
-    function renderGoogleDriveStatus(message='') {
-      const connected=!!googleDriveAccessToken && Date.now() < googleDriveTokenExpiresAt;
-      if(!connected && googleDriveAccessToken) googleDriveAccessToken=null;
+    function renderDriveRemoteCard(file=googleDriveRemoteFile){
+      const el=document.getElementById('drive-remote-card');
+      if(!el)return;
+      const anchor=localData?.settings?.['drive_sync_anchor_modified_time']||'';
+      const knownModified=localData?.settings?.['drive_remote_modified_time']||'';
+      const knownSize=localData?.settings?.['drive_remote_size']||'';
+      const knownName=localData?.settings?.['drive_remote_name']||GOOGLE_DRIVE_BACKUP_NAME;
+      const f=file||((knownModified||knownSize)?{name:knownName,modifiedTime:knownModified,size:knownSize}:null);
+      if(!f){
+        el.innerHTML='<strong>Respaldo remoto:</strong> todavía no consultado en este dispositivo.';
+        return;
+      }
+      const changed=!!(anchor&&f.modifiedTime&&anchor!==f.modifiedTime);
+      const neverSynced=!anchor;
+      const state=changed
+        ? '<span class="text-amber-800 font-bold">Cambió desde tu última sincronización.</span>'
+        : neverSynced
+          ? '<span class="text-slate-700 font-bold">Este dispositivo aún no tiene punto de sincronización.</span>'
+          : '<span class="text-emerald-800 font-bold">Coincide con tu última sincronización.</span>';
+      el.innerHTML=`<div class="flex flex-col gap-1">
+        <div><strong>Respaldo remoto:</strong> ${escapeHTML(f.name||GOOGLE_DRIVE_BACKUP_NAME)}</div>
+        <div>Modificado: <strong>${escapeHTML(driveFormatDate(f.modifiedTime))}</strong>${f.size?` · ${escapeHTML(driveFormatBytes(f.size))}`:''}</div>
+        <div>${state}</div>
+      </div>`;
+    }
+
+    function renderGoogleDriveStatus(message=''){
+      const connected=!!googleDriveAccessToken&&Date.now()<googleDriveTokenExpiresAt;
+      if(!connected&&googleDriveAccessToken) googleDriveAccessToken=null;
       const badge=document.getElementById('drive-connection-badge');
       if(badge){
         badge.textContent=connected?'Conectado':'Desconectado';
@@ -11823,36 +11914,43 @@ function populateReportControls() {
           : 'shrink-0 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold';
       }
       const connect=document.getElementById('drive-connect-btn');
-      const upload=document.getElementById('drive-upload-btn');
-      const download=document.getElementById('drive-download-btn');
-      const disconnect=document.getElementById('drive-disconnect-btn');
       if(connect) connect.textContent=connected?'Renovar conexión':'Conectar Google Drive';
-      if(upload) upload.disabled=!connected || googleDriveBusy;
-      if(download) download.disabled=!connected || googleDriveBusy;
-      if(disconnect) disconnect.disabled=!connected || googleDriveBusy;
+      ['drive-check-btn','drive-upload-btn','drive-download-btn','drive-disconnect-btn'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.disabled=!connected||googleDriveBusy;
+      });
       const status=document.getElementById('drive-sync-status');
       if(status){
+        const details=[];
         const lastUpload=localData?.settings?.['drive_last_upload_at'];
         const lastDownload=localData?.settings?.['drive_last_download_at'];
-        const details=[];
-        if(lastUpload) details.push(`Último envío: ${new Date(lastUpload).toLocaleString('es-MX')}`);
-        if(lastDownload) details.push(`Última recuperación: ${new Date(lastDownload).toLocaleString('es-MX')}`);
+        if(lastUpload) details.push(`Último envío: ${driveFormatDate(lastUpload)}`);
+        if(lastDownload) details.push(`Última recuperación: ${driveFormatDate(lastDownload)}`);
+        if(connected) details.push(`Sesión aprox. hasta ${new Date(googleDriveTokenExpiresAt).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}`);
         status.innerHTML=`<strong>${connected?'Drive conectado para esta sesión.':'Drive no conectado.'}</strong>${message?`<br>${escapeHTML(message)}`:''}${details.length?`<br>${details.map(escapeHTML).join(' · ')}`:''}`;
       }
+      renderDriveRemoteCard();
     }
 
-    function initGoogleDriveTokenClient() {
-      if(googleDriveTokenClient) return true;
-      if(!window.google?.accounts?.oauth2) return false;
+    function initGoogleDriveTokenClient(){
+      if(googleDriveTokenClient)return true;
+      if(!window.google?.accounts?.oauth2)return false;
       googleDriveTokenClient=google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_DRIVE_CLIENT_ID,
-        scope: GOOGLE_DRIVE_SCOPE,
-        callback: () => {}
+        client_id:GOOGLE_DRIVE_CLIENT_ID,
+        scope:GOOGLE_DRIVE_SCOPE,
+        callback:()=>{}
       });
       return true;
     }
 
-    function requestGoogleDriveToken(promptMode='consent') {
+    function driveFriendlyOAuthError(err){
+      const raw=String(err?.message||err?.type||err||'');
+      if(/popup_closed|popup.*closed/i.test(raw)) return 'Se cerró la ventana de Google antes de terminar.';
+      if(/access_denied/i.test(raw)) return 'No se concedió el permiso de Google Drive.';
+      if(/network|fetch|internet/i.test(raw)) return 'No fue posible contactar Google. Revisa tu conexión a Internet.';
+      return raw||'No fue posible completar la autorización de Google.';
+    }
+
+    function requestGoogleDriveToken(promptMode=''){
       return new Promise((resolve,reject)=>{
         if(!initGoogleDriveTokenClient()) return reject(new Error('Google Identity Services aún no está disponible. Comprueba tu conexión a Internet.'));
         googleDriveTokenClient.callback=(response)=>{
@@ -11863,94 +11961,191 @@ function populateReportControls() {
           googleDriveTokenExpiresAt=Date.now()+Math.max(60,expires-60)*1000;
           resolve(response);
         };
-        googleDriveTokenClient.error_callback=(err)=>reject(new Error(err?.message||err?.type||'No fue posible abrir la autorización de Google.'));
+        googleDriveTokenClient.error_callback=(err)=>reject(new Error(driveFriendlyOAuthError(err)));
         googleDriveTokenClient.requestAccessToken({prompt:promptMode});
       });
     }
 
-    async function ensureGoogleDriveToken(interactive=true) {
-      if(googleDriveAccessToken && Date.now()<googleDriveTokenExpiresAt) return googleDriveAccessToken;
-      await requestGoogleDriveToken(interactive?'consent':'');
+    async function ensureGoogleDriveToken(interactive=true){
+      if(googleDriveAccessToken&&Date.now()<googleDriveTokenExpiresAt)return googleDriveAccessToken;
+      try{await requestGoogleDriveToken('');}
+      catch(err){
+        if(!interactive)throw err;
+        await requestGoogleDriveToken('consent');
+      }
       return googleDriveAccessToken;
     }
 
-    async function connectGoogleDrive() {
-      if(googleDriveBusy) return;
+    async function connectGoogleDrive(){
+      if(googleDriveBusy)return;
       driveSetBusy(true);
       try{
-        await requestGoogleDriveToken(googleDriveAccessToken?'':'consent');
-        renderGoogleDriveStatus('Autorización concedida. Ya puedes guardar o recuperar tu respaldo.');
+        await ensureGoogleDriveToken(true);
+        renderGoogleDriveStatus('Autorización concedida. Comprobando respaldo remoto.');
         showToast('Google Drive conectado');
         await refreshDriveRemoteMetadata(false);
       }catch(err){
         console.error('Google Drive OAuth:',err);
         renderGoogleDriveStatus('No se completó la conexión.');
-        showToast(err.message||'No fue posible conectar Google Drive');
-      }finally{ driveSetBusy(false); renderGoogleDriveStatus(); }
+        showToast(driveFriendlyOAuthError(err));
+      }finally{
+        driveSetBusy(false);
+        renderGoogleDriveStatus();
+      }
     }
 
-    async function disconnectGoogleDrive() {
+    async function disconnectGoogleDrive(){
       const token=googleDriveAccessToken;
       googleDriveAccessToken=null; googleDriveTokenExpiresAt=0;
-      if(token && window.google?.accounts?.oauth2?.revoke){
-        try{ await new Promise(resolve=>google.accounts.oauth2.revoke(token,()=>resolve())); }catch(_e){}
+      if(token&&window.google?.accounts?.oauth2?.revoke){
+        try{await new Promise(resolve=>google.accounts.oauth2.revoke(token,()=>resolve()));}catch(_e){}
       }
       renderGoogleDriveStatus('La autorización de esta sesión fue retirada. Tus archivos de Drive no se borraron.');
       showToast('Google Drive desconectado');
     }
 
-    async function driveFetch(url,options={}) {
+    async function driveFetch(url,options={},retryAuth=true){
       const token=await ensureGoogleDriveToken(true);
       const headers=new Headers(options.headers||{});
       headers.set('Authorization',`Bearer ${token}`);
-      const response=await fetch(url,{...options,headers});
-      if(response.status===401){
+      let response;
+      try{response=await fetch(url,{...options,headers});}
+      catch(_e){throw new Error('No fue posible comunicarse con Google Drive. Revisa tu conexión a Internet.');}
+      if(response.status===401&&retryAuth){
         googleDriveAccessToken=null; googleDriveTokenExpiresAt=0;
-        throw new Error('La sesión de Google venció. Vuelve a conectar Drive.');
+        await ensureGoogleDriveToken(true);
+        return driveFetch(url,options,false);
       }
       if(!response.ok){
         let detail=''; try{detail=(await response.json())?.error?.message||'';}catch(_e){}
+        if(response.status===403)throw new Error(detail||'Google Drive rechazó la operación. Verifica la cuenta autorizada.');
+        if(response.status===404)throw new Error('El respaldo ya no está disponible en Google Drive.');
+        if(response.status===429)throw new Error('Google Drive está recibiendo demasiadas solicitudes. Espera un momento.');
         throw new Error(detail||`Google Drive respondió con error ${response.status}.`);
       }
       return response;
     }
 
-    async function findDriveBackupFile() {
+    async function findDriveBackupFile(){
       const q=`name='${GOOGLE_DRIVE_BACKUP_NAME}' and trashed=false and appProperties has { key='${GOOGLE_DRIVE_APP_PROPERTY}' and value='true' }`;
       const url='https://www.googleapis.com/drive/v3/files?spaces=drive&pageSize=10&orderBy=modifiedTime%20desc&fields=files(id,name,modifiedTime,size,appProperties)&q='+encodeURIComponent(q);
       const data=await (await driveFetch(url)).json();
       return data.files?.[0]||null;
     }
 
-    async function refreshDriveRemoteMetadata(showErrors=true) {
-      if(!googleDriveAccessToken) return null;
-      try{
-        const file=await findDriveBackupFile();
-        if(file) renderGoogleDriveStatus(`Respaldo en Drive: ${new Date(file.modifiedTime).toLocaleString('es-MX')}${file.size?` · ${(Number(file.size)/1024).toFixed(1)} KB`:''}`);
-        else renderGoogleDriveStatus('Todavía no existe un respaldo de esta app en tu Drive.');
-        return file;
-      }catch(err){ if(showErrors) showToast(err.message); return null; }
+    async function persistDriveRemoteMetadata(file){
+      googleDriveRemoteFile=file||null;
+      if(!file)return;
+      const vals={
+        drive_remote_name:file.name||GOOGLE_DRIVE_BACKUP_NAME,
+        drive_remote_modified_time:file.modifiedTime||'',
+        drive_remote_size:file.size||''
+      };
+      for(const [key,value] of Object.entries(vals)){
+        await dbPut('settings',{key,value});
+        localData.settings[key]=value;
+      }
+      renderDriveRemoteCard(file);
     }
 
-    async function uploadBackupToDrive() {
-      if(googleDriveBusy) return;
+    async function refreshDriveRemoteMetadata(showErrors=true){
+      if(!googleDriveAccessToken){
+        if(showErrors)showToast('Conecta Google Drive para comprobar el respaldo');
+        return null;
+      }
+      try{
+        const file=await findDriveBackupFile();
+        if(file){
+          await persistDriveRemoteMetadata(file);
+          renderGoogleDriveStatus(`Respaldo localizado: ${driveFormatDate(file.modifiedTime)}${file.size?` · ${driveFormatBytes(file.size)}`:''}.`);
+        }else{
+          googleDriveRemoteFile=null;
+          renderGoogleDriveStatus('Todavía no existe un respaldo de esta app en tu Drive.');
+          renderDriveRemoteCard(null);
+        }
+        return file;
+      }catch(err){
+        if(showErrors)showToast(err.message||'No fue posible comprobar Drive');
+        return null;
+      }
+    }
+
+    async function readDriveBackupFile(file){
+      const response=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(file.id)}?alt=media`);
+      const body=await response.text();
+      if(body.length>50*1024*1024)throw new Error('El respaldo de Drive supera 50 MB.');
+      let parsed;
+      try{parsed=JSON.parse(body);}
+      catch(_e){throw new Error('El respaldo de Drive no contiene JSON válido.');}
+      const validation=validateBackupObject(parsed);
+      if(!validation.ok)throw new Error(validation.message);
+      return parsed;
+    }
+
+    async function guardDriveOverwrite(existing){
+      if(!existing)return true;
+      const localCount=countLocalMeaningfulRecords();
+      const anchor=localData?.settings?.['drive_sync_anchor_modified_time']||'';
+      const changed=!!(anchor&&existing.modifiedTime&&anchor!==existing.modifiedTime);
+
+      if(localCount===0){
+        const remoteBackup=await readDriveBackupFile(existing);
+        const remoteCount=countBackupRecords(remoteBackup);
+        if(remoteCount>0){
+          renderGoogleDriveStatus(`Protección activa: Drive contiene ${remoteCount} registros y esta base local está vacía.`);
+          showToast('Recupera desde Drive antes de guardar desde este dispositivo');
+          return false;
+        }
+      }
+
+      if(changed){
+        return confirm(
+          `El respaldo de Google Drive cambió desde la última sincronización de este dispositivo.\n\n`+
+          `Drive: ${driveFormatDate(existing.modifiedTime)}\n`+
+          `Última sincronización conocida: ${driveFormatDate(anchor)}\n\n`+
+          `Se recomienda cancelar y usar “Recuperar desde Drive”. ¿Deseas sobrescribirlo de todos modos?`
+        );
+      }
+
+      if(!anchor&&localCount>0){
+        return confirm(
+          `Este dispositivo aún no tiene un punto de sincronización con el respaldo existente.\n\n`+
+          `Para evitar reemplazar cambios hechos desde otro dispositivo, se recomienda cancelar y usar “Recuperar desde Drive” primero.\n\n`+
+          `¿Deseas sobrescribir el respaldo remoto de todos modos?`
+        );
+      }
+      return true;
+    }
+
+    async function setDriveSyncAnchor(file){
+      const modified=file?.modifiedTime||new Date().toISOString();
+      await dbPut('settings',{key:'drive_sync_anchor_modified_time',value:modified});
+      localData.settings['drive_sync_anchor_modified_time']=modified;
+      if(file)await persistDriveRemoteMetadata(file);
+    }
+
+    async function uploadBackupToDrive(){
+      if(googleDriveBusy)return;
       driveSetBusy(true);
       try{
         await ensureGoogleDriveToken(true);
-        const backup=buildBackupObject();
-        const body=JSON.stringify(backup,null,2);
         const existing=await findDriveBackupFile();
+        if(existing){
+          await persistDriveRemoteMetadata(existing);
+          if(!(await guardDriveOverwrite(existing)))return;
+        }
+        const body=JSON.stringify(buildBackupObject(),null,2);
         let response;
         if(existing){
           response=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(existing.id)}?uploadType=media&fields=id,name,modifiedTime,size`,{
-            method:'PATCH', headers:{'Content-Type':'application/json;charset=utf-8'}, body
+            method:'PATCH',headers:{'Content-Type':'application/json;charset=utf-8'},body
           });
         }else{
           const boundary='mcd_'+Math.random().toString(36).slice(2);
           const metadata={name:GOOGLE_DRIVE_BACKUP_NAME,mimeType:'application/json',appProperties:{[GOOGLE_DRIVE_APP_PROPERTY]:'true'}};
           const multipart=`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${body}\r\n--${boundary}--`;
           response=await driveFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime,size',{
-            method:'POST', headers:{'Content-Type':`multipart/related; boundary=${boundary}`}, body:multipart
+            method:'POST',headers:{'Content-Type':`multipart/related; boundary=${boundary}`},body:multipart
           });
         }
         const file=await response.json();
@@ -11959,46 +12154,53 @@ function populateReportControls() {
         await dbPut('settings',{key:'last_backup_at',value:now});
         localData.settings['drive_last_upload_at']=now;
         localData.settings['last_backup_at']=now;
+        await setDriveSyncAnchor(file);
         renderBackupStatus();
-        renderGoogleDriveStatus(`Respaldo guardado en Drive: ${new Date(file.modifiedTime||now).toLocaleString('es-MX')}.`);
+        renderGoogleDriveStatus(`Respaldo guardado en Drive: ${driveFormatDate(file.modifiedTime||now)}.`);
         showToast(existing?'Respaldo de Drive actualizado':'Respaldo creado en Google Drive');
       }catch(err){
-        console.error('Drive upload:',err); showToast(err.message||'No fue posible guardar en Drive');
-      }finally{ driveSetBusy(false); renderGoogleDriveStatus(); }
+        console.error('Drive upload:',err);
+        showToast(err.message||'No fue posible guardar en Drive');
+      }finally{
+        driveSetBusy(false);
+        renderGoogleDriveStatus();
+      }
     }
 
-    async function loadBackupFromDrive() {
-      if(googleDriveBusy) return;
+    async function loadBackupFromDrive(){
+      if(googleDriveBusy)return;
       driveSetBusy(true);
       try{
         await ensureGoogleDriveToken(true);
         const file=await findDriveBackupFile();
-        if(!file) return showToast('No se encontró un respaldo de Mi Control Docente en esta cuenta');
-        const response=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(file.id)}?alt=media`);
-        const text=await response.text();
-        if(text.length>50*1024*1024) throw new Error('El respaldo de Drive supera 50 MB y no se abrirá automáticamente.');
-        const parsed=JSON.parse(text);
-        const validation=validateBackupObject(parsed);
-        if(!validation.ok) throw new Error(validation.message);
+        if(!file)return showToast('No se encontró un respaldo de Mi Control Docente en esta cuenta');
+        await persistDriveRemoteMetadata(file);
+        const parsed=await readDriveBackupFile(file);
         pendingRestoreJSON=parsed;
         const now=new Date().toISOString();
         await dbPut('settings',{key:'drive_last_download_at',value:now});
         localData.settings['drive_last_download_at']=now;
-        renderGoogleDriveStatus(`Respaldo recuperado para revisión. Drive: ${new Date(file.modifiedTime).toLocaleString('es-MX')}.`);
+        await setDriveSyncAnchor(file);
+        const source=parsed?.sync_meta?.source_device_label;
+        renderGoogleDriveStatus(`Respaldo recuperado para revisión. Drive: ${driveFormatDate(file.modifiedTime)}${source?` · origen ${source}`:''}.`);
         showRestoreConfirmationModal(parsed);
         showToast('Respaldo de Drive listo para revisar');
       }catch(err){
         console.error('Drive download:',err);
-        showToast(err instanceof SyntaxError?'El respaldo de Drive no contiene JSON válido':(err.message||'No fue posible recuperar el respaldo'));
-      }finally{ driveSetBusy(false); renderGoogleDriveStatus(); }
+        showToast(err.message||'No fue posible recuperar el respaldo');
+      }finally{
+        driveSetBusy(false);
+        renderGoogleDriveStatus();
+      }
     }
 
     window.addEventListener('DOMContentLoaded',()=>{
       renderGoogleDriveStatus();
+      renderDriveRemoteCard();
       let attempts=0;
       const wait=setInterval(()=>{
         attempts++;
-        if(initGoogleDriveTokenClient()||attempts>20) clearInterval(wait);
+        if(initGoogleDriveTokenClient()||attempts>20)clearInterval(wait);
       },250);
     });
   </script>\n\n  <script>
