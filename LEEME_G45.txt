@@ -1,0 +1,37 @@
+MI CONTROL DOCENTE G45 · PWA INSTALABLE
+
+CONTENIDO
+- index.html
+- manifest.webmanifest
+- sw.js
+- icons/icon-192.png
+- icons/icon-512.png
+
+CÓMO FUNCIONA
+Esta versión convierte Mi Control Docente en una PWA instalable. Puede funcionar como aplicación
+en Android, tablet y computadora, y conserva IndexedDB como almacenamiento local/offline.
+
+PARA INSTALARLA
+La carpeta debe publicarse en un sitio HTTPS. Abrir index.html directamente como file:// no permite
+instalar correctamente el Service Worker.
+
+Android/tablet:
+1. Abre la URL publicada en Chrome.
+2. Usa “Instalar aplicación” o “Agregar a pantalla de inicio”.
+3. También puede aparecer el botón “Instalar app” dentro de Mi Control Docente.
+
+Computadora:
+1. Abre la URL publicada en Chrome o Edge.
+2. Pulsa el icono de instalación del navegador o el botón “Instalar app”.
+
+MIGRACIÓN DESDE EL HTML ANTERIOR
+El almacenamiento file:// y el almacenamiento del dominio HTTPS son independientes.
+Antes de cambiar:
+1. Abre tu versión anterior.
+2. Exporta un respaldo JSON.
+3. Abre la nueva PWA publicada.
+4. Restaura ese respaldo.
+
+GOOGLE DRIVE
+G45 todavía NO sincroniza automáticamente con Google Drive. La siguiente fase será configurar
+la autorización de Google y después la sincronización multidispositivo con control de conflictos.
