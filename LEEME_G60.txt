@@ -1,0 +1,7 @@
+MI CONTROL DOCENTE G60 · GUARDADO Y PERSISTENCIA
+- Mantiene la lógica funcional de G59.
+- Al guardar correctamente limpia el borrador auxiliar y confirma Guardado local.
+- Muestra la hora del último guardado.
+- Si ocurre un error, conserva el borrador y lo indica.
+- Advierte al recargar/cerrar cuando quedan cambios sin guardar.
+- Conserva Google Drive y DB_VERSION 12.
