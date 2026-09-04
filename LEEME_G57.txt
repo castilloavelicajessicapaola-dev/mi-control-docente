@@ -1,0 +1,8 @@
+MI CONTROL DOCENTE G57 · BOTONES ACTIVOS Y COLORES
+- AT verde, TA ámbar, JU azul, SE rojo y — gris.
+- Los botones son seleccionables y actualizan el borrador.
+- El estado seleccionado queda resaltado.
+- Acciones AT/TA/JU/SE/— para todos los alumnos de la actividad seleccionada, solo en borrador.
+- Nada se guarda hasta pulsar Guardar cambios.
+- Vacío ≠ 0 y sin estado ≠ SE.
+- Conserva G56/G55/G54, Google Drive y DB_VERSION 12.

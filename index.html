@@ -992,7 +992,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G56 · captura rápida mejorada</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G57 · botones activos y por color</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -1126,6 +1126,14 @@
               </div>
               <div class="flex flex-wrap gap-2 items-center">
                 <select id="quick-activity-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-xs font-semibold" onchange="renderGradebookMatrixG55(activeGroupId, document.getElementById('gradebook-trimester-select')?.value || 'T1')"></select>
+                <div class="flex flex-wrap gap-1 items-center">
+                  <span class="text-[10px] font-bold text-[#66767a] mr-1">A todos (borrador):</span>
+                  <button type="button" class="rounded-lg px-2.5 py-2 text-[11px] font-bold bg-emerald-100 border border-emerald-300 text-emerald-800 hover:bg-emerald-200" onclick="g57SetStatusAll('AT')">AT</button>
+                  <button type="button" class="rounded-lg px-2.5 py-2 text-[11px] font-bold bg-amber-100 border border-amber-300 text-amber-900 hover:bg-amber-200" onclick="g57SetStatusAll('TA')">TA</button>
+                  <button type="button" class="rounded-lg px-2.5 py-2 text-[11px] font-bold bg-blue-100 border border-blue-300 text-blue-800 hover:bg-blue-200" onclick="g57SetStatusAll('JU')">JU</button>
+                  <button type="button" class="rounded-lg px-2.5 py-2 text-[11px] font-bold bg-red-100 border border-red-300 text-red-800 hover:bg-red-200" onclick="g57SetStatusAll('SE')">SE</button>
+                  <button type="button" class="rounded-lg px-2.5 py-2 text-[11px] font-bold bg-slate-100 border border-slate-300 text-slate-700 hover:bg-slate-200" onclick="g57SetStatusAll('')">—</button>
+                </div>
                 <button type="button" class="rounded-xl px-3 py-2 text-xs font-bold border border-[#145b4b] text-[#145b4b]" onclick="openQuickPasteGrades()">Pegar calificaciones</button>
                 <button id="gradebook-save-btn" type="button" class="rounded-xl px-4 py-2 text-xs font-bold bg-[#145b4b] text-white disabled:opacity-50" onclick="saveGradebookChanges()" disabled>Guardar cambios</button>
               </div>
@@ -1154,7 +1162,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div>
                 <div class="flex items-center gap-2 flex-wrap"><h3 class="serif text-lg font-bold text-[#145b4b]">Matriz de Calificaciones</h3><span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">G56 · captura rápida mejorada</span></div>
-                <p class="text-xs text-[#66767a]">Escribe la calificación y pulsa AT, TA, JU o SE. Vacío ≠ 0 y sin estado ≠ SE.</p>
+                <p class="text-xs text-[#66767a]">Escribe la calificación y pulsa un estado. El botón elegido queda resaltado por color. Vacío ≠ 0 y sin estado ≠ SE.</p>
                 <div class="mt-2 flex flex-wrap gap-1 text-[10px] font-bold">
                   <span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800">AT · A tiempo</span>
                   <span class="px-2 py-1 rounded-lg bg-amber-100 text-amber-900">TA · Tardía</span>
@@ -6338,6 +6346,38 @@
       return all.sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'es-MX'));
     }
 
+    function g57CurrentResult(activity, studentId){
+      if(typeof getDraftOrStoredResult==='function'){
+        return getDraftOrStoredResult(activity, studentId) || {};
+      }
+      return (localData.activity_results||[]).find(r=>r.activity_id===activity.activity_id && r.student_id===studentId) || {};
+    }
+
+    function g57RerenderMatrix(){
+      const groupId=document.getElementById('gradebook-group-select')?.value || activeGroupId || '';
+      const trimester=document.getElementById('gradebook-trimester-select')?.value || 'T1';
+      renderGradebookMatrixG55(groupId, trimester);
+    }
+
+    function g57SetStatus(activityId, studentId, status){
+      updateTempGradeResult(activityId, studentId, 'delivery_status', status);
+      g57RerenderMatrix();
+    }
+
+    function g57SetStatusAll(status){
+      const groupId=document.getElementById('gradebook-group-select')?.value || activeGroupId || '';
+      const quick=document.getElementById('quick-activity-select');
+      const activityId=quick?.value || '';
+      if(!activityId){
+        showToast('Selecciona una actividad para aplicar el estado');
+        return;
+      }
+      const students=getGradebookStudentsSafe(groupId);
+      students.forEach(s=>updateTempGradeResult(activityId,s.student_id,'delivery_status',status));
+      g57RerenderMatrix();
+      showToast(status ? `Estado ${status} aplicado en borrador a ${students.length} alumnos` : 'Estados limpiados en borrador');
+    }
+
     function renderGradebookMatrixG55(groupId, trimester){
       const tbody=document.getElementById('gradebook-tbody');
       const thead=document.getElementById('gradebook-thead-tr');
@@ -6360,7 +6400,7 @@
       thead.innerHTML=`
         <th class="py-3 px-2 sticky left-0 bg-slate-50 z-10">#</th>
         <th class="py-3 px-2 sticky left-10 bg-slate-50 z-10 min-w-[250px]">Alumno</th>
-        ${activities.map(a=>`<th class="py-3 px-2 text-center min-w-[250px]" title="${escapeHTML(a.activity_name||'Actividad')}">
+        ${activities.map(a=>`<th class="py-3 px-2 text-center min-w-[300px]" title="${escapeHTML(a.activity_name||'Actividad')}">
           <div class="font-bold text-[#145b4b]">${escapeHTML(a.activity_code||'ACT')}</div>
           <div class="text-[10px] font-normal text-[#66767a] mt-0.5">${escapeHTML(a.activity_name||'Actividad')}</div>
         </th>`).join('')}
@@ -6371,20 +6411,25 @@
         return;
       }
 
-      const statusButton=(activityId,studentId,current,value,label,cls)=>{
+      const buttonClass=(current,value)=>{
         const selected=current===value;
-        return `<button type="button"
-          class="g56-status-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition ${selected?cls:'bg-white border-[#c7d3c8] text-[#52635d] hover:bg-slate-50'}"
-          aria-pressed="${selected?'true':'false'}"
-          title="${label}"
-          onclick="updateTempGradeResult('${activityId}','${studentId}','delivery_status','${value}')">${value}</button>`;
+        const palettes={
+          AT:selected ? 'bg-emerald-600 border-emerald-700 text-white shadow-sm' : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100',
+          TA:selected ? 'bg-amber-500 border-amber-600 text-white shadow-sm' : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100',
+          JU:selected ? 'bg-blue-600 border-blue-700 text-white shadow-sm' : 'bg-blue-50 border-blue-300 text-blue-800 hover:bg-blue-100',
+          SE:selected ? 'bg-red-600 border-red-700 text-white shadow-sm' : 'bg-red-50 border-red-300 text-red-800 hover:bg-red-100',
+          '':selected ? 'bg-slate-500 border-slate-600 text-white shadow-sm' : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
+        };
+        return palettes[value];
       };
+
+      const labelMap={AT:'A tiempo',TA:'Tardía',JU:'Justificada',SE:'Sin entregar','':'Sin estado'};
 
       tbody.innerHTML=students.map((s,idx)=>{
         const cols=activities.map(a=>{
-          const draft=typeof getDraftOrStoredResult==='function' ? getDraftOrStoredResult(a,s.student_id) : null;
-          const grade=(draft && draft.grade!==null && draft.grade!==undefined && draft.grade!=='') ? draft.grade : '';
-          const status=draft ? (draft.delivery_status||'') : '';
+          const draft=g57CurrentResult(a,s.student_id);
+          const grade=(draft.grade!==null && draft.grade!==undefined && draft.grade!=='') ? draft.grade : '';
+          const status=draft.delivery_status||'';
           const max=a.max_grade??10;
 
           return `<td class="py-3 px-2 text-center align-middle">
@@ -6397,13 +6442,17 @@
                   oninput="updateTempGradeResult('${a.activity_id}','${s.student_id}','grade',this.value)">
                 <span class="text-[10px] text-[#66767a]">/ ${escapeHTML(String(max))}</span>
               </div>
-              <div class="flex flex-wrap justify-center gap-1">
-                ${statusButton(a.activity_id,s.student_id,status,'AT','A tiempo','bg-emerald-100 border-emerald-400 text-emerald-800')}
-                ${statusButton(a.activity_id,s.student_id,status,'TA','Tardía','bg-amber-100 border-amber-400 text-amber-900')}
-                ${statusButton(a.activity_id,s.student_id,status,'JU','Justificada','bg-blue-100 border-blue-400 text-blue-800')}
-                ${statusButton(a.activity_id,s.student_id,status,'SE','Sin entregar','bg-red-100 border-red-400 text-red-800')}
-                <button type="button" class="px-2 py-1.5 rounded-lg text-[11px] font-bold border ${status===''?'bg-slate-200 border-slate-400 text-slate-700':'bg-white border-[#c7d3c8] text-[#66767a]'}"
-                  title="Quitar estado" onclick="updateTempGradeResult('${a.activity_id}','${s.student_id}','delivery_status','')">—</button>
+              <div class="flex flex-wrap justify-center gap-1.5" role="group" aria-label="Estado de entrega">
+                ${['AT','TA','JU','SE',''].map(v=>`
+                  <button type="button"
+                    class="min-w-[42px] px-2.5 py-1.5 rounded-lg text-[11px] font-bold border-2 transition focus:outline-none focus:ring-2 focus:ring-offset-1 ${buttonClass(status,v)}"
+                    aria-pressed="${status===v?'true':'false'}"
+                    title="${labelMap[v]}"
+                    onclick="g57SetStatus('${a.activity_id}','${s.student_id}','${v}')">${v||'—'}</button>
+                `).join('')}
+              </div>
+              <div class="text-[10px] font-semibold ${status==='AT'?'text-emerald-700':status==='TA'?'text-amber-700':status==='JU'?'text-blue-700':status==='SE'?'text-red-700':'text-slate-500'}">
+                ${escapeHTML(labelMap[status]||'Sin estado')}
               </div>
             </div>
           </td>`;
@@ -6428,25 +6477,20 @@
       const focus=document.getElementById('gradebook-focus-activity');
       if(focus){
         const a=allActivities.find(x=>x.activity_id===focusId);
-        focus.textContent=a
-          ? `Captura: ${a.activity_code||''} · ${a.activity_name||'Actividad'}`
-          : (allActivities.length ? `${allActivities.length} actividades visibles` : 'Sin actividades');
+        focus.textContent=a ? `Captura: ${a.activity_code||''} · ${a.activity_name||'Actividad'}` : (allActivities.length ? `${allActivities.length} actividades visibles` : 'Sin actividades');
       }
 
       const scope=document.getElementById('g56-capture-scope');
       if(scope){
         const a=allActivities.find(x=>x.activity_id===focusId);
-        scope.textContent=a
-          ? `Mostrando solo ${a.activity_code||'actividad'} para captura rápida`
-          : 'Mostrando todas las actividades';
+        scope.textContent=a ? `Mostrando solo ${a.activity_code||'actividad'} para captura rápida` : 'Mostrando todas las actividades';
       }
     }
 
     function g56SelectActivityForCapture(activityId){
       const quick=document.getElementById('quick-activity-select');
       if(quick && [...quick.options].some(o=>o.value===activityId)) quick.value=activityId;
-      const trimester=document.getElementById('gradebook-trimester-select')?.value || 'T1';
-      renderGradebookMatrixG55(activeGroupId,trimester);
+      g57RerenderMatrix();
       const card=document.getElementById('gradebook-matrix-card');
       if(card) card.scrollIntoView({behavior:'smooth',block:'start'});
     }
