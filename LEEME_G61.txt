@@ -1,0 +1,10 @@
+MI CONTROL DOCENTE G61 · GUARDADO REAL CORREGIDO
+Corrección raíz:
+- Eliminada la doble capa de borrador G59/G60.
+- Botones y calificaciones vuelven a usar el Map nativo tempGradebookState, que es la misma estructura que Guardar cambios persiste.
+- La matriz lee exactamente ese mismo borrador.
+- Guardado hace upsert seguro por actividad + alumno y evita duplicados lógicos dentro del lote.
+- En error conserva el borrador y muestra el tipo de error.
+- Promedios y analítica se actualizan desde los datos persistidos después de guardar.
+- Mantiene 0 válido, vacío distinto de 0 y sin estado distinto de SE.
+- DB_VERSION 12 y Google Drive se conservan.
