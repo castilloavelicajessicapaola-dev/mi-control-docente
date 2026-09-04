@@ -1,0 +1,9 @@
+MI CONTROL DOCENTE G55
+Corrección de captura de resultados:
+- La Matriz de Calificaciones carga directamente los alumnos activos del grupo.
+- Muestra una fila por alumno y una columna por actividad activa del trimestre.
+- Cada celda permite calificación 0–máxima y estado AT/TA/JU/SE.
+- Vacío sigue siendo distinto de 0.
+- Sin estado sigue siendo distinto de SE.
+- Capturar resultados fuerza el render de la matriz y hace scroll a ella.
+- Conserva G54, Google Drive y DB_VERSION 12.
