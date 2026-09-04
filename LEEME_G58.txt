@@ -1,0 +1,7 @@
+MI CONTROL DOCENTE G58 · SELECCIÓN VISIBLE Y GUARDADO CLARO
+- El estado seleccionado se rellena con color intenso, aro visual y ✓.
+- AT verde, TA ámbar, JU azul, SE rojo y — gris.
+- Al elegir estado o escribir calificación, se fuerza la actualización de “Cambios pendientes”.
+- El botón Guardar cambios se habilita cuando hay modificaciones en borrador.
+- Las acciones para todos siguen siendo borrador hasta guardar.
+- Conserva G57/G56/G55/G54, Google Drive y DB_VERSION 12.
