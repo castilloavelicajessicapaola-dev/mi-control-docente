@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap" rel="stylesheet">
   <!-- G47 · Google Identity Services para conexión segura con Google Drive -->
-  <!-- G53 · Gestión visible de actividades -->
+  <!-- G54 · Gestión visible y estable de actividades -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
@@ -992,7 +992,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G53 · administrador de actividades activo</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G54 · administrador de actividades corregido</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -1011,11 +1011,11 @@
             </div>
           </div>
 
-          <!-- G53: ADMINISTRACIÓN VISIBLE DE ACTIVIDADES -->
+          <!-- G54: ADMINISTRACIÓN VISIBLE Y ESTABLE DE ACTIVIDADES -->
           <div class="bg-white rounded-3xl border-2 border-[#8fc5ad] p-5 mb-6" id="g53-activity-management-panel">
             <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3 mb-4">
               <div>
-                <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G53 · Gestión visible</p>
+                <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G54 · Gestión visible y estable</p>
                 <h3 class="serif text-xl font-bold mt-1">Administrar actividades del trimestre</h3>
                 <p class="text-xs text-[#66767a] mt-1">Este panel se llena directamente desde los registros de actividades del grupo y trimestre seleccionados.</p>
               </div>
@@ -6222,36 +6222,107 @@
       const list=document.getElementById('g53-activity-manager-list');
       const status=document.getElementById('g53-activity-manager-status');
       if(!list) return;
-      const groupId=document.getElementById('gradebook-group-select')?.value || activeGroupId || '';
-      const trimester=document.getElementById('gradebook-trimester-select')?.value || 'T1';
-      const activities=(localData.activities||[]).filter(a=>a.group_id===groupId && a.trimester===trimester && (a.status||'ACTIVE')==='ACTIVE');
-      const groups=new Map();
-      activities.forEach(a=>{ const k=g53ActivityKey(a); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(a); });
-      const duplicateIds=new Set([...groups.values()].filter(v=>v.length>1).flat().map(a=>a.activity_id));
-      status.innerHTML=`<div class="rounded-xl border border-[#c7d3c8] bg-[#f7faf7] px-3 py-2 text-xs"><strong>${activities.length}</strong> actividad(es) activas en ${escapeHTML(trimester)}${duplicateIds.size?` · <strong class="text-amber-800">${duplicateIds.size} registro(s) en posibles duplicados</strong>`:''}</div>`;
-      if(!activities.length){
-        list.innerHTML='<div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-[#c7d3c8] p-4 text-sm text-[#66767a]">No hay actividades activas registradas para este grupo y trimestre.</div>';
-        return;
+
+      try{
+        const groupId=document.getElementById('gradebook-group-select')?.value || activeGroupId || '';
+        const trimester=document.getElementById('gradebook-trimester-select')?.value || 'T1';
+        const activities=(localData.activities||[]).filter(a=>
+          a.group_id===groupId &&
+          (a.trimester||'T1')===trimester &&
+          (a.status||'ACTIVE')==='ACTIVE'
+        );
+
+        const keyOf=a=>[
+          String(a.activity_code||'').trim().toLowerCase(),
+          String(a.activity_name||a.title||'').trim().toLowerCase()
+        ].join('::');
+
+        const grouped={};
+        activities.forEach(a=>{
+          const k=keyOf(a);
+          if(!grouped[k]) grouped[k]=[];
+          grouped[k].push(a);
+        });
+        const duplicateIds=new Set();
+        Object.values(grouped).forEach(arr=>{
+          if(arr.length>1) arr.forEach(a=>duplicateIds.add(a.activity_id));
+        });
+
+        if(status){
+          status.innerHTML=`<div class="rounded-xl border border-[#c7d3c8] bg-[#f7faf7] px-3 py-2 text-xs">
+            <strong>${activities.length}</strong> actividad(es) activas en ${escapeHTML(trimester)}
+            ${duplicateIds.size?` · <strong class="text-amber-800">${duplicateIds.size} registro(s) en posibles duplicados</strong>`:''}
+          </div>`;
+        }
+
+        if(!activities.length){
+          list.innerHTML='<div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-[#c7d3c8] p-4 text-sm text-[#66767a]">No hay actividades activas registradas para este grupo y trimestre.</div>';
+          return;
+        }
+
+        const d=localData||{};
+        const depCount=(storeName,id)=>{
+          const arr=d[storeName]||[];
+          return arr.filter(x=>x.activity_id===id || x.linked_activity_id===id).length;
+        };
+
+        list.innerHTML=activities.map((a,idx)=>{
+          try{
+            const resultCount=depCount('activity_results',a.activity_id);
+            const instrumentCount=depCount('assessment_instruments',a.activity_id);
+            const instrumentResultCount=depCount('instrument_results',a.activity_id);
+            const evidenceCount=depCount('portfolio_evidence',a.activity_id);
+            const journalCount=depCount('teacher_journal',a.activity_id);
+            const planCount=depCount('plans',a.activity_id);
+            const total=resultCount+instrumentCount+instrumentResultCount+evidenceCount+journalCount+planCount;
+            const canDelete=total===0;
+            const dup=duplicateIds.has(a.activity_id);
+            const shortId=String(a.activity_id||'').slice(-8) || '—';
+            const typeLabel=({ACTIVITY:'Actividad',PROJECT:'Proyecto',EVALUATION:'Evaluación',RECOVERY:'Recuperación'})[a.activity_type] || a.activity_type || 'Actividad';
+            const due=a.due_date || '—';
+            const depText=total
+              ? `Resultados: ${resultCount} · Instrumentos: ${instrumentCount} · Evaluaciones instrumento: ${instrumentResultCount} · Evidencias: ${evidenceCount} · Bitácoras: ${journalCount} · Planeaciones: ${planCount}`
+              : 'Sin historial vinculado';
+
+            return `<article class="rounded-2xl border ${dup?'border-amber-300 bg-amber-50/50':'border-[#d9e1da] bg-slate-50'} p-4 text-xs">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-bold text-[#145b4b] text-sm">${escapeHTML(a.activity_code||'Sin clave')} · ${escapeHTML(a.activity_name||a.title||'Actividad')}</span>
+                    ${dup?'<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">Posible duplicado</span>':''}
+                  </div>
+                  <p class="text-[#66767a] mt-1">${escapeHTML(typeLabel)} · ${escapeHTML(a.trimester||trimester)} · Máx. ${escapeHTML(String(a.max_grade??10))}</p>
+                  <p class="text-[#66767a]">Entrega: ${escapeHTML(String(due))} · ID: <code>${escapeHTML(shortId)}</code></p>
+                  <p class="mt-2 font-semibold ${total?'text-amber-800':'text-emerald-800'}">${escapeHTML(depText)}</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#d9e1da]">
+                <button type="button" class="px-2.5 py-1.5 rounded-lg bg-[#145b4b] text-white font-bold" onclick="focusActivityCapture('${a.activity_id}')">Capturar resultados</button>
+                <button type="button" class="px-2.5 py-1.5 rounded-lg border border-[#c7d3c8] font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
+                <button type="button" class="px-2.5 py-1.5 rounded-lg border border-amber-300 text-amber-800 font-bold" onclick="archiveActivity('${a.activity_id}')">Archivar</button>
+                <button type="button" class="px-2.5 py-1.5 rounded-lg border ${canDelete?'border-red-300 text-red-700':'border-slate-200 text-slate-400'} font-bold"
+                  ${canDelete?`onclick="deleteActivity('${a.activity_id}')"`:'disabled title="Tiene historial vinculado"'}>
+                  Eliminar${dup&&canDelete?' copia vacía':''}
+                </button>
+              </div>
+            </article>`;
+          }catch(cardErr){
+            console.error('G54 card error',cardErr,a);
+            return `<article class="rounded-2xl border border-red-300 bg-red-50 p-4 text-xs">
+              <strong class="text-red-800">Actividad detectada, pero ocurrió un error al mostrarla.</strong>
+              <p class="mt-1">${escapeHTML(a.activity_code||'Sin clave')} · ${escapeHTML(a.activity_name||a.title||'Actividad')}</p>
+              <p class="mt-1 text-red-700">ID: ${escapeHTML(String(a.activity_id||'').slice(-8))}</p>
+            </article>`;
+          }
+        }).join('');
+
+        const badge=document.getElementById('g53-version-badge');
+        if(badge) badge.textContent='G54 · administrador de actividades corregido';
+      }catch(err){
+        console.error('G54 activity manager error',err);
+        if(status) status.innerHTML='<div class="rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-xs text-red-800"><strong>G54:</strong> se detectó un error al preparar la lista de actividades.</div>';
+        list.innerHTML='<div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-800">No se modificó ningún dato. Actualiza la página y vuelve a intentar.</div>';
       }
-      list.innerHTML=activities.map(a=>{
-        const dep=g53ActivityDeps(a.activity_id);
-        const dup=duplicateIds.has(a.activity_id);
-        const canDelete=dep.total===0;
-        const shortId=String(a.activity_id||'').slice(-8);
-        const depText=dep.total?activityDependencyLabel(a.activity_id):'Sin historial vinculado';
-        return `<article class="rounded-2xl border ${dup?'border-amber-300 bg-amber-50/50':'border-[#d9e1da] bg-slate-50'} p-4 text-xs">
-          <div class="flex items-start justify-between gap-2"><div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><span class="font-bold text-[#145b4b] text-sm">${escapeHTML(a.activity_code||'Sin clave')} · ${escapeHTML(a.activity_name||'Actividad')}</span>${dup?'<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">Posible duplicado</span>':''}</div>
-          <p class="text-[#66767a] mt-1">${escapeHTML(activityTypeLabel(a.activity_type))} · ${escapeHTML(a.trimester||trimester)} · Máx. ${escapeHTML(String(a.max_grade??10))}</p>
-          <p class="text-[#66767a]">Entrega: ${escapeHTML(formatDateForDisplay(a.due_date))} · ID: <code>${escapeHTML(shortId||'—')}</code></p>
-          <p class="mt-2 font-semibold ${dep.total?'text-amber-800':'text-emerald-800'}">${escapeHTML(depText)}</p></div></div>
-          <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#d9e1da]">
-            <button type="button" class="px-2.5 py-1.5 rounded-lg bg-[#145b4b] text-white font-bold" onclick="focusActivityCapture('${a.activity_id}')">Capturar resultados</button>
-            <button type="button" class="px-2.5 py-1.5 rounded-lg border border-[#c7d3c8] font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
-            <button type="button" class="px-2.5 py-1.5 rounded-lg border border-amber-300 text-amber-800 font-bold" onclick="archiveActivity('${a.activity_id}')">Archivar</button>
-            <button type="button" class="px-2.5 py-1.5 rounded-lg border ${canDelete?'border-red-300 text-red-700':'border-slate-200 text-slate-400'} font-bold" ${canDelete?`onclick="deleteActivity('${a.activity_id}')"`:'disabled title="Tiene historial vinculado"'}>Eliminar${dup&&canDelete?' copia vacía':''}</button>
-          </div>
-        </article>`;
-      }).join('');
     }
 
     function renderGradebook(preserveDraft = false) {

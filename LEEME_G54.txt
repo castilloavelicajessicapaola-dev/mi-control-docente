@@ -1,0 +1,10 @@
+MI CONTROL DOCENTE G54
+Corrección específica del administrador de actividades:
+- El resumen y las tarjetas se generan con lógica autocontenida.
+- Ya no depende de activityDependencyLabel/getActivityDependencyCounts para pintar las tarjetas.
+- Cada actividad se muestra aunque una dependencia tenga datos incompletos.
+- Si una tarjeta falla, muestra un aviso visible sin ocultar las demás.
+- Detecta posibles duplicados.
+- Eliminar solo se habilita cuando no hay historial vinculado.
+- Conserva Capturar resultados, Editar y Archivar.
+- DB_VERSION permanece en 12.
