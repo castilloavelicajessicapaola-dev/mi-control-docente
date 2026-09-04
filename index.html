@@ -992,7 +992,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G61 · guardado real corregido</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G62 · guardado verificado por alumno</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -1164,7 +1164,7 @@
           <div id="gradebook-matrix-card" class="bg-white rounded-3xl border border-[#d9e1da] p-5 overflow-x-auto scroll-mt-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div>
-                <div class="flex items-center gap-2 flex-wrap"><h3 class="serif text-lg font-bold text-[#145b4b]">Matriz de Calificaciones</h3><span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">G61 · captura y persistencia unificadas</span></div>
+                <div class="flex items-center gap-2 flex-wrap"><h3 class="serif text-lg font-bold text-[#145b4b]">Matriz de Calificaciones</h3><span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">G62 · persistencia verificada</span></div>
                 <p class="text-xs text-[#66767a]">Escribe la calificación y pulsa un estado. El botón elegido queda resaltado por color. Vacío ≠ 0 y sin estado ≠ SE.</p>
                 <div class="mt-2 flex flex-wrap gap-1 text-[10px] font-bold">
                   <span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800">AT · A tiempo</span>
@@ -4712,72 +4712,136 @@
 
     async function saveGradebookChanges() {
       if (!gradebookDirty || tempGradebookState.size === 0) return;
-      const btn = document.getElementById('gradebook-save-btn');
-      if (btn) btn.disabled = true;
-      const status = document.getElementById('gradebook-save-status');
-      if (status) status.textContent = 'Guardando…';
 
-      const now = new Date().toISOString();
-      const toPut = [];
-      const toDelete = [];
+      const btn=document.getElementById('gradebook-save-btn');
+      const statusEl=document.getElementById('gradebook-save-status');
+      const g60state=document.getElementById('g60-save-state');
+      if(btn) btn.disabled=true;
+      if(statusEl) statusEl.textContent='Guardando y verificando…';
+      if(g60state) g60state.textContent='Guardando…';
 
-      for (const draft of tempGradebookState.values()) {
-        const existing = localData.activity_results.find(r => r.activity_id === draft.activity_id && r.student_id === draft.student_id);
-        const completelyEmpty = draft.grade === null && draft.delivery_status === null && !(draft.observation || '').trim();
-        if (completelyEmpty) {
-          if (existing) toDelete.push(existing.result_id);
-          continue;
-        }
-        toPut.push({
-          result_id: existing ? existing.result_id : (draft.result_id || generateId('res')),
-          activity_id: draft.activity_id,
-          school_id: draft.school_id,
-          group_id: draft.group_id,
-          student_id: draft.student_id,
-          delivery_status: draft.delivery_status,
-          grade: draft.grade,
-          observation: draft.observation || '',
-          created_at: existing ? existing.created_at : now,
-          updated_at: now
-        });
-      }
+      const now=new Date().toISOString();
+      const intended=[];
 
-      try {
-        if (toPut.length) {
-          const seenPairs=new Set();
-          const safePut=[];
-          for(const rec of toPut){
-            const pair=`${rec.activity_id}::${rec.student_id}`;
-            if(seenPairs.has(pair)) continue;
-            seenPairs.add(pair);
-            const existingPair=(localData.activity_results||[]).find(r=>r.activity_id===rec.activity_id&&r.student_id===rec.student_id);
-            safePut.push(existingPair ? {...rec,result_id:existingPair.result_id,created_at:existingPair.created_at||rec.created_at} : rec);
+      try{
+        // Guardado serial: un alumno no hace fallar todo el grupo.
+        for(const draft of tempGradebookState.values()){
+          if(!draft?.activity_id || !draft?.student_id) continue;
+
+          const activity=(localData.activities||[]).find(a=>a.activity_id===draft.activity_id);
+          const student=(localData.students||[]).find(s=>s.student_id===draft.student_id);
+          if(!activity || !student) {
+            const e=new Error('Referencia de actividad o alumno no encontrada');
+            e.name='ReferenceError';
+            throw e;
           }
-          await dbPutBatch('activity_results', safePut);
+
+          const pairMatches=(localData.activity_results||[])
+            .filter(r=>r.activity_id===draft.activity_id && r.student_id===draft.student_id)
+            .sort((a,b)=>String(b.updated_at||'').localeCompare(String(a.updated_at||'')));
+          const existing=pairMatches[0] || null;
+
+          const delivery=(draft.delivery_status===null || draft.delivery_status===undefined || draft.delivery_status==='') ? null : draft.delivery_status;
+          const grade=(draft.grade===null || draft.grade===undefined || draft.grade==='') ? null : Number(draft.grade);
+          if(grade!==null && (!Number.isFinite(grade) || grade<0 || grade>Number(activity.max_grade||10))){
+            const e=new Error(`Calificación fuera de rango para ${student.full_name}`);
+            e.name='ValidationError';
+            throw e;
+          }
+
+          const empty=grade===null && delivery===null && !(draft.observation||'').trim();
+
+          if(empty){
+            // Si el usuario dejó completamente vacío, elimina solo los resultados de esa actividad+alumno.
+            for(const rec of pairMatches){
+              await dbDelete('activity_results',rec.result_id);
+            }
+            intended.push({activity_id:draft.activity_id,student_id:draft.student_id,empty:true});
+            continue;
+          }
+
+          const group=(localData.groups||[]).find(g=>g.group_id===activity.group_id);
+          const record={
+            result_id: existing?.result_id || draft.result_id || generateId('res'),
+            activity_id:draft.activity_id,
+            school_id:activity.school_id || student.school_id || group?.school_id || '',
+            group_id:activity.group_id,
+            student_id:draft.student_id,
+            delivery_status:delivery,
+            grade,
+            observation:draft.observation||'',
+            created_at:existing?.created_at || draft.created_at || now,
+            updated_at:now
+          };
+
+          try{
+            await dbPut('activity_results',record);
+          }catch(err){
+            // Recuperación de colisión de índice activity_student.
+            await refreshLocalCache();
+            const collision=(localData.activity_results||[]).find(r=>r.activity_id===record.activity_id && r.student_id===record.student_id);
+            if(!collision) throw err;
+            await dbPut('activity_results',{
+              ...record,
+              result_id:collision.result_id,
+              created_at:collision.created_at||record.created_at
+            });
+          }
+
+          intended.push({
+            activity_id:draft.activity_id,
+            student_id:draft.student_id,
+            empty:false,
+            grade,
+            delivery_status:delivery
+          });
         }
-        for (const id of [...new Set(toDelete)]) await dbDelete('activity_results', id);
+
+        // Releer desde IndexedDB y verificar exactamente lo solicitado.
         await refreshLocalCache();
+
+        const failed=[];
+        for(const x of intended){
+          const rec=(localData.activity_results||[]).find(r=>r.activity_id===x.activity_id && r.student_id===x.student_id);
+          if(x.empty){
+            if(rec) failed.push(x);
+            continue;
+          }
+          const persistedGrade=(rec?.grade===null || rec?.grade===undefined || rec?.grade==='') ? null : Number(rec.grade);
+          const persistedStatus=(rec?.delivery_status===null || rec?.delivery_status===undefined || rec?.delivery_status==='') ? null : rec.delivery_status;
+          if(!rec || persistedGrade!==x.grade || persistedStatus!==x.delivery_status) failed.push(x);
+        }
+
+        if(failed.length){
+          const e=new Error(`No se verificaron ${failed.length} registro(s)`);
+          e.name='VerificationError';
+          throw e;
+        }
+
         tempGradebookState.clear();
         setGradebookDirty(false);
         if(typeof g58RefreshDirtyState==='function') g58RefreshDirtyState();
-        const g60state=document.getElementById('g60-save-state');
+
+        if(g60state) g60state.textContent='✓ Guardado local verificado';
         const g60time=document.getElementById('g60-saved-at');
-        if(g60state) g60state.textContent='✓ Guardado local confirmado';
         if(g60time) g60time.textContent='Último guardado: '+new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
-        if (status) status.textContent = '✓ Guardado local';
-        showToast('Calificaciones guardadas localmente');
+        if(statusEl) statusEl.textContent='✓ Guardado y verificado';
+
         renderGradebook();
         renderAdvancedEvaluation();
         renderAdvancedDeliveries();
-        setTimeout(() => { if (status) status.textContent = ''; }, 3000);
-      } catch (err) {
-        console.error('G61 saveGradebookChanges',err);
-        if (status) status.textContent = 'Error al guardar. El borrador sigue en pantalla.';
+        if(typeof renderG53ActivityManager==='function') renderG53ActivityManager();
+
+        showToast(`${intended.length} registro(s) guardados y verificados`);
+        setTimeout(()=>{ if(statusEl) statusEl.textContent=''; },3500);
+      }catch(err){
+        console.error('G62 save verified',err);
         setGradebookDirty(true);
         if(typeof g58RefreshDirtyState==='function') g58RefreshDirtyState();
-        const g60state=document.getElementById('g60-save-state');
-        if(g60state) g60state.textContent='Error al guardar · borrador conservado';
-        showToast(`Error al guardar: ${err?.name||'IndexedDB'}`);
+        if(g60state) g60state.textContent=`Error: ${err?.name||'IndexedDB'} · borrador conservado`;
+        if(statusEl) statusEl.textContent='Error al guardar. El borrador sigue disponible.';
+        if(btn) btn.disabled=false;
+        showToast(`No se guardó todo: ${err?.name||'Error de datos'}`);
       }
     }
 

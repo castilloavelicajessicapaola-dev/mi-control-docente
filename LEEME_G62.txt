@@ -1,0 +1,9 @@
+MI CONTROL DOCENTE G62 · GUARDADO VERIFICADO POR ALUMNO
+- Guardado serial por actividad + alumno para evitar que un registro defectuoso cancele todo el lote.
+- Cada actualización usa el result_id existente cuando corresponde.
+- Si IndexedDB reporta una colisión, vuelve a leer el resultado existente y reintenta como actualización.
+- Después de guardar, relee IndexedDB y verifica calificación y estado exactos.
+- Solo muestra éxito cuando la verificación coincide.
+- Si algo falla, conserva el borrador y muestra el tipo de error.
+- Mantiene 0 válido, vacío distinto de 0 y sin estado distinto de SE.
+- Conserva Google Drive y DB_VERSION 12.
