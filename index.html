@@ -992,7 +992,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G55 · captura de resultados corregida</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G56 · captura rápida mejorada</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -1118,14 +1118,14 @@
           </div>
 
           <!-- GRADEBOOK QUICK ACTIONS -->
-          <div class="bg-white rounded-3xl border border-[#d9e1da] p-5 mb-6">
+          <div class="bg-white rounded-3xl border border-[#d9e1da] p-5 mb-6 sticky top-2 z-20 shadow-sm">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
               <div>
                 <h3 class="serif text-lg font-bold text-[#145b4b]">Captura rápida</h3>
                 <p class="text-xs text-[#66767a]">Los cambios permanecen en borrador hasta pulsar Guardar cambios.</p>
               </div>
               <div class="flex flex-wrap gap-2 items-center">
-                <select id="quick-activity-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-xs font-semibold"></select>
+                <select id="quick-activity-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-xs font-semibold" onchange="renderGradebookMatrixG55(activeGroupId, document.getElementById('gradebook-trimester-select')?.value || 'T1')"></select>
                 <button type="button" class="rounded-xl px-3 py-2 text-xs font-bold border border-[#145b4b] text-[#145b4b]" onclick="openQuickPasteGrades()">Pegar calificaciones</button>
                 <button id="gradebook-save-btn" type="button" class="rounded-xl px-4 py-2 text-xs font-bold bg-[#145b4b] text-white disabled:opacity-50" onclick="saveGradebookChanges()" disabled>Guardar cambios</button>
               </div>
@@ -1153,8 +1153,15 @@
           <div id="gradebook-matrix-card" class="bg-white rounded-3xl border border-[#d9e1da] p-5 overflow-x-auto scroll-mt-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div>
-                <div class="flex items-center gap-2 flex-wrap"><h3 class="serif text-lg font-bold text-[#145b4b]">Matriz de Calificaciones</h3><span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">G55 · 39 alumnos visibles</span></div>
-                <p class="text-xs text-[#66767a]">Captura estado de entrega y calificación por alumno. Vacío ≠ 0 y sin estado ≠ SE.</p>
+                <div class="flex items-center gap-2 flex-wrap"><h3 class="serif text-lg font-bold text-[#145b4b]">Matriz de Calificaciones</h3><span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">G56 · captura rápida mejorada</span></div>
+                <p class="text-xs text-[#66767a]">Escribe la calificación y pulsa AT, TA, JU o SE. Vacío ≠ 0 y sin estado ≠ SE.</p>
+                <div class="mt-2 flex flex-wrap gap-1 text-[10px] font-bold">
+                  <span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800">AT · A tiempo</span>
+                  <span class="px-2 py-1 rounded-lg bg-amber-100 text-amber-900">TA · Tardía</span>
+                  <span class="px-2 py-1 rounded-lg bg-blue-100 text-blue-800">JU · Justificada</span>
+                  <span class="px-2 py-1 rounded-lg bg-red-100 text-red-800">SE · Sin entregar</span>
+                  <span id="g56-capture-scope" class="px-2 py-1 rounded-lg bg-slate-100 text-[#66767a]">Mostrando actividad seleccionada</span>
+                </div>
               </div>
               <span id="gradebook-focus-activity" class="text-xs font-bold text-[#145b4b]"></span>
             </div>
@@ -6336,42 +6343,68 @@
       const thead=document.getElementById('gradebook-thead-tr');
       if(!tbody||!thead) return;
 
-      const activities=(localData.activities||[]).filter(a=>
+      const allActivities=(localData.activities||[]).filter(a=>
         a.group_id===groupId &&
         (a.trimester||'T1')===trimester &&
         (a.status||'ACTIVE')==='ACTIVE'
       );
+
+      const quick=document.getElementById('quick-activity-select');
+      const focusId=quick?.value || '';
+      const activities=focusId && allActivities.some(a=>a.activity_id===focusId)
+        ? allActivities.filter(a=>a.activity_id===focusId)
+        : allActivities;
+
       const students=getGradebookStudentsSafe(groupId);
 
       thead.innerHTML=`
-        <th class="py-3 px-2">#</th>
-        <th class="py-3 px-2">Alumno</th>
-        ${activities.map(a=>`<th class="py-3 px-2 text-center" title="${escapeHTML(a.activity_name||'Actividad')}">${escapeHTML(a.activity_code||'ACT')}</th>`).join('')}
-        <th class="py-3 px-2 text-center font-bold">Promedio Trimestral</th>`;
+        <th class="py-3 px-2 sticky left-0 bg-slate-50 z-10">#</th>
+        <th class="py-3 px-2 sticky left-10 bg-slate-50 z-10 min-w-[250px]">Alumno</th>
+        ${activities.map(a=>`<th class="py-3 px-2 text-center min-w-[250px]" title="${escapeHTML(a.activity_name||'Actividad')}">
+          <div class="font-bold text-[#145b4b]">${escapeHTML(a.activity_code||'ACT')}</div>
+          <div class="text-[10px] font-normal text-[#66767a] mt-0.5">${escapeHTML(a.activity_name||'Actividad')}</div>
+        </th>`).join('')}
+        <th class="py-3 px-2 text-center font-bold min-w-[120px]">Promedio</th>`;
 
       if(!students.length){
         tbody.innerHTML=`<tr><td colspan="${activities.length+3}" class="py-6 text-center text-sm text-[#66767a]">No hay alumnos activos en este grupo.</td></tr>`;
         return;
       }
 
+      const statusButton=(activityId,studentId,current,value,label,cls)=>{
+        const selected=current===value;
+        return `<button type="button"
+          class="g56-status-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition ${selected?cls:'bg-white border-[#c7d3c8] text-[#52635d] hover:bg-slate-50'}"
+          aria-pressed="${selected?'true':'false'}"
+          title="${label}"
+          onclick="updateTempGradeResult('${activityId}','${studentId}','delivery_status','${value}')">${value}</button>`;
+      };
+
       tbody.innerHTML=students.map((s,idx)=>{
         const cols=activities.map(a=>{
           const draft=typeof getDraftOrStoredResult==='function' ? getDraftOrStoredResult(a,s.student_id) : null;
           const grade=(draft && draft.grade!==null && draft.grade!==undefined && draft.grade!=='') ? draft.grade : '';
           const status=draft ? (draft.delivery_status||'') : '';
-          return `<td class="py-3 px-2 text-center align-top">
-            <div class="flex flex-col items-center gap-1">
-              <input type="number" step="0.1" min="0" max="${a.max_grade??10}" value="${grade}" placeholder="—"
-                class="w-16 text-center border rounded-lg py-1 text-xs font-semibold"
-                oninput="updateTempGradeResult('${a.activity_id}','${s.student_id}','grade',this.value)">
-              <select class="text-[10px] border rounded px-1 py-1"
-                onchange="updateTempGradeResult('${a.activity_id}','${s.student_id}','delivery_status',this.value)">
-                <option value="" ${status===''?'selected':''}>—</option>
-                <option value="AT" ${status==='AT'?'selected':''}>AT</option>
-                <option value="TA" ${status==='TA'?'selected':''}>TA</option>
-                <option value="JU" ${status==='JU'?'selected':''}>JU</option>
-                <option value="SE" ${status==='SE'?'selected':''}>SE</option>
-              </select>
+          const max=a.max_grade??10;
+
+          return `<td class="py-3 px-2 text-center align-middle">
+            <div class="flex flex-col items-center gap-2">
+              <div class="flex items-center gap-1">
+                <input type="number" inputmode="decimal" step="0.1" min="0" max="${max}" value="${grade}" placeholder="—"
+                  aria-label="Calificación de ${escapeHTML(s.full_name||'alumno')} en ${escapeHTML(a.activity_code||'actividad')}"
+                  class="w-20 h-10 text-center border-2 border-[#c7d3c8] rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                  onfocus="this.select()"
+                  oninput="updateTempGradeResult('${a.activity_id}','${s.student_id}','grade',this.value)">
+                <span class="text-[10px] text-[#66767a]">/ ${escapeHTML(String(max))}</span>
+              </div>
+              <div class="flex flex-wrap justify-center gap-1">
+                ${statusButton(a.activity_id,s.student_id,status,'AT','A tiempo','bg-emerald-100 border-emerald-400 text-emerald-800')}
+                ${statusButton(a.activity_id,s.student_id,status,'TA','Tardía','bg-amber-100 border-amber-400 text-amber-900')}
+                ${statusButton(a.activity_id,s.student_id,status,'JU','Justificada','bg-blue-100 border-blue-400 text-blue-800')}
+                ${statusButton(a.activity_id,s.student_id,status,'SE','Sin entregar','bg-red-100 border-red-400 text-red-800')}
+                <button type="button" class="px-2 py-1.5 rounded-lg text-[11px] font-bold border ${status===''?'bg-slate-200 border-slate-400 text-slate-700':'bg-white border-[#c7d3c8] text-[#66767a]'}"
+                  title="Quitar estado" onclick="updateTempGradeResult('${a.activity_id}','${s.student_id}','delivery_status','')">—</button>
+              </div>
             </div>
           </td>`;
         }).join('');
@@ -6385,19 +6418,37 @@
         }catch(e){}
 
         return `<tr class="border-b hover:bg-slate-50">
-          <td class="py-3 px-2 text-xs text-gray-400 font-bold">${escapeHTML(String(s.student_number||idx+1))}</td>
-          <td class="py-3 px-2 font-bold text-sm text-[#172226]">${escapeHTML(s.full_name||'Alumno')}</td>
+          <td class="py-3 px-2 text-xs text-gray-400 font-bold sticky left-0 bg-white z-[5]">${escapeHTML(String(s.student_number||idx+1))}</td>
+          <td class="py-3 px-2 font-bold text-sm text-[#172226] sticky left-10 bg-white z-[5] min-w-[250px]">${escapeHTML(s.full_name||'Alumno')}</td>
           ${cols}
           <td class="py-3 px-2 text-center font-bold text-emerald-700 text-sm">${avg}</td>
         </tr>`;
       }).join('');
 
       const focus=document.getElementById('gradebook-focus-activity');
-      const quick=document.getElementById('quick-activity-select');
-      if(focus && quick && quick.value){
-        const a=activities.find(x=>x.activity_id===quick.value);
-        if(a) focus.textContent=`Captura: ${a.activity_code||''} · ${a.activity_name||'Actividad'}`;
+      if(focus){
+        const a=allActivities.find(x=>x.activity_id===focusId);
+        focus.textContent=a
+          ? `Captura: ${a.activity_code||''} · ${a.activity_name||'Actividad'}`
+          : (allActivities.length ? `${allActivities.length} actividades visibles` : 'Sin actividades');
       }
+
+      const scope=document.getElementById('g56-capture-scope');
+      if(scope){
+        const a=allActivities.find(x=>x.activity_id===focusId);
+        scope.textContent=a
+          ? `Mostrando solo ${a.activity_code||'actividad'} para captura rápida`
+          : 'Mostrando todas las actividades';
+      }
+    }
+
+    function g56SelectActivityForCapture(activityId){
+      const quick=document.getElementById('quick-activity-select');
+      if(quick && [...quick.options].some(o=>o.value===activityId)) quick.value=activityId;
+      const trimester=document.getElementById('gradebook-trimester-select')?.value || 'T1';
+      renderGradebookMatrixG55(activeGroupId,trimester);
+      const card=document.getElementById('gradebook-matrix-card');
+      if(card) card.scrollIntoView({behavior:'smooth',block:'start'});
     }
 
 function renderGradebook(preserveDraft = false) {
@@ -6534,6 +6585,7 @@ function renderGradebook(preserveDraft = false) {
       if(!activity) return showToast('Actividad no disponible');
       const quick=document.getElementById('quick-activity-select');
       if(quick&&[...quick.options].some(o=>o.value===activityId)) quick.value=activityId;
+      if(typeof g56SelectActivityForCapture==='function') g56SelectActivityForCapture(activityId);
       const label=document.getElementById('gradebook-focus-activity');
       if(label) label.textContent=`Captura: ${activity.activity_code||''} · ${activity.activity_name||'Actividad'}`;
       const card=document.getElementById('gradebook-matrix-card');

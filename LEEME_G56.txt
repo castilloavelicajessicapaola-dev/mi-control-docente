@@ -1,0 +1,11 @@
+MI CONTROL DOCENTE G56 · CAPTURA RÁPIDA MEJORADA
+- Calificación con campo grande por alumno.
+- Botones visibles AT, TA, JU, SE y — para quitar estado.
+- El estado seleccionado queda resaltado.
+- Capturar resultados muestra solo la actividad elegida para evitar una tabla demasiado ancha.
+- Selector de actividad cambia de inmediato la matriz.
+- Encabezado de captura rápida queda visible al desplazarse.
+- Número y nombre del alumno permanecen visibles horizontalmente.
+- Vacío ≠ 0; sin estado ≠ SE.
+- Guardado sigue siendo por botón Guardar cambios.
+- Conserva G55/G54, Drive y DB_VERSION 12.
