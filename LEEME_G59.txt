@@ -1,0 +1,9 @@
+MI CONTROL DOCENTE G59 · SELECCIÓN Y PROMEDIO CORREGIDOS
+- Los botones AT/TA/JU/SE/— escriben directamente en el borrador real de la matriz.
+- El botón seleccionado conserva color intenso y ✓.
+- Las calificaciones escriben en el mismo borrador.
+- El promedio visual se actualiza al salir del campo; con una sola actividad visible se normaliza sobre 10.
+- Cambios pendientes y Guardar cambios se activan al modificar estado o calificación.
+- Antes de guardar, G59 sincroniza el borrador con la capa de guardado existente.
+- Vacío ≠ 0 y sin estado ≠ SE.
+- Conserva Drive y DB_VERSION 12.
