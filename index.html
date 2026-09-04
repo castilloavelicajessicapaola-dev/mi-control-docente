@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap" rel="stylesheet">
   <!-- G47 · Google Identity Services para conexión segura con Google Drive -->
-  <!-- G49 · Menú lateral completo y navegación adaptable -->
+  <!-- G50 · Gestión segura de actividades y duplicados -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
@@ -1010,22 +1010,26 @@
             </div>
           </div>
 
-          <!-- G48: ADMINISTRACIÓN OPERATIVA DE ACTIVIDADES -->
-          <div class="bg-white rounded-3xl border-2 border-[#b9d2c5] p-5 mb-6" id="g48-activity-management-panel">
+          <!-- G50: ADMINISTRACIÓN SEGURA DE ACTIVIDADES Y DUPLICADOS -->
+          <div class="bg-white rounded-3xl border-2 border-[#b9d2c5] p-5 mb-6" id="g50-activity-management-panel">
             <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3 mb-4">
               <div>
                 <div class="flex items-center gap-2 flex-wrap">
-                  <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G48 · Gestión directa</p>
-                  <span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">Actividades visibles y editables</span>
+                  <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G50 · Gestión segura</p>
+                  <span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">Actividades visibles · duplicados detectables</span>
                 </div>
                 <h3 class="serif text-xl font-bold mt-1">Administrar actividades del trimestre</h3>
-                <p class="text-xs text-[#66767a] mt-1">Desde aquí puedes capturar resultados, editar, crear instrumentos, archivar o eliminar actividades sin perder de vista el grupo y trimestre seleccionados.</p>
+                <p class="text-xs text-[#66767a] mt-1">Muestra cada actividad con su fecha, resultados y dependencias para editar, capturar, archivar o eliminar sin tocar historial por accidente.</p>
               </div>
-              <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold bg-[#145b4b] text-white" onclick="openActivityModal()">+ Nueva actividad</button>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold border border-[#145b4b] text-[#145b4b]" onclick="renderActivityManagementPanel()">Actualizar</button>
+                <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold bg-[#145b4b] text-white" onclick="openActivityModal()">+ Nueva actividad</button>
+              </div>
             </div>
+            <div id="activity-duplicate-summary" class="hidden mb-3 rounded-2xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900"></div>
             <div id="activity-management-container" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
             <div class="mt-3 rounded-xl bg-[#f7faf7] border border-[#d9e1da] p-3 text-[11px] text-[#66767a]">
-              <strong>Eliminar:</strong> solo se permite cuando la actividad no tiene resultados, instrumentos, evidencias, bitácoras o planeaciones vinculadas. Si ya existe historial, utiliza <strong>Archivar</strong>.
+              <strong>Regla de seguridad:</strong> eliminar definitivamente solo está disponible cuando una actividad no tiene resultados, instrumentos, evidencias, bitácoras ni planeaciones vinculadas. Si tiene historial, utiliza <strong>Archivar</strong>.
             </div>
           </div>
 
@@ -3589,7 +3593,7 @@
       if (viewId === 'today') renderTodaySchedule();
       if (viewId === 'home' || viewId === 'groups') renderGroups();
       if (viewId === 'attendance') loadAttendanceList();
-      if (viewId === 'activities') renderGradebook();
+      if (viewId === 'activities') { renderGradebook(); renderActivityManagementPanel(); }
       if (viewId === 'reports') { populateReportCycleOptions(); renderReports(); }
       if (viewId === 'pending') renderPendingStats();
       if (viewId === 'planning') renderPlans();
@@ -4565,8 +4569,19 @@
       const dueDate = document.getElementById('act-due-date').value || getLocalDateISO();
       if(!name||!code||!Number.isFinite(maxGrade)||maxGrade<=0) return showToast('Revisa nombre, clave y calificación máxima');
 
-      const duplicate=localData.activities.find(a=>a.activity_id!==editId&&a.group_id===targetGroupId&&a.trimester===trimester&&(a.activity_code||'').trim().toLowerCase()===code.toLowerCase()&&(a.status||'ACTIVE')==='ACTIVE');
-      if(duplicate) return showToast(`Ya existe una actividad activa con la clave ${code} en este trimestre`);
+      const duplicate=localData.activities.find(a=>
+        a.activity_id!==editId &&
+        a.group_id===targetGroupId &&
+        a.trimester===trimester &&
+        (a.status||'ACTIVE')==='ACTIVE' &&
+        normalizeActivityToken(a.activity_code)===normalizeActivityToken(code)
+      );
+      if(duplicate){
+        const sameName=normalizeActivityToken(duplicate.activity_name)===normalizeActivityToken(name);
+        return showToast(sameName
+          ? `Ya existe esta actividad (${code} · ${name}) en el trimestre`
+          : `Ya existe una actividad activa con la clave ${code} en este trimestre`);
+      }
 
       if(existing){
         const grades=localData.activity_results.filter(r=>r.activity_id===editId&&r.grade!==null&&r.grade!==undefined&&r.grade!=='').map(r=>Number(r.grade)).filter(Number.isFinite);
@@ -6070,6 +6085,134 @@
       w.document.close(); setTimeout(()=>w.print(),250);
     }
 
+
+    function normalizeActivityToken(value=''){
+      return String(value||'').trim().toLocaleLowerCase('es-MX').replace(/\s+/g,' ');
+    }
+
+    function activityLogicalKey(activity){
+      return [
+        activity.group_id||'',
+        activity.trimester||'',
+        normalizeActivityToken(activity.activity_code),
+        normalizeActivityToken(activity.activity_name)
+      ].join('::');
+    }
+
+    function getActiveActivitiesForManagement(){
+      const groupSel=document.getElementById('gradebook-group-select');
+      const trimSel=document.getElementById('gradebook-trimester-select');
+      const groupId=groupSel?.value || activeGroupId || '';
+      const trimester=trimSel?.value || 'T1';
+      return (localData.activities||[])
+        .filter(a=>a.group_id===groupId && a.trimester===trimester && (a.status||'ACTIVE')==='ACTIVE')
+        .sort((a,b)=>{
+          const da=String(a.due_date||''); const db=String(b.due_date||'');
+          if(da!==db) return da.localeCompare(db);
+          return String(a.created_at||'').localeCompare(String(b.created_at||''));
+        });
+    }
+
+    function getActivityDuplicateGroups(activities=getActiveActivitiesForManagement()){
+      const map=new Map();
+      activities.forEach(a=>{
+        const key=activityLogicalKey(a);
+        if(!map.has(key)) map.set(key,[]);
+        map.get(key).push(a);
+      });
+      return [...map.values()].filter(items=>items.length>1);
+    }
+
+    function activityDependencyTotal(activityId){
+      return Object.values(getActivityDependencyCounts(activityId)).reduce((sum,n)=>sum+Number(n||0),0);
+    }
+
+    function activityDependencyLabel(activityId){
+      const deps=getActivityDependencyCounts(activityId);
+      const parts=Object.entries(deps).filter(([,n])=>Number(n)>0).map(([k,n])=>{
+        const labels={
+          resultados:'resultados',
+          instrumentos:'instrumentos',
+          evaluaciones_instrumento:'evaluaciones de instrumento',
+          evidencias:'evidencias',
+          bitacoras:'bitácoras',
+          planeaciones:'planeaciones'
+        };
+        return `${labels[k]||k}: ${n}`;
+      });
+      return parts.length?parts.join(' · '):'Sin historial vinculado';
+    }
+
+    function renderActivityManagementPanel(){
+      const container=document.getElementById('activity-management-container');
+      const duplicateSummary=document.getElementById('activity-duplicate-summary');
+      if(!container) return;
+
+      const activities=getActiveActivitiesForManagement();
+      const duplicateGroups=getActivityDuplicateGroups(activities);
+      const duplicateIds=new Set(duplicateGroups.flat().map(a=>a.activity_id));
+
+      if(duplicateSummary){
+        if(duplicateGroups.length){
+          const total=duplicateGroups.reduce((n,g)=>n+g.length,0);
+          duplicateSummary.classList.remove('hidden');
+          duplicateSummary.innerHTML=`<strong>Duplicados detectados:</strong> ${duplicateGroups.length} coincidencia${duplicateGroups.length===1?'':'s'} lógica${duplicateGroups.length===1?'':'s'} (${total} registros). Compara fecha, ID corto e historial antes de eliminar. La app nunca borra duplicados automáticamente.`;
+        }else{
+          duplicateSummary.classList.add('hidden');
+          duplicateSummary.innerHTML='';
+        }
+      }
+
+      if(!activities.length){
+        container.innerHTML=`<div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-[#c7d3c8] p-4 text-sm text-[#66767a]">No hay actividades activas en el grupo y trimestre seleccionados.</div>`;
+        return;
+      }
+
+      container.innerHTML=activities.map(a=>{
+        const deps=getActivityDependencyCounts(a.activity_id);
+        const total=Object.values(deps).reduce((s,n)=>s+Number(n||0),0);
+        const resultCount=Number(deps.resultados||0);
+        const isDuplicate=duplicateIds.has(a.activity_id);
+        const shortId=String(a.activity_id||'').slice(-8);
+        const canDelete=total===0;
+        return `<article class="rounded-2xl border ${isDuplicate?'border-amber-300 bg-amber-50/40':'border-[#d9e1da] bg-slate-50'} p-4 text-xs">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-bold text-[#145b4b] text-sm">${escapeHTML(a.activity_code||'Sin clave')} · ${escapeHTML(a.activity_name||'Actividad')}</span>
+                ${isDuplicate?'<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">Posible duplicado</span>':''}
+              </div>
+              <p class="text-[#66767a] mt-1">${escapeHTML(activityTypeLabel(a.activity_type))} · ${escapeHTML(a.trimester||'')} · Máx. ${escapeHTML(String(a.max_grade??10))}</p>
+              <p class="text-[#66767a]">Entrega: ${escapeHTML(formatDateForDisplay(a.due_date))} · Resultados: ${resultCount}</p>
+              <p class="text-[#66767a]">ID corto: <code>${escapeHTML(shortId||'—')}</code></p>
+              <p class="mt-2 ${total?'text-amber-800':'text-emerald-800'} font-semibold">${escapeHTML(activityDependencyLabel(a.activity_id))}</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#d9e1da]">
+            <button type="button" class="px-2.5 py-1.5 rounded-lg bg-[#145b4b] text-white font-bold" onclick="focusActivityCapture('${a.activity_id}')">Capturar resultados</button>
+            <button type="button" class="px-2.5 py-1.5 rounded-lg border border-[#c7d3c8] font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
+            <button type="button" class="px-2.5 py-1.5 rounded-lg border border-[#145b4b] text-[#145b4b] font-bold" onclick="openInstrumentModal('', '${a.activity_id}')">Instrumento</button>
+            <button type="button" class="px-2.5 py-1.5 rounded-lg border border-amber-300 text-amber-800 font-bold" onclick="archiveActivity('${a.activity_id}')">Archivar</button>
+            <button type="button" class="px-2.5 py-1.5 rounded-lg border ${canDelete?'border-red-300 text-red-700':'border-slate-200 text-slate-400'} font-bold" ${canDelete?`onclick="deleteActivity('${a.activity_id}')"`:'disabled title="Tiene historial vinculado"'}>Eliminar</button>
+            ${isDuplicate&&canDelete?`<button type="button" class="px-2.5 py-1.5 rounded-lg bg-red-50 border border-red-300 text-red-700 font-bold" onclick="deleteEmptyDuplicateActivity('${a.activity_id}')">Eliminar copia vacía</button>`:''}
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    async function deleteEmptyDuplicateActivity(activityId){
+      const activity=localData.activities.find(a=>a.activity_id===activityId);
+      if(!activity) return showToast('Actividad no disponible');
+      const peers=getActiveActivitiesForManagement().filter(a=>a.activity_id!==activityId && activityLogicalKey(a)===activityLogicalKey(activity));
+      if(!peers.length) return showToast('Ya no se detecta un duplicado equivalente');
+      if(activityDependencyTotal(activityId)>0) return showToast('No se puede eliminar: esta copia ya tiene historial vinculado');
+      if(!confirm(`¿Eliminar esta copia duplicada vacía?\n\n${activity.activity_code||''} · ${activity.activity_name||'Actividad'}\nID: ${String(activity.activity_id||'').slice(-8)}\n\nLa otra copia se conservará.`)) return;
+      await dbDelete('activities',activityId);
+      await refreshLocalCache();
+      renderGradebook();
+      showToast('Copia duplicada vacía eliminada');
+    }
+
     function renderGradebook(preserveDraft = false) {
       const selectGroup = document.getElementById('gradebook-group-select');
       if (selectGroup && selectGroup.value) activeGroupId = selectGroup.value;
@@ -6119,9 +6262,9 @@
               </div>
             </div>`;
           }).join('');
-      ['activity-management-container','activities-list-container'].forEach(id=>{
-        const el=document.getElementById(id); if(el) el.innerHTML=activityCardsHTML;
-      });
+      const legacyActivityList=document.getElementById('activities-list-container');
+      if(legacyActivityList) legacyActivityList.innerHTML=activityCardsHTML;
+      renderActivityManagementPanel();
 
       // Render Matrix Table Headers
       const theadTr = document.getElementById('gradebook-thead-tr');

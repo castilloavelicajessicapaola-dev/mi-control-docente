@@ -1,0 +1,15 @@
+MI CONTROL DOCENTE G50 · ACTIVIDADES Y DUPLICADOS
+
+Cambios principales:
+- El panel “Administrar actividades del trimestre” se renderiza de forma independiente y siempre al abrir Actividades.
+- Cada actividad muestra código, nombre, fecha, ID corto, resultados y dependencias.
+- Detecta coincidencias lógicas por grupo + trimestre + clave + nombre.
+- Marca “Posible duplicado”, pero nunca elimina automáticamente.
+- Si una copia duplicada no tiene historial, aparece “Eliminar copia vacía”.
+- Si una actividad tiene historial, “Eliminar” queda bloqueado y se conserva “Archivar”.
+- Previene nuevas actividades activas con la misma clave dentro del trimestre.
+- Mantiene Capturar resultados, Editar, Instrumento, Archivar y Eliminar.
+- Conserva G49, G48, Google Drive G47 y DB_VERSION 12.
+
+Actualización GitHub Pages:
+subir index.html, manifest.webmanifest, sw.js, icons/ y LEEME_G50.txt.
