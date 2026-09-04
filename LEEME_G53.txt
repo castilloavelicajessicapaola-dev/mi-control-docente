@@ -1,0 +1,11 @@
+MI CONTROL DOCENTE G53
+
+Corrección enfocada en Actividades:
+- Panel visible G53 inmediatamente debajo de los selectores.
+- Lee directamente localData.activities por grupo y trimestre.
+- Muestra código, nombre, fecha, ID corto y dependencias.
+- Detecta posibles duplicados.
+- Capturar resultados, Editar, Archivar y Eliminar.
+- Eliminar solo si no existe historial vinculado.
+- Mantiene DB_VERSION 12 y Google Drive.
+- Service Worker usa cache g53 para evitar servir versiones anteriores.
