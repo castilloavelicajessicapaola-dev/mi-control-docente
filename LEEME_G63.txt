@@ -1,0 +1,7 @@
+MI CONTROL DOCENTE G63
+Corrección crítica:
+El mensaje ReferenceError de G62 podía ocurrir DESPUÉS de que IndexedDB ya había guardado y verificado los datos, durante el refresco de módulos visuales.
+G63 separa el guardado real del refresco de interfaz. Los renderizadores opcionales se ejecutan de forma segura y ya no pueden marcar como fallido un guardado confirmado.
+El éxito solo aparece después de releer IndexedDB y verificar calificación + estado.
+Si existe un error real de persistencia, ahora muestra nombre y mensaje del error y conserva el borrador.
+DB_VERSION permanece en 12.
