@@ -1011,27 +1011,7 @@
           </div>
 
           <!-- G50: ADMINISTRACIÓN SEGURA DE ACTIVIDADES Y DUPLICADOS -->
-          <div class="bg-white rounded-3xl border-2 border-[#b9d2c5] p-5 mb-6" id="g50-activity-management-panel">
-            <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3 mb-4">
-              <div>
-                <div class="flex items-center gap-2 flex-wrap">
-                  <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G50 · Gestión segura</p>
-                  <span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">Actividades visibles · duplicados detectables</span>
-                </div>
-                <h3 class="serif text-xl font-bold mt-1">Administrar actividades del trimestre</h3>
-                <p class="text-xs text-[#66767a] mt-1">Muestra cada actividad con su fecha, resultados y dependencias para editar, capturar, archivar o eliminar sin tocar historial por accidente.</p>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold border border-[#145b4b] text-[#145b4b]" onclick="renderActivityManagementPanel()">Actualizar</button>
-                <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold bg-[#145b4b] text-white" onclick="openActivityModal()">+ Nueva actividad</button>
-              </div>
-            </div>
-            <div id="activity-duplicate-summary" class="hidden mb-3 rounded-2xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900"></div>
-            <div id="activity-management-container" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
-            <div class="mt-3 rounded-xl bg-[#f7faf7] border border-[#d9e1da] p-3 text-[11px] text-[#66767a]">
-              <strong>Regla de seguridad:</strong> eliminar definitivamente solo está disponible cuando una actividad no tiene resultados, instrumentos, evidencias, bitácoras ni planeaciones vinculadas. Si tiene historial, utiliza <strong>Archivar</strong>.
-            </div>
-          </div>
+          
 
           <!-- G4: CONFIGURACIÓN DE EVALUACIÓN TRIMESTRAL -->
           <div class="bg-white rounded-3xl border border-[#d9e1da] p-5 mb-6">
@@ -1255,7 +1235,28 @@
             </div>
           </div>
 
-          <!-- G35: CENTRO DE ACTIVIDADES Y ENTREGAS AVANZADO -->
+          <div class="bg-white rounded-3xl border-2 border-[#b9d2c5] p-5 mb-6" id="g50-activity-management-panel">
+            <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3 mb-4">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G51 · Gestión segura</p>
+                  <span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">Actividades visibles · duplicados detectables</span>
+                </div>
+                <h3 class="serif text-xl font-bold mt-1">Administrar actividades del trimestre</h3>
+                <p class="text-xs text-[#66767a] mt-1">Muestra cada actividad con su fecha, resultados y dependencias para editar, capturar, archivar o eliminar sin tocar historial por accidente.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold border border-[#145b4b] text-[#145b4b]" onclick="renderActivityManagementPanel()">Actualizar</button>
+                <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold bg-[#145b4b] text-white" onclick="openActivityModal()">+ Nueva actividad</button>
+              </div>
+            </div>
+            <div id="activity-duplicate-summary" class="hidden mb-3 rounded-2xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900"></div>
+            <div id="activity-management-container" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+            <div class="mt-3 rounded-xl bg-[#f7faf7] border border-[#d9e1da] p-3 text-[11px] text-[#66767a]">
+              <strong>Regla de seguridad:</strong> eliminar definitivamente solo está disponible cuando una actividad no tiene resultados, instrumentos, evidencias, bitácoras ni planeaciones vinculadas. Si tiene historial, utiliza <strong>Archivar</strong>.
+            </div>
+          </div>
+<!-- G35: CENTRO DE ACTIVIDADES Y ENTREGAS AVANZADO -->
           <div id="advanced-deliveries-panel" class="mt-6 space-y-5">
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
               <div>

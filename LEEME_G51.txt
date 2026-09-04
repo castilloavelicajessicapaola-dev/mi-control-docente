@@ -1,0 +1,4 @@
+G51
+- Reubica el administrador existente de actividades inmediatamente antes del Centro G35.
+- Conserva la lógica G50 de detección de duplicados y eliminación segura.
+- No cambia el esquema de datos: DB_VERSION 12.
