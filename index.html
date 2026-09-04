@@ -16,6 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap" rel="stylesheet">
   <!-- G47 · Google Identity Services para conexión segura con Google Drive -->
+  <!-- G49 · Menú lateral completo y navegación adaptable -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
@@ -36,7 +37,26 @@
     body { font-family: "DM Sans", sans-serif; color: var(--ink); background: var(--paper); font-size: calc(1rem * var(--access-scale)); }
     .serif { font-family: "Fraunces", serif; }
     
-    .desktop-nav { width: 250px; }
+    .desktop-nav {
+      width: 250px;
+      min-height: 100vh;
+      height: 100dvh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(216,239,135,.65) rgba(13,64,54,.18);
+    }
+    .desktop-nav::-webkit-scrollbar { width: 7px; }
+    .desktop-nav::-webkit-scrollbar-track { background: rgba(13,64,54,.18); }
+    .desktop-nav::-webkit-scrollbar-thumb { background: rgba(216,239,135,.65); border-radius: 999px; }
+    .desktop-nav nav { flex: 0 0 auto; }
+    .desktop-nav .nav-item { min-height: 38px; }
+    .desktop-nav [data-view-target="settings"] {
+      margin-top: .5rem !important;
+      margin-bottom: max(.25rem, env(safe-area-inset-bottom));
+      flex-shrink: 0;
+    }
+    .mobile-bottom { display: none; }
     .nav-item { transition: all .18s ease; }
     .nav-item:hover, .nav-item.is-active { background: #e4f0e5; color: var(--pine-dark); }
     
@@ -63,6 +83,12 @@
       to { opacity: 1; transform: translateY(0); } 
     }
     
+
+    @media (min-width: 768px) {
+      .desktop-nav .nav-item { padding-top: .48rem !important; padding-bottom: .48rem !important; }
+      .desktop-nav nav { display: flex; flex-direction: column; gap: .12rem; }
+    }
+
     @media (max-width: 767px) {
       .desktop-nav { display: none; }
       .mobile-bottom { display: flex; padding-bottom: max(.5rem, env(safe-area-inset-bottom)); }
@@ -96,8 +122,8 @@
   <div class="app-shell flex w-full min-h-screen">
     
     <!-- DESKTOP SIDEBAR NAVIGATION -->
-    <aside class="desktop-nav hidden md:flex md:flex-col bg-[#145b4b] text-white px-4 py-6 sticky top-0 self-start h-screen overflow-y-auto z-30">
-      <div class="px-3 mb-6 flex items-center gap-3">
+    <aside class="desktop-nav hidden md:flex md:flex-col bg-[#145b4b] text-white px-3 py-3 sticky top-0 self-start z-30">
+      <div class="px-2 mb-3 flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-[#d8ef87] text-[#145b4b] flex items-center justify-center shrink-0">
           <i data-lucide="book-open-check" class="w-6 h-6"></i>
         </div>
@@ -978,9 +1004,28 @@
               </select>
               <button type="button" class="rounded-xl px-4 py-2 font-bold text-sm border border-[#145b4b] text-[#145b4b] bg-white" onclick="document.getElementById('advanced-deliveries-panel')?.scrollIntoView({behavior:'smooth',block:'start'})">Analítica de entregas</button>
               <button type="button" class="rounded-xl px-4 py-2 font-bold text-sm border border-[#145b4b] text-[#145b4b] bg-white" onclick="document.getElementById('advanced-evaluation-panel')?.scrollIntoView({behavior:'smooth',block:'start'})">Analítica de evaluación</button>
-              <button type="button" class="rounded-xl px-4 py-2 font-bold text-sm bg-[#145b4b] text-white hover:bg-[#0d4036]" onclick="openModal('modal-add-activity')">
+              <button type="button" class="rounded-xl px-4 py-2 font-bold text-sm bg-[#145b4b] text-white hover:bg-[#0d4036]" onclick="openActivityModal()">
                 + Nueva Actividad
               </button>
+            </div>
+          </div>
+
+          <!-- G48: ADMINISTRACIÓN OPERATIVA DE ACTIVIDADES -->
+          <div class="bg-white rounded-3xl border-2 border-[#b9d2c5] p-5 mb-6" id="g48-activity-management-panel">
+            <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3 mb-4">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G48 · Gestión directa</p>
+                  <span class="px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">Actividades visibles y editables</span>
+                </div>
+                <h3 class="serif text-xl font-bold mt-1">Administrar actividades del trimestre</h3>
+                <p class="text-xs text-[#66767a] mt-1">Desde aquí puedes capturar resultados, editar, crear instrumentos, archivar o eliminar actividades sin perder de vista el grupo y trimestre seleccionados.</p>
+              </div>
+              <button type="button" class="rounded-xl px-4 py-2 text-xs font-bold bg-[#145b4b] text-white" onclick="openActivityModal()">+ Nueva actividad</button>
+            </div>
+            <div id="activity-management-container" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+            <div class="mt-3 rounded-xl bg-[#f7faf7] border border-[#d9e1da] p-3 text-[11px] text-[#66767a]">
+              <strong>Eliminar:</strong> solo se permite cuando la actividad no tiene resultados, instrumentos, evidencias, bitácoras o planeaciones vinculadas. Si ya existe historial, utiliza <strong>Archivar</strong>.
             </div>
           </div>
 
@@ -1105,8 +1150,14 @@
           </div>
 
           <!-- GRADEBOOK TABLE -->
-          <div class="bg-white rounded-3xl border border-[#d9e1da] p-5 overflow-x-auto">
-            <h3 class="serif text-lg font-bold mb-3 text-[#145b4b]">Matriz de Calificaciones</h3>
+          <div id="gradebook-matrix-card" class="bg-white rounded-3xl border border-[#d9e1da] p-5 overflow-x-auto scroll-mt-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div>
+                <h3 class="serif text-lg font-bold text-[#145b4b]">Matriz de Calificaciones</h3>
+                <p class="text-xs text-[#66767a]">Captura estado de entrega y calificación por alumno. Vacío ≠ 0 y sin estado ≠ SE.</p>
+              </div>
+              <span id="gradebook-focus-activity" class="text-xs font-bold text-[#145b4b]"></span>
+            </div>
             <table class="w-full text-left text-sm border-collapse">
               <thead>
                 <tr id="gradebook-thead-tr" class="border-b border-[#d9e1da] text-[#66767a] bg-slate-50">
@@ -1206,7 +1257,7 @@
               <div>
                 <p class="text-xs font-bold tracking-[.14em] uppercase text-[#145b4b]">G35 · Cumplimiento de actividades</p>
                 <h3 class="serif text-2xl font-semibold mt-1">Centro de actividades y entregas avanzado</h3>
-                <p class="text-sm text-[#66767a] mt-1">Visualiza entregas a tiempo, tardías, justificadas, SE explícitos, calificaciones pendientes y acumulación por alumno.</p>
+                <p class="text-sm text-[#66767a] mt-1">Visualiza entregas a tiempo, tardías, justificadas, SE explícitos y calificaciones pendientes. “Sin estado” se muestra como dato informativo y no genera una alerta por sí solo.</p>
               </div>
               <div class="flex flex-wrap gap-2">
                 <button type="button" class="px-3 py-2 rounded-xl border border-[#c7d3c8] text-xs font-bold" onclick="exportAdvancedDeliveriesCSV()">Exportar CSV</button>
@@ -2714,8 +2765,9 @@
   <!-- MODAL: NUEVA ACTIVIDAD -->
   <div id="modal-add-activity" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl">
-      <h3 class="serif text-2xl font-bold text-[#172226] mb-4">Nueva Actividad Evaluable</h3>
-      <form onsubmit="handleCreateActivity(event)" class="space-y-4">
+      <h3 id="activity-modal-title" class="serif text-2xl font-bold text-[#172226] mb-4">Nueva Actividad Evaluable</h3>
+      <form id="activity-form" onsubmit="handleCreateActivity(event)" class="space-y-4">
+        <input type="hidden" id="act-edit-id">
         <div>
           <label class="block text-xs font-bold uppercase text-[#66767a] mb-1">Nombre de la Actividad</label>
           <input type="text" id="act-name" required placeholder="Ej. Examen Diagnóstico" class="w-full rounded-xl border border-[#c7d3c8] p-3 text-sm">
@@ -2755,7 +2807,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-3">
           <button type="button" class="px-4 py-2 rounded-xl border border-gray-300 text-sm font-bold" onclick="closeModal('modal-add-activity')">Cancelar</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-[#145b4b] text-white text-sm font-bold">Crear Actividad</button>
+          <button id="activity-submit-btn" type="submit" class="px-4 py-2 rounded-xl bg-[#145b4b] text-white text-sm font-bold">Crear Actividad</button>
         </div>
       </form>
     </div>
@@ -4153,11 +4205,11 @@
             </div>
             <div class="flex items-center gap-1 flex-wrap">
               <button class="px-2 py-1 bg-[#e0f3e9] text-[#145b4b] font-bold rounded hover:bg-emerald-100" onclick="closeModal('modal-manage-students'); openStudentProfile('${s.student_id}')">Perfil</button>
-              <button class="px-2 py-1 border border-[#c7d3c8] text-[#172226] font-bold rounded hover:bg-slate-50" onclick="openStudentEdit('${s.student_id}')">Editar / mover</button>
+              <button class="px-2 py-1 border border-[#c7d3c8] text-[#172226] font-bold rounded hover:bg-slate-50" onclick="openStudentEdit('${s.student_id}')">Editar</button>
               ${status !== 'ACTIVE' ? `<button class="px-2 py-1 bg-emerald-50 text-emerald-700 font-bold rounded hover:bg-emerald-100" onclick="updateStudentStatus('${s.student_id}', 'ACTIVE')">Activar</button>` : ''}
               ${status !== 'TEMPORARY_LEAVE' ? `<button class="px-2 py-1 bg-amber-50 text-amber-700 font-bold rounded hover:bg-amber-100" onclick="updateStudentStatus('${s.student_id}', 'TEMPORARY_LEAVE')">Baja Temp.</button>` : ''}
               ${status !== 'INACTIVE' ? `<button class="px-2 py-1 bg-red-50 text-red-700 font-bold rounded hover:bg-red-100" onclick="updateStudentStatus('${s.student_id}', 'INACTIVE')">Baja Def.</button>` : ''}
-              <button class="px-2 py-1 border border-red-200 text-red-600 font-bold rounded hover:bg-red-50" onclick="deleteStudentPermanently('${s.student_id}')">Eliminar</button>
+              <button class="px-2 py-1 border border-red-200 text-red-600 font-bold rounded hover:bg-red-50" onclick="deleteStudentPermanently('${s.student_id}')">Eliminar alumno</button>
             </div>
           </div>`;
       }).join('');
@@ -4213,7 +4265,7 @@
         (localData.recovery_plans||[]).some(r=>r.student_id===studentId);
 
       if (hasHistory) {
-        showToast('Este alumno tiene historial. Utiliza Baja definitiva para conservar todos sus registros.');
+        const h=getStudentHistoryCounts(studentId); const total=Object.values(h).reduce((a,b)=>a+b,0); showToast(`No se puede eliminar: el alumno tiene ${total} registro(s) de historial. Usa Baja definitiva para conservar su expediente.`);
         return;
       }
       if (!confirm('¿Desea eliminar definitivamente este alumno sin historial académico?')) return;
@@ -4467,46 +4519,90 @@
     /* ==========================================================================
        7. ACTIVITIES & GRADEBOOK ENGINE
        ========================================================================== */
+    function openActivityModal(activityId='') {
+      const form=document.getElementById('activity-form');
+      const editId=document.getElementById('act-edit-id');
+      const title=document.getElementById('activity-modal-title');
+      const submit=document.getElementById('activity-submit-btn');
+      const currentTrimester=document.getElementById('gradebook-trimester-select')?.value||'T1';
+      if(form) form.reset();
+      if(editId) editId.value=activityId||'';
+      const activity=activityId?localData.activities.find(a=>a.activity_id===activityId):null;
+      if(activity){
+        if(title) title.textContent='Editar Actividad Evaluable';
+        if(submit) submit.textContent='Guardar cambios';
+        document.getElementById('act-name').value=activity.activity_name||'';
+        document.getElementById('act-code').value=activity.activity_code||'';
+        document.getElementById('act-type').value=activity.activity_type||'ACTIVITY';
+        document.getElementById('act-trimester').value=activity.trimester||currentTrimester;
+        document.getElementById('act-max-grade').value=activity.max_grade??10;
+        document.getElementById('act-due-date').value=activity.due_date||getLocalDateISO();
+      }else{
+        if(title) title.textContent='Nueva Actividad Evaluable';
+        if(submit) submit.textContent='Crear Actividad';
+        document.getElementById('act-trimester').value=currentTrimester;
+        document.getElementById('act-max-grade').value=10;
+        document.getElementById('act-due-date').value=getLocalDateISO();
+      }
+      openModal('modal-add-activity');
+    }
+
     async function handleCreateActivity(e) {
       e.preventDefault();
-      const targetTrimester = document.getElementById('act-trimester')?.value || getCurrentGradebookTrimester();
-      if (activeGroupId && isTrimesterClosed(activeGroupId, targetTrimester)) return showToast('Ese trimestre está cerrado. Reábrelo para crear actividades.');
-      if (!activeGroupId) {
-        showToast('Seleccione un grupo');
-        return;
-      }
-      const group = localData.groups.find(g => g.group_id === activeGroupId);
+      const editId=document.getElementById('act-edit-id')?.value||'';
+      const existing=editId?localData.activities.find(a=>a.activity_id===editId):null;
+      const targetGroupId=existing?.group_id||activeGroupId;
+      const targetTrimester=document.getElementById('act-trimester')?.value||getCurrentGradebookTrimester();
+      if (targetGroupId && isTrimesterClosed(targetGroupId, targetTrimester)) return showToast('Ese trimestre está cerrado. Reábrelo para modificar actividades.');
+      if (!targetGroupId) return showToast('Seleccione un grupo');
+      const group = localData.groups.find(g => g.group_id === targetGroupId);
+      if(!group) return showToast('Grupo no disponible');
       const name = document.getElementById('act-name').value.trim();
       const code = document.getElementById('act-code').value.trim();
       const type = document.getElementById('act-type').value;
-      const trimester = document.getElementById('act-trimester').value;
-      const maxGrade = parseFloat(document.getElementById('act-max-grade').value) || 10;
+      const trimester = targetTrimester;
+      const maxGrade = Number(document.getElementById('act-max-grade').value);
       const dueDate = document.getElementById('act-due-date').value || getLocalDateISO();
+      if(!name||!code||!Number.isFinite(maxGrade)||maxGrade<=0) return showToast('Revisa nombre, clave y calificación máxima');
 
-      const newAct = {
-        activity_id: generateId('act'),
-        school_id: group ? group.school_id : '',
-        group_id: activeGroupId,
-        trimester: trimester,
+      const duplicate=localData.activities.find(a=>a.activity_id!==editId&&a.group_id===targetGroupId&&a.trimester===trimester&&(a.activity_code||'').trim().toLowerCase()===code.toLowerCase()&&(a.status||'ACTIVE')==='ACTIVE');
+      if(duplicate) return showToast(`Ya existe una actividad activa con la clave ${code} en este trimestre`);
+
+      if(existing){
+        const grades=localData.activity_results.filter(r=>r.activity_id===editId&&r.grade!==null&&r.grade!==undefined&&r.grade!=='').map(r=>Number(r.grade)).filter(Number.isFinite);
+        const highest=grades.length?Math.max(...grades):null;
+        if(highest!==null&&highest>maxGrade) return showToast(`No puedes bajar el máximo a ${maxGrade}: ya existe una calificación de ${highest}.`);
+      }
+
+      const rec = {
+        activity_id: existing?.activity_id || generateId('act'),
+        school_id: existing?.school_id || group.school_id || '',
+        group_id: targetGroupId,
+        trimester,
         activity_code: code,
         activity_name: name,
         activity_type: type,
         due_date: dueDate,
         max_grade: maxGrade,
-        status: 'ACTIVE',
-        created_at: new Date().toISOString(),
+        status: existing?.status || 'ACTIVE',
+        created_at: existing?.created_at || new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
 
       try {
-        await dbPut('activities', newAct);
+        await dbPut('activities', rec);
         await refreshLocalCache();
+        activeGroupId=targetGroupId;
+        const gsel=document.getElementById('gradebook-group-select'); if(gsel) gsel.value=targetGroupId;
+        const tsel=document.getElementById('gradebook-trimester-select'); if(tsel) tsel.value=trimester;
         renderGradebook();
         closeModal('modal-add-activity');
-        showToast('Actividad creada con éxito');
+        showToast(existing?'Actividad actualizada':'Actividad creada con éxito');
         e.target.reset();
+        const id=document.getElementById('act-edit-id'); if(id) id.value='';
       } catch (err) {
-        showToast('Error al crear actividad');
+        console.error(err);
+        showToast(existing?'Error al actualizar actividad':'Error al crear actividad');
       }
     }
 
@@ -5846,7 +5942,6 @@
         const issues=[];
         if(counts.SE>0) issues.push(`${counts.SE} SE`);
         if(counts.UNGRADED>0) issues.push(`${counts.UNGRADED} sin calificar`);
-        if(counts.NONE>0) issues.push(`${counts.NONE} sin estado`);
         return {activity,counts,total,delivered,compliance,seRate,critical,issues};
       });
 
@@ -5870,7 +5965,6 @@
         if(counts.SE>=seThreshold) alerts.push(`${counts.SE} SE`);
         if(counts.TA>=2) alerts.push(`${counts.TA} entregas tardías`);
         if(counts.UNGRADED>0) alerts.push(`${counts.UNGRADED} sin calificar`);
-        if(total>0&&counts.NONE/total>=.5) alerts.push('Muchos estados sin registrar');
         return {student,counts,total,delivered,compliance,alerts};
       });
 
@@ -6003,27 +6097,31 @@
       const students = localData.students.filter(s => s.group_id === activeGroupId && s.status !== 'INACTIVE');
       students.sort((a, b) => a.full_name.localeCompare(b.full_name, 'es-MX'));
 
-      // Render activities summary pills
-      const actContainer = document.getElementById('activities-list-container');
-      if (actContainer) {
-        if (groupActivities.length === 0) {
-          actContainer.innerHTML = `<div class="sm:col-span-3 text-xs text-[#66767a]">No hay actividades registradas para este trimestre.</div>`;
-        } else {
-          actContainer.innerHTML = groupActivities.map(a => `
-            <div class="p-3 rounded-2xl border border-[#d9e1da] bg-slate-50 flex justify-between items-center text-xs">
-              <div>
-                <span class="font-bold text-[#145b4b] block">${escapeHTML(a.activity_code)}: ${escapeHTML(a.activity_name)}</span>
-                <span class="text-[#66767a]">Fecha: ${a.due_date} • Máx: ${a.max_grade}</span>
+      // G48: Render de gestión de actividades en dos ubicaciones, con acciones explícitas.
+      const activityCardsHTML = groupActivities.length === 0
+        ? `<div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-[#c7d3c8] p-4 text-sm text-[#66767a]">No hay actividades registradas para este trimestre. Usa <strong>+ Nueva actividad</strong> para comenzar.</div>`
+        : groupActivities.map(a => {
+            const resultCount=(localData.activity_results||[]).filter(r=>r.activity_id===a.activity_id).length;
+            return `<div class="p-4 rounded-2xl border border-[#d9e1da] bg-slate-50 text-xs">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="font-bold text-[#145b4b] block text-sm">${escapeHTML(a.activity_code||'Sin clave')} · ${escapeHTML(a.activity_name||'Actividad')}</span>
+                  <span class="text-[#66767a] block mt-1">${escapeHTML(activityTypeLabel(a.activity_type))} · ${escapeHTML(a.trimester||trimester)} · Máx. ${escapeHTML(String(a.max_grade??10))}</span>
+                  <span class="text-[#66767a] block">Entrega: ${escapeHTML(formatDateForDisplay(a.due_date))} · Resultados guardados: ${resultCount}</span>
+                </div>
               </div>
-              <div class="flex items-center gap-2">
-                <button class="text-[#145b4b] font-bold hover:underline text-xs" onclick="openInstrumentModal('', '${a.activity_id}')">Instrumento</button>
-                <button class="text-amber-700 font-bold hover:underline text-xs" onclick="archiveActivity('${a.activity_id}')">Archivar</button>
-                <button class="text-red-600 font-bold hover:underline" onclick="deleteActivity('${a.activity_id}')">✕</button>
+              <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#d9e1da]">
+                <button type="button" class="px-2.5 py-1.5 rounded-lg bg-[#145b4b] text-white font-bold" onclick="focusActivityCapture('${a.activity_id}')">Capturar resultados</button>
+                <button type="button" class="px-2.5 py-1.5 rounded-lg border border-[#c7d3c8] font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
+                <button type="button" class="px-2.5 py-1.5 rounded-lg border border-[#145b4b] text-[#145b4b] font-bold" onclick="openInstrumentModal('', '${a.activity_id}')">Instrumento</button>
+                <button type="button" class="px-2.5 py-1.5 rounded-lg border border-amber-300 text-amber-800 font-bold" onclick="archiveActivity('${a.activity_id}')">Archivar</button>
+                <button type="button" class="px-2.5 py-1.5 rounded-lg border border-red-300 text-red-700 font-bold" onclick="deleteActivity('${a.activity_id}')">Eliminar</button>
               </div>
-            </div>
-          `).join('');
-        }
-      }
+            </div>`;
+          }).join('');
+      ['activity-management-container','activities-list-container'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.innerHTML=activityCardsHTML;
+      });
 
       // Render Matrix Table Headers
       const theadTr = document.getElementById('gradebook-thead-tr');
@@ -6095,6 +6193,36 @@
       updateTempGradeResult(activityId, studentId, 'delivery_status', deliveryStatus);
     }
 
+    function activityTypeLabel(type){
+      return ({ACTIVITY:'Actividad',PROJECT:'Proyecto',EVALUATION:'Evaluación',RECOVERY:'Recuperación'})[type]||type||'Actividad';
+    }
+
+    function focusActivityCapture(activityId){
+      const activity=localData.activities.find(a=>a.activity_id===activityId);
+      if(!activity) return showToast('Actividad no disponible');
+      const quick=document.getElementById('quick-activity-select');
+      if(quick&&[...quick.options].some(o=>o.value===activityId)) quick.value=activityId;
+      const label=document.getElementById('gradebook-focus-activity');
+      if(label) label.textContent=`Captura: ${activity.activity_code||''} · ${activity.activity_name||'Actividad'}`;
+      const card=document.getElementById('gradebook-matrix-card');
+      if(card){
+        card.scrollIntoView({behavior:'smooth',block:'start'});
+        card.classList.add('ring-2','ring-emerald-400');
+        setTimeout(()=>card.classList.remove('ring-2','ring-emerald-400'),2200);
+      }
+    }
+
+    function getActivityDependencyCounts(activityId){
+      return {
+        resultados:(localData.activity_results||[]).filter(x=>x.activity_id===activityId).length,
+        instrumentos:(localData.assessment_instruments||[]).filter(x=>x.activity_id===activityId).length,
+        evaluaciones_instrumento:(localData.instrument_results||[]).filter(x=>x.activity_id===activityId).length,
+        evidencias:(localData.portfolio_evidence||[]).filter(x=>x.activity_id===activityId).length,
+        bitacoras:(localData.teacher_journal||[]).filter(x=>x.activity_id===activityId).length,
+        planeaciones:(localData.plans||[]).filter(x=>x.activity_id===activityId).length
+      };
+    }
+
     async function archiveActivity(activityId) {
       const activity = localData.activities.find(a => a.activity_id === activityId);
       if (!activity) return;
@@ -6112,18 +6240,23 @@
     }
 
     async function deleteActivity(activityId) {
-      const hasResults = localData.activity_results.some(r => r.activity_id === activityId);
-      if (hasResults) {
-        showToast('Esta actividad tiene resultados registrados. Archívala para conservar el historial.');
+      const activity=localData.activities.find(a=>a.activity_id===activityId);
+      if(!activity) return showToast('Actividad no disponible');
+      const deps=getActivityDependencyCounts(activityId);
+      const total=Object.values(deps).reduce((a,b)=>a+b,0);
+      if(total>0){
+        const detail=Object.entries(deps).filter(([,v])=>v>0).map(([k,v])=>`${k.replace('_',' ')}: ${v}`).join(' · ');
+        showToast(`No se puede eliminar: tiene historial vinculado (${detail}). Usa Archivar.`);
         return;
       }
-      if (!confirm('¿Desea eliminar definitivamente esta actividad sin resultados?')) return;
+      if (!confirm(`¿Eliminar definitivamente “${activity.activity_code||''} ${activity.activity_name||'Actividad'}”?\n\nEsta acción solo es posible porque no tiene historial vinculado.`)) return;
       try {
         await dbDelete('activities', activityId);
         await refreshLocalCache();
         renderGradebook();
-        showToast('Actividad eliminada');
+        showToast('Actividad eliminada definitivamente');
       } catch (err) {
+        console.error(err);
         showToast('Error al eliminar actividad');
       }
     }
@@ -7455,7 +7588,7 @@
       populateScheduleGroupSelect();
       const grid=document.getElementById('schedule-week-grid'); if(!grid) return;
       const days=[1,2,3,4,5];
-      grid.innerHTML=`<div class="grid grid-cols-5 gap-3">${days.map(day=>{const entries=getScheduleForDay(day); return `<div><div class="font-bold text-sm text-[#145b4b] mb-2">${DAY_NAMES[day]}</div><div class="space-y-2">${entries.length?entries.map(e=>{const info=scheduleGroupLabel(e); return `<div class="rounded-2xl border border-[#d9e1da] p-3 bg-[#f8faf7]"><div class="text-xs font-bold text-[#145b4b]">${e.start_time}–${e.end_time}</div><div class="font-bold text-sm mt-1">${escapeHTML(info.label)}</div><div class="text-[11px] text-[#66767a] mt-1">${escapeHTML(info.school?.school_name||'')}</div><div class="flex flex-wrap gap-2 mt-2"><button class="text-[11px] font-bold text-[#145b4b]" onclick="openScheduleModal('${e.schedule_id}')">Editar</button><button class="text-[11px] font-bold text-[#145b4b]" onclick="openJournalFromSchedule('${e.schedule_id}')">Bitácora</button><button class="text-[11px] font-bold text-red-600" onclick="deleteScheduleEntry('${e.schedule_id}')">Eliminar</button></div></div>`;}).join(''):'<div class="rounded-xl border border-dashed p-3 text-xs text-[#66767a]">Sin clases</div>'}</div></div>`;}).join('')}</div>`;
+      grid.innerHTML=`<div class="grid grid-cols-5 gap-3">${days.map(day=>{const entries=getScheduleForDay(day); return `<div><div class="font-bold text-sm text-[#145b4b] mb-2">${DAY_NAMES[day]}</div><div class="space-y-2">${entries.length?entries.map(e=>{const info=scheduleGroupLabel(e); return `<div class="rounded-2xl border border-[#d9e1da] p-3 bg-[#f8faf7]"><div class="text-xs font-bold text-[#145b4b]">${e.start_time}–${e.end_time}</div><div class="font-bold text-sm mt-1">${escapeHTML(info.label)}</div><div class="text-[11px] text-[#66767a] mt-1">${escapeHTML(info.school?.school_name||'')}</div><div class="flex flex-wrap gap-2 mt-2"><button class="text-[11px] font-bold text-[#145b4b]" onclick="openScheduleModal('${e.schedule_id}')">Editar</button><button class="text-[11px] font-bold text-[#145b4b]" onclick="openJournalFromSchedule('${e.schedule_id}')">Bitácora</button><button class="text-[11px] font-bold text-red-600" onclick="deleteScheduleEntry('${e.schedule_id}')">Eliminar clase</button></div></div>`;}).join(''):'<div class="rounded-xl border border-dashed p-3 text-xs text-[#66767a]">Sin clases</div>'}</div></div>`;}).join('')}</div>`;
     }
 
     function openScheduleModal(scheduleId='') {
@@ -7487,8 +7620,24 @@
     }
 
     async function deleteScheduleEntry(id){
-      if(!confirm('¿Eliminar esta clase del horario? No se borrará asistencia ni calificaciones.')) return;
-      try{await dbDelete('schedule',id); await refreshLocalCache(); renderSchedule(); renderTodaySchedule(); showToast('Clase eliminada del horario');}catch(err){showToast('Error al eliminar horario');}
+      const item=(localData.schedule||[]).find(x=>x.schedule_id===id);
+      if(!item) return showToast('Clase no disponible');
+      const linkedJournals=(localData.teacher_journal||[]).filter(j=>j.schedule_id===id).length;
+      const info=scheduleGroupLabel(item);
+      const warning=linkedJournals
+        ? `\n\nHay ${linkedJournals} bitácora(s) vinculada(s). Se conservarán como historial, pero la clase dejará de aparecer en el horario.`
+        : '';
+      if(!confirm(`¿Eliminar la clase ${DAY_NAMES[item.day_of_week]||''} ${item.start_time}–${item.end_time} de ${info.label}?\n\nNo se borrará asistencia, calificaciones ni otros datos académicos.${warning}`)) return;
+      try{
+        await dbDelete('schedule',id);
+        await refreshLocalCache();
+        renderSchedule();
+        renderTodaySchedule();
+        showToast('Clase eliminada del horario');
+      }catch(err){
+        console.error(err);
+        showToast('Error al eliminar horario');
+      }
     }
 
     function addDaysISO(iso, days) {

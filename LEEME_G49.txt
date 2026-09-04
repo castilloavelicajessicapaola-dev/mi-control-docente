@@ -1,0 +1,14 @@
+MI CONTROL DOCENTE G49 · MENÚ LATERAL COMPLETO
+
+Cambios:
+- Oculta la barra inferior móvil en pantallas de escritorio.
+- Muestra la barra inferior solo en teléfonos/tablets pequeñas (<768 px).
+- Reduce espaciado del menú lateral en escritorio para que entren todos los botones.
+- El menú lateral usa altura dinámica 100dvh y desplazamiento propio cuando la pantalla es baja.
+- Agrega scrollbar discreto al menú lateral cuando es necesario.
+- Mantiene visible y accesible Configuración al final del menú.
+- Conserva todas las funciones de G48 y Google Drive G47.
+- DB_VERSION no cambia.
+
+Para GitHub Pages:
+sube index.html, manifest.webmanifest, sw.js, icons/ y este LEEME_G49.txt.

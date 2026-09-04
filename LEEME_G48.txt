@@ -1,0 +1,23 @@
+MI CONTROL DOCENTE G48 · ADMINISTRACIÓN SEGURA
+
+G48 conserva DB_VERSION 12. No agrega tablas.
+
+ACTIVIDADES
+- Panel visible al inicio de Actividades.
+- Capturar resultados, Editar, Instrumento, Archivar y Eliminar.
+- Eliminar solo cuando no existe historial vinculado.
+- Editar conserva activity_id y bloquea bajar el máximo debajo de una nota ya registrada.
+- La matriz recuerda la actividad seleccionada y sigue usando guardado por lote.
+- G35 deja de considerar “sin estado” como alerta automática.
+
+ALUMNOS
+- Gestionar alumnos conserva Editar, Baja temporal, Baja definitiva y Eliminar alumno.
+- Eliminar definitivamente solo si no existe historial.
+- Editar conserva student_id y los registros históricos.
+
+HORARIO
+- Cada clase muestra Editar, Bitácora y Eliminar clase.
+- Eliminar clase no borra asistencia ni calificaciones y avisa si hay bitácoras vinculadas.
+
+GOOGLE DRIVE
+- Se conserva G47: drive.file, sincronización manual, protección anti-sobrescritura y respaldo multidispositivo.

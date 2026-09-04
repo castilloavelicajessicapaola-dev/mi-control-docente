@@ -1,7 +1,7 @@
 {
   "name": "Mi Control Docente",
   "short_name": "Control Docente",
-  "description": "Control docente instalable con respaldo local y sincronización manual segura mediante Google Drive.",
+  "description": "Control docente instalable con gestión segura de actividades, alumnos, horario y respaldo manual mediante Google Drive.",
   "lang": "es-MX",
   "start_url": "./index.html",
   "scope": "./",
