@@ -761,7 +761,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G71 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G72 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -828,7 +828,7 @@
             <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G71 · Organización tipo Classroom</p>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G72 · Organización tipo Classroom</p>
                   <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema. Usa Modificar, Mover arriba/abajo o Eliminar. Los materiales ahora pueden editarse, moverse, archivarse o eliminarse sin generar calificaciones.</p>
                 </div>
                 <div class="flex flex-col gap-1">
@@ -1112,7 +1112,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G71 · materiales tipo Classroom</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G72 · botón Materiales corregido</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -4197,6 +4197,11 @@ async function g66DeleteTopic(topicId){
       document.getElementById('g71-material-url').value=m?.url||'';
       const title=document.getElementById('g71-material-modal-title');
       if(title) title.textContent=m?'Editar material':'Nuevo material';
+      const modal=document.getElementById('modal-g71-material');
+      if(!modal){
+        console.error('G72: modal-g71-material no encontrado');
+        return showToast('No se pudo abrir Materiales');
+      }
       openModal('modal-g71-material');
       setTimeout(()=>document.getElementById('g71-material-title')?.focus(),50);
     }
@@ -13856,11 +13861,11 @@ window.addEventListener('beforeunload',function(e){
 
 
     <!-- G71: MODAL MATERIAL TIPO CLASSROOM -->
-    <div id="modal-g71-material" class="modal fixed inset-0 bg-black/50 z-[90] hidden items-center justify-center p-4">
+    <div id="modal-g71-material" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[90] items-center justify-center p-4">
       <div class="bg-white w-full max-w-2xl rounded-3xl shadow-xl max-h-[92vh] overflow-y-auto">
         <div class="p-6 border-b border-[#d9e1da] flex items-start justify-between gap-3">
           <div>
-            <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G71 · Material del aula</p>
+            <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G72 · Material del aula</p>
             <h3 id="g71-material-modal-title" class="serif text-2xl font-bold mt-1">Nuevo material</h3>
             <p class="text-xs text-[#66767a] mt-1">Los materiales no generan calificaciones ni entregas.</p>
           </div>

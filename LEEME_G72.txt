@@ -1,0 +1,7 @@
+MI CONTROL DOCENTE G72 · BOTÓN MATERIALES CORREGIDO
+Corrección raíz:
+- El modal de Materiales usaba una clase incompatible con el sistema de modales existente.
+- Ahora usa modal-backdrop, igual que los demás modales funcionales de la app.
+- + Material abre correctamente el formulario.
+- Conserva creación, edición, cambio de tema, archivo/reactivación y eliminación de materiales.
+- DB_VERSION permanece en 12.
