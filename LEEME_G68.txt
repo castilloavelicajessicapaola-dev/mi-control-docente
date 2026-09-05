@@ -1,0 +1,6 @@
+MI CONTROL DOCENTE G68 · ACTIVIDADES SIEMPRE VISIBLES
+- Trabajo de clase obtiene las actividades directamente de localData.activities usando grupo + trimestre.
+- Siempre muestra una línea de diagnóstico con cuántas actividades/materiales detectó.
+- Al seleccionar un tema vacío, muestra las actividades sin tema disponibles con botón Mover a [tema].
+- Si ocurre un error de renderizado, lo muestra en pantalla en lugar de dejar un espacio vacío.
+- Mantiene temas, materiales, calificaciones y DB_VERSION 12.

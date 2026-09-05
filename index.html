@@ -761,7 +761,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G67 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G68 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -828,7 +828,7 @@
             <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G67 · Organización tipo Classroom</p>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G68 · Organización tipo Classroom</p>
                   <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema sin duplicar calificaciones ni alumnos.</p>
                 </div>
                 <div id="g66-topic-chips" class="flex flex-wrap gap-1"></div>
@@ -1108,7 +1108,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G67 · temas con asignación guiada</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G68 · actividades siempre visibles</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -4188,145 +4188,166 @@ async function g66DeleteTopic(topicId){
 function g65RenderWork(){
       const box=document.getElementById('g65-work-list');
       if(!box) return;
-      g66RenderTopicControls();
 
-      const tri=document.getElementById('g65-work-trimester')?.value||'T1';
-      const topicFilter=document.getElementById('g66-work-topic')?.value||'all';
-      const topics=g66GetTopics();
-      const topicMap=g66GetActivityTopicMap();
-      const topicName=new Map(topics.map(t=>[t.topic_id,t.name]));
+      try{
+        g66RenderTopicControls();
 
-      const allActs=(localData.activities||[])
-        .filter(a=>a.group_id===g65ClassroomGroupId&&(a.trimester||'T1')===tri&&(a.status||'ACTIVE')==='ACTIVE')
-        .sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));
-      const allMaterials=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri);
+        const tri=document.getElementById('g65-work-trimester')?.value||'T1';
+        const topicFilter=document.getElementById('g66-work-topic')?.value||'all';
+        const topics=g66GetTopics();
+        const topicMap=g66GetActivityTopicMap();
+        const materialsAll=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri);
 
-      let acts=allActs.slice();
-      let materials=allMaterials.slice();
+        // G68: obtener actividades directamente de la misma fuente usada por Calificaciones.
+        const groupId=g65ClassroomGroupId||activeGroupId||'';
+        const allActs=(localData.activities||[])
+          .filter(a=>a.group_id===groupId && (a.trimester||'T1')===tri && (a.status||'ACTIVE')==='ACTIVE')
+          .sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));
 
-      if(topicFilter==='none'){
-        acts=acts.filter(a=>!topicMap[a.activity_id]);
-        materials=materials.filter(m=>!m.topic_id);
-      }else if(topicFilter!=='all'){
-        acts=acts.filter(a=>topicMap[a.activity_id]===topicFilter);
-        materials=materials.filter(m=>m.topic_id===topicFilter);
-      }
-
-      const topicOptions=(selected='')=>'<option value="">Sin tema</option>'+
-        topics.map(t=>`<option value="${escapeHTML(t.topic_id)}" ${selected===t.topic_id?'selected':''}>${escapeHTML(t.name)}</option>`).join('');
-
-      const activityCard=(a,showQuickMove=false)=>{
-        const results=(localData.activity_results||[]).filter(r=>r.activity_id===a.activity_id);
-        const se=results.filter(r=>r.delivery_status==='SE').length;
-        const graded=results.filter(r=>r.grade!==null&&r.grade!==undefined&&r.grade!=='').length;
-        const tid=topicMap[a.activity_id]||'';
+        const topicName=new Map(topics.map(t=>[t.topic_id,t.name]));
         const selectedTopic=(topicFilter!=='all'&&topicFilter!=='none')?topicFilter:'';
-        return `<article class="bg-white rounded-3xl border border-[#d9e1da] p-5">
-          <div class="flex items-start justify-between gap-2">
+
+        const topicOptions=(selected='')=>'<option value="">Sin tema</option>'+
+          topics.map(t=>`<option value="${escapeHTML(t.topic_id)}" ${selected===t.topic_id?'selected':''}>${escapeHTML(t.name)}</option>`).join('');
+
+        const fmtDate=(d)=>{
+          if(!d) return 'Sin fecha';
+          try{ return typeof formatDateForDisplay==='function' ? formatDateForDisplay(d) : d; }
+          catch(e){ return d; }
+        };
+
+        const actType=(a)=>{
+          try{ return typeof activityTypeLabel==='function' ? activityTypeLabel(a.activity_type) : (a.activity_type||'Actividad'); }
+          catch(e){ return a.activity_type||'Actividad'; }
+        };
+
+        const activityCard=(a,quickTopic='')=>{
+          const results=(localData.activity_results||[]).filter(r=>r.activity_id===a.activity_id);
+          const se=results.filter(r=>r.delivery_status==='SE').length;
+          const graded=results.filter(r=>r.grade!==null&&r.grade!==undefined&&r.grade!=='').length;
+          const tid=topicMap[a.activity_id]||'';
+          return `<article class="bg-white rounded-3xl border border-[#d9e1da] p-5">
             <div>
-              <span class="text-[10px] font-bold uppercase text-[#145b4b]">${escapeHTML(activityTypeLabel(a.activity_type))}</span>
+              <span class="text-[10px] font-bold uppercase text-[#145b4b]">${escapeHTML(actType(a))}</span>
               <h4 class="font-bold text-base mt-1">${escapeHTML(a.activity_code||'ACT')} · ${escapeHTML(a.activity_name||'Actividad')}</h4>
-              <p class="text-xs text-[#66767a] mt-1">Entrega: ${escapeHTML(formatDateForDisplay(a.due_date))} · Máx. ${escapeHTML(String(a.max_grade??10))}</p>
+              <p class="text-xs text-[#66767a] mt-1">Entrega: ${escapeHTML(fmtDate(a.due_date))} · Máx. ${escapeHTML(String(a.max_grade??10))}</p>
             </div>
-          </div>
-          <div class="mt-3 no-print">
-            <label class="block text-[10px] font-bold uppercase text-[#66767a] mb-1">Tema</label>
-            <select class="w-full rounded-xl border border-[#c7d3c8] px-2 py-2 text-xs" onchange="g66AssignActivityTopic('${a.activity_id}',this.value)">
-              ${topicOptions(tid)}
-            </select>
-            ${showQuickMove&&selectedTopic?`<button type="button" class="mt-2 w-full rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 px-3 py-2 text-xs font-bold" onclick="g67MoveActivityToTopic('${a.activity_id}','${selectedTopic}')">Mover a ${escapeHTML(topicName.get(selectedTopic)||'este tema')}</button>`:''}
-          </div>
-          <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs">
-            <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${results.length}</strong>registros</div>
-            <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${graded}</strong>calificados</div>
-            <div class="rounded-xl bg-red-50 p-2"><strong class="block text-lg text-red-700">${se}</strong>SE</div>
-          </div>
-          <div class="flex flex-wrap gap-2 mt-4 no-print">
-            <button class="rounded-lg bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="switchAndSelectGradebook('${g65ClassroomGroupId}');setTimeout(()=>focusActivityCapture('${a.activity_id}'),80)">Capturar</button>
-            <button class="rounded-lg border border-[#c7d3c8] px-3 py-2 text-xs font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
-          </div>
-        </article>`;
-      };
+            <div class="mt-3 no-print">
+              <label class="block text-[10px] font-bold uppercase text-[#66767a] mb-1">Tema</label>
+              <select class="w-full rounded-xl border border-[#c7d3c8] px-2 py-2 text-xs" onchange="g66AssignActivityTopic('${a.activity_id}',this.value)">
+                ${topicOptions(tid)}
+              </select>
+              ${quickTopic?`<button type="button" class="mt-2 w-full rounded-xl bg-emerald-600 text-white px-3 py-2 text-xs font-bold hover:bg-emerald-700" onclick="g67MoveActivityToTopic('${a.activity_id}','${quickTopic}')">Mover a ${escapeHTML(topicName.get(quickTopic)||'este tema')}</button>`:''}
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs">
+              <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${results.length}</strong>registros</div>
+              <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${graded}</strong>calificados</div>
+              <div class="rounded-xl bg-red-50 p-2"><strong class="block text-lg text-red-700">${se}</strong>SE</div>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-4 no-print">
+              <button class="rounded-lg bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="switchAndSelectGradebook('${groupId}');setTimeout(()=>focusActivityCapture('${a.activity_id}'),80)">Capturar</button>
+              <button class="rounded-lg border border-[#c7d3c8] px-3 py-2 text-xs font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
+            </div>
+          </article>`;
+        };
 
-      const materialCard=(m,showQuickMove=false)=>{
-        const selectedTopic=(topicFilter!=='all'&&topicFilter!=='none')?topicFilter:'';
-        return `<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
+        const materialCard=(m,quickTopic='')=>`<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
           <span class="text-[10px] font-bold uppercase text-amber-800">Material</span>
           <h4 class="font-bold text-base mt-1">${escapeHTML(m.title||'Material')}</h4>
           ${m.notes?`<p class="text-xs text-[#66767a] mt-2">${escapeHTML(m.notes)}</p>`:''}
           <p class="text-[10px] text-[#66767a] mt-2">${m.topic_id?`Tema: ${escapeHTML(topicName.get(m.topic_id)||'Sin tema')}`:'Sin tema'}</p>
-          ${showQuickMove&&selectedTopic?`<button type="button" class="mt-3 w-full rounded-xl bg-white border border-amber-300 text-amber-800 px-3 py-2 text-xs font-bold" onclick="g67MoveMaterialToTopic('${m.material_id}','${selectedTopic}')">Mover a ${escapeHTML(topicName.get(selectedTopic)||'este tema')}</button>`:''}
+          ${quickTopic?`<button type="button" class="mt-3 w-full rounded-xl bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g67MoveMaterialToTopic('${m.material_id}','${quickTopic}')">Mover a ${escapeHTML(topicName.get(quickTopic)||'este tema')}</button>`:''}
           <div class="flex flex-wrap gap-2 mt-4 no-print">
             ${m.url?`<button class="rounded-lg bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g66OpenMaterial('${m.material_id}')">Abrir material</button>`:''}
             <button class="rounded-lg border border-red-200 text-red-700 px-3 py-2 text-xs font-bold" onclick="g66DeleteMaterial('${m.material_id}')">Eliminar</button>
           </div>
         </article>`;
-      };
 
-      if(topicFilter!=='all'){
-        const currentTopic=topics.find(t=>t.topic_id===topicFilter);
-        const title=topicFilter==='none'?'Sin tema':(currentTopic?.name||'Tema');
-        const unassignedActs=allActs.filter(a=>!topicMap[a.activity_id]);
-        const unassignedMats=allMaterials.filter(m=>!m.topic_id);
+        // Always show a small count so the teacher can see what the app detected.
+        const info=`<div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-[#66767a]">
+          Detectado en ${escapeHTML(tri)}: <strong>${allActs.length}</strong> actividad(es) y <strong>${materialsAll.length}</strong> material(es).
+        </div>`;
 
-        if(!acts.length && !materials.length && topicFilter!=='none'){
-          box.innerHTML=`
+        if(selectedTopic){
+          const assignedActs=allActs.filter(a=>topicMap[a.activity_id]===selectedTopic);
+          const assignedMats=materialsAll.filter(m=>m.topic_id===selectedTopic);
+          const availableActs=allActs.filter(a=>!topicMap[a.activity_id] || !topicName.has(topicMap[a.activity_id]));
+          const availableMats=materialsAll.filter(m=>!m.topic_id || !topicName.has(m.topic_id));
+          const title=topicName.get(selectedTopic)||'Tema';
+
+          box.innerHTML=info+`
             <section class="space-y-4">
               <div class="bg-white rounded-3xl border border-emerald-200 p-5">
                 <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema seleccionado</p>
                 <h4 class="serif text-2xl font-bold mt-1">${escapeHTML(title)}</h4>
-                <p class="text-sm text-[#66767a] mt-1">Todavía no tiene contenido. Puedes mover actividades o materiales que estén sin tema.</p>
+                <p class="text-sm text-[#66767a] mt-1">${assignedActs.length+assignedMats.length ? 'Contenido actualmente asignado.' : 'Todavía no tiene contenido asignado.'}</p>
               </div>
-              ${(unassignedActs.length||unassignedMats.length)?`
+              ${assignedActs.length||assignedMats.length?`
                 <div>
-                  <h4 class="serif text-xl font-bold mb-3">Contenido disponible para mover a ${escapeHTML(title)}</h4>
-                  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    ${unassignedActs.map(a=>activityCard(a,true)).join('')}
-                    ${unassignedMats.map(m=>materialCard(m,true)).join('')}
-                  </div>
+                  <h4 class="serif text-xl font-bold mb-3">Dentro de ${escapeHTML(title)}</h4>
+                  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${assignedActs.map(a=>activityCard(a)).join('')}${assignedMats.map(m=>materialCard(m)).join('')}</div>
+                </div>`:''}
+              ${availableActs.length||availableMats.length?`
+                <div>
+                  <h4 class="serif text-xl font-bold mb-1">Contenido disponible para mover</h4>
+                  <p class="text-xs text-[#66767a] mb-3">Estas actividades/materiales están sin tema. Pulsa el botón verde para agregarlos a <strong>${escapeHTML(title)}</strong>.</p>
+                  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${availableActs.map(a=>activityCard(a,selectedTopic)).join('')}${availableMats.map(m=>materialCard(m,selectedTopic)).join('')}</div>
                 </div>`:
-                '<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay contenido sin tema disponible.</div>'}
+                (!assignedActs.length&&!assignedMats.length?'<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay contenido disponible en este trimestre.</div>':'')}
             </section>`;
           return;
         }
 
-        box.innerHTML=`
+        let visibleActs=allActs;
+        let visibleMats=materialsAll;
+        let heading='Todo el trabajo de clase';
+        if(topicFilter==='none'){
+          visibleActs=allActs.filter(a=>!topicMap[a.activity_id] || !topicName.has(topicMap[a.activity_id]));
+          visibleMats=materialsAll.filter(m=>!m.topic_id || !topicName.has(m.topic_id));
+          heading='Sin tema';
+        }
+
+        if(topicFilter==='none'){
+          box.innerHTML=info+`
+            <section class="space-y-3">
+              <h4 class="serif text-xl font-bold">${heading}</h4>
+              ${visibleActs.length||visibleMats.length
+                ? `<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${visibleActs.map(a=>activityCard(a)).join('')}${visibleMats.map(m=>materialCard(m)).join('')}</div>`
+                : '<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay contenido sin tema.</div>'}
+            </section>`;
+          return;
+        }
+
+        if(!allActs.length&&!materialsAll.length){
+          box.innerHTML=info+'<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay actividades ni materiales registrados en este trimestre.</div>';
+          return;
+        }
+
+        const sections=[];
+        topics.forEach(t=>{
+          const aa=allActs.filter(a=>topicMap[a.activity_id]===t.topic_id);
+          const mm=materialsAll.filter(m=>m.topic_id===t.topic_id);
+          if(aa.length||mm.length) sections.push({name:t.name,acts:aa,mats:mm});
+        });
+        const ua=allActs.filter(a=>!topicMap[a.activity_id] || !topicName.has(topicMap[a.activity_id]));
+        const um=materialsAll.filter(m=>!m.topic_id || !topicName.has(m.topic_id));
+        if(ua.length||um.length) sections.push({name:'Sin tema',acts:ua,mats:um});
+
+        box.innerHTML=info+sections.map(s=>`
           <section class="space-y-3">
             <div class="flex items-center justify-between gap-3">
-              <div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema / Unidad</p><h4 class="serif text-xl font-bold">${escapeHTML(title)}</h4></div>
-              <span class="text-xs text-[#66767a]">${acts.length} actividad(es) · ${materials.length} material(es)</span>
+              <div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema / Unidad</p><h4 class="serif text-xl font-bold">${escapeHTML(s.name)}</h4></div>
+              <span class="text-xs text-[#66767a]">${s.acts.length} actividad(es) · ${s.mats.length} material(es)</span>
             </div>
-            <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${acts.map(a=>activityCard(a,false)).join('')}${materials.map(m=>materialCard(m,false)).join('')}</div>
-          </section>`;
-        return;
+            <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${s.acts.map(a=>activityCard(a)).join('')}${s.mats.map(m=>materialCard(m)).join('')}</div>
+          </section>`).join('');
+      }catch(err){
+        console.error('G68 render trabajo de clase',err);
+        box.innerHTML=`<div class="bg-red-50 rounded-3xl border border-red-200 p-5 text-sm text-red-800">
+          <strong>No se pudo mostrar Trabajo de clase.</strong>
+          <div class="mt-1 text-xs">${escapeHTML(err?.name||'Error')} · ${escapeHTML(err?.message||'Error desconocido')}</div>
+        </div>`;
       }
-
-      if(!allActs.length && !allMaterials.length){
-        box.innerHTML='<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay actividades ni materiales registrados en este trimestre.</div>';
-        return;
-      }
-
-      const groups=[];
-      topics.forEach(t=>{
-        const a=allActs.filter(x=>topicMap[x.activity_id]===t.topic_id);
-        const m=allMaterials.filter(x=>x.topic_id===t.topic_id);
-        if(a.length||m.length) groups.push({id:t.topic_id,name:t.name,acts:a,mats:m});
-      });
-      const unassignedActs=allActs.filter(x=>!topicMap[x.activity_id]||!topicName.has(topicMap[x.activity_id]));
-      const unassignedMats=allMaterials.filter(x=>!x.topic_id||!topicName.has(x.topic_id));
-      if(unassignedActs.length||unassignedMats.length) groups.push({id:'',name:'Sin tema',acts:unassignedActs,mats:unassignedMats});
-
-      box.innerHTML=groups.map(g=>`
-        <section class="space-y-3">
-          <div class="flex items-center justify-between gap-3">
-            <div>
-              <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema / Unidad</p>
-              <h4 class="serif text-xl font-bold">${escapeHTML(g.name)}</h4>
-            </div>
-            <span class="text-xs text-[#66767a]">${g.acts.length} actividad(es) · ${g.mats.length} material(es)</span>
-          </div>
-          <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${g.acts.map(a=>activityCard(a,false)).join('')}${g.mats.map(m=>materialCard(m,false)).join('')}</div>
-        </section>`).join('');
     }
 
     function g65OpenPeopleManager(groupId=''){
