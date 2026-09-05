@@ -1,0 +1,6 @@
+MI CONTROL DOCENTE G70 · CONTROLES DE TEMA VISIBLES
+- Los controles de tema ya no son iconos diminutos.
+- Cada tema muestra botones claros: Modificar, Mover arriba, Mover abajo y Eliminar.
+- Mover arriba/abajo queda deshabilitado cuando el tema está en un extremo; con un solo tema, ambos quedan deshabilitados.
+- Eliminar tema conserva actividades y materiales y los deja como Sin tema.
+- Conserva G69, calificaciones, materiales, temas y DB_VERSION 12.
