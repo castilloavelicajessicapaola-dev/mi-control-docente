@@ -1,0 +1,7 @@
+MI CONTROL DOCENTE G64 · GESTIÓN Y CONTROLES VISIBLES
+- Conserva el guardado verificado de G63.
+- Refuerza editar/eliminar alumnos con protección de historial.
+- Refuerza editar/archivar/eliminar actividades.
+- Añade eliminación explícita de clases del horario sin borrar historial académico.
+- El menú lateral puede desplazarse para que todos los botones sean accesibles.
+- DB_VERSION permanece en 12.
