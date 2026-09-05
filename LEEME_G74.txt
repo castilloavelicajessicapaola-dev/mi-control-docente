@@ -1,0 +1,9 @@
+MI CONTROL DOCENTE G74 · COLOR DE INTERFAZ CONFIGURABLE
+- Configuración > Accesibilidad y apariencia > Color de la interfaz.
+- Temas incluidos: Verde, Azul, Morado, Rosa, Naranja y Turquesa.
+- Color personalizado mediante selector de color.
+- Cambia menú lateral, navegación inferior, botones principales, bordes y textos de marca.
+- El color elegido se guarda localmente en settings y se restaura al abrir la app.
+- Alto contraste sigue teniendo prioridad sobre los temas de color.
+- Botón para restablecer el verde original.
+- Conserva G73, materiales, Classroom local, Google Drive y DB_VERSION 12.

@@ -129,6 +129,52 @@
   nav button, nav a { flex-shrink: 0; }
 </style>
 
+
+<style id="g74-theme-system">
+  /* G74 · temas de color de interfaz */
+  body {
+    --brand: var(--pine);
+    --brand-dark: var(--pine-dark);
+    --brand-soft: #e4f0e5;
+    --brand-accent: var(--lime);
+  }
+
+  body[data-ui-theme="green"]  { --brand:#145b4b; --brand-dark:#0d4036; --brand-soft:#e4f0e5; --brand-accent:#d8ef87; }
+  body[data-ui-theme="blue"]   { --brand:#1d4ed8; --brand-dark:#1e3a8a; --brand-soft:#e8f0ff; --brand-accent:#bfdbfe; }
+  body[data-ui-theme="purple"] { --brand:#6d28d9; --brand-dark:#4c1d95; --brand-soft:#f1eafe; --brand-accent:#ddd6fe; }
+  body[data-ui-theme="rose"]   { --brand:#be185d; --brand-dark:#831843; --brand-soft:#fce7f3; --brand-accent:#fbcfe8; }
+  body[data-ui-theme="orange"] { --brand:#c2410c; --brand-dark:#7c2d12; --brand-soft:#fff0e8; --brand-accent:#fed7aa; }
+  body[data-ui-theme="teal"]   { --brand:#0f766e; --brand-dark:#134e4a; --brand-soft:#e2f5f2; --brand-accent:#99f6e4; }
+  body[data-ui-theme="custom"] { --brand:var(--custom-brand,#145b4b); --brand-dark:var(--custom-brand-dark,#0d4036); --brand-soft:var(--custom-brand-soft,#e4f0e5); --brand-accent:var(--custom-brand-accent,#d8ef87); }
+
+  /* Sidebar + bottom navigation */
+  body:not(.high-contrast) .desktop-nav,
+  body:not(.high-contrast) .mobile-bottom { background:var(--brand) !important; }
+  body:not(.high-contrast) .desktop-nav::-webkit-scrollbar-track { background:color-mix(in srgb,var(--brand-dark) 35%,transparent); }
+  body:not(.high-contrast) .desktop-nav::-webkit-scrollbar-thumb { background:color-mix(in srgb,var(--brand-accent) 70%,white); }
+  body:not(.high-contrast) .nav-item:hover,
+  body:not(.high-contrast) .nav-item.is-active { background:var(--brand-soft) !important; color:var(--brand-dark) !important; }
+
+  /* Override principal hard-coded green utility classes used throughout the app */
+  body:not(.high-contrast) .bg-\[\#145b4b\] { background-color:var(--brand) !important; }
+  body:not(.high-contrast) .hover\:bg-\[\#0d4036\]:hover { background-color:var(--brand-dark) !important; }
+  body:not(.high-contrast) .text-\[\#145b4b\] { color:var(--brand) !important; }
+  body:not(.high-contrast) .border-\[\#145b4b\] { border-color:var(--brand) !important; }
+  body:not(.high-contrast) .accent-\[\#145b4b\] { accent-color:var(--brand) !important; }
+
+  /* Generic brand elements that use CSS variables */
+  body:not(.high-contrast) .g74-brand-bg { background:var(--brand) !important; color:white !important; }
+  body:not(.high-contrast) .g74-brand-text { color:var(--brand) !important; }
+  body:not(.high-contrast) .g74-brand-border { border-color:var(--brand) !important; }
+
+  /* Keep selected classroom tab aligned with theme */
+  body:not(.high-contrast) .g65-tab.bg-\[\#145b4b\] { background:var(--brand) !important; }
+
+  /* Custom color preview */
+  .g74-theme-swatch { width:1.75rem; height:1.75rem; border-radius:999px; border:2px solid rgba(255,255,255,.95); box-shadow:0 0 0 1px rgba(23,34,38,.15); }
+  .g74-theme-card.is-selected { outline:3px solid var(--brand); outline-offset:2px; }
+</style>
+
 </head>
 
 <body>
@@ -761,7 +807,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G73 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G74 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -828,7 +874,7 @@
             <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G73 · Organización tipo Classroom</p>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G74 · Organización tipo Classroom</p>
                   <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema. Usa Modificar, Mover arriba/abajo o Eliminar. Los materiales pueden editarse, reutilizarse en otros grupos, reordenarse, archivarse o eliminarse sin generar calificaciones.</p>
                 </div>
                 <div class="flex flex-col gap-1">
@@ -1112,7 +1158,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G73 · materiales reutilizables y ordenados</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G74 · color de interfaz configurable</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -2478,6 +2524,40 @@
                     <span class="font-medium text-sm">Modo Táctil (Botones Ampliados)</span>
                     <input type="checkbox" id="toggle-touch-mode" class="w-5 h-5 accent-[#145b4b]" onchange="toggleTouchMode(this.checked)">
                   </label>
+
+                  <div class="rounded-2xl border border-[#d9e1da] p-4">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 class="font-bold text-sm">Color de la interfaz</h4>
+                        <p class="text-[11px] text-[#66767a] mt-1">Cambia el color principal del menú, botones y elementos destacados. Se guarda en este dispositivo.</p>
+                      </div>
+                      <span id="g74-theme-name" class="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-[#44565a]">Verde</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4" id="g74-theme-grid">
+                      <button type="button" data-theme="green" class="g74-theme-card rounded-xl border border-[#d9e1da] p-2 flex items-center gap-2 text-xs font-bold" onclick="g74SelectTheme('green')"><span class="g74-theme-swatch" style="background:#145b4b"></span>Verde</button>
+                      <button type="button" data-theme="blue" class="g74-theme-card rounded-xl border border-[#d9e1da] p-2 flex items-center gap-2 text-xs font-bold" onclick="g74SelectTheme('blue')"><span class="g74-theme-swatch" style="background:#1d4ed8"></span>Azul</button>
+                      <button type="button" data-theme="purple" class="g74-theme-card rounded-xl border border-[#d9e1da] p-2 flex items-center gap-2 text-xs font-bold" onclick="g74SelectTheme('purple')"><span class="g74-theme-swatch" style="background:#6d28d9"></span>Morado</button>
+                      <button type="button" data-theme="rose" class="g74-theme-card rounded-xl border border-[#d9e1da] p-2 flex items-center gap-2 text-xs font-bold" onclick="g74SelectTheme('rose')"><span class="g74-theme-swatch" style="background:#be185d"></span>Rosa</button>
+                      <button type="button" data-theme="orange" class="g74-theme-card rounded-xl border border-[#d9e1da] p-2 flex items-center gap-2 text-xs font-bold" onclick="g74SelectTheme('orange')"><span class="g74-theme-swatch" style="background:#c2410c"></span>Naranja</button>
+                      <button type="button" data-theme="teal" class="g74-theme-card rounded-xl border border-[#d9e1da] p-2 flex items-center gap-2 text-xs font-bold" onclick="g74SelectTheme('teal')"><span class="g74-theme-swatch" style="background:#0f766e"></span>Turquesa</button>
+                    </div>
+
+                    <div class="mt-4 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <p class="text-xs font-bold">Color personalizado</p>
+                          <p class="text-[10px] text-[#66767a]">Elige cualquier color principal.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <input type="color" id="g74-custom-color" value="#145b4b" class="w-12 h-10 rounded-lg border border-[#c7d3c8] p-1 bg-white" onchange="g74PreviewCustomColor(this.value)">
+                          <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g74UseCustomColor()">Usar color</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button type="button" class="mt-3 rounded-xl bg-[#145b4b] text-white px-4 py-2 text-xs font-bold" onclick="g74ResetTheme()">Restablecer verde original</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -13447,7 +13527,131 @@ function populateReportControls() {
       }
     }
 
-    async function toggleHighContrast(enabled) {
+    
+    const G74_THEME_PRESETS={
+      green:{name:'Verde',brand:'#145b4b',dark:'#0d4036',soft:'#e4f0e5',accent:'#d8ef87'},
+      blue:{name:'Azul',brand:'#1d4ed8',dark:'#1e3a8a',soft:'#e8f0ff',accent:'#bfdbfe'},
+      purple:{name:'Morado',brand:'#6d28d9',dark:'#4c1d95',soft:'#f1eafe',accent:'#ddd6fe'},
+      rose:{name:'Rosa',brand:'#be185d',dark:'#831843',soft:'#fce7f3',accent:'#fbcfe8'},
+      orange:{name:'Naranja',brand:'#c2410c',dark:'#7c2d12',soft:'#fff0e8',accent:'#fed7aa'},
+      teal:{name:'Turquesa',brand:'#0f766e',dark:'#134e4a',soft:'#e2f5f2',accent:'#99f6e4'}
+    };
+
+    function g74HexToRgb(hex){
+      const clean=String(hex||'').replace('#','');
+      if(!/^[0-9a-fA-F]{6}$/.test(clean)) return null;
+      return {
+        r:parseInt(clean.slice(0,2),16),
+        g:parseInt(clean.slice(2,4),16),
+        b:parseInt(clean.slice(4,6),16)
+      };
+    }
+
+    function g74RgbToHex(r,g,b){
+      const c=v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
+      return `#${c(r)}${c(g)}${c(b)}`;
+    }
+
+    function g74Mix(hex1,hex2,weight){
+      const a=g74HexToRgb(hex1), b=g74HexToRgb(hex2);
+      if(!a||!b) return hex1;
+      const w=Math.max(0,Math.min(1,weight));
+      return g74RgbToHex(a.r*(1-w)+b.r*w,a.g*(1-w)+b.g*w,a.b*(1-w)+b.b*w);
+    }
+
+    function g74CustomPalette(color){
+      const brand=/^#[0-9a-fA-F]{6}$/.test(color||'')?color:'#145b4b';
+      return {
+        name:'Personalizado',
+        brand,
+        dark:g74Mix(brand,'#000000',0.35),
+        soft:g74Mix(brand,'#ffffff',0.88),
+        accent:g74Mix(brand,'#ffffff',0.62)
+      };
+    }
+
+    function g74ApplyTheme(theme,customColor='',persistUI=true){
+      const key=G74_THEME_PRESETS[theme]?theme:(theme==='custom'?'custom':'green');
+      const palette=key==='custom'?g74CustomPalette(customColor):G74_THEME_PRESETS[key];
+
+      document.body.dataset.uiTheme=key;
+      document.body.style.setProperty('--custom-brand',palette.brand);
+      document.body.style.setProperty('--custom-brand-dark',palette.dark);
+      document.body.style.setProperty('--custom-brand-soft',palette.soft);
+      document.body.style.setProperty('--custom-brand-accent',palette.accent);
+
+      // Keep legacy CSS variables aligned so components based on var(--pine) also update.
+      document.documentElement.style.setProperty('--pine',palette.brand);
+      document.documentElement.style.setProperty('--pine-dark',palette.dark);
+      document.documentElement.style.setProperty('--lime',palette.accent);
+
+      const meta=document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.setAttribute('content',palette.brand);
+
+      const name=document.getElementById('g74-theme-name');
+      if(name) name.textContent=palette.name;
+
+      document.querySelectorAll('.g74-theme-card').forEach(el=>el.classList.toggle('is-selected',el.dataset.theme===key));
+      const picker=document.getElementById('g74-custom-color');
+      if(picker && key==='custom') picker.value=palette.brand;
+
+      if(persistUI){
+        try{ lucide?.createIcons?.(); }catch(e){}
+      }
+    }
+
+    async function g74SelectTheme(theme){
+      if(!G74_THEME_PRESETS[theme]) return;
+      const palette=G74_THEME_PRESETS[theme];
+      g74ApplyTheme(theme,'',true);
+      localData.settings['ui_theme']=theme;
+      localData.settings['ui_custom_color']=palette.brand;
+      try{
+        await dbPut('settings',{key:'ui_theme',value:theme});
+        await dbPut('settings',{key:'ui_custom_color',value:palette.brand});
+        showToast(`Tema ${palette.name} aplicado`);
+      }catch(e){
+        console.error('G74 save theme',e);
+        showToast('El color cambió, pero no se pudo guardar la preferencia');
+      }
+    }
+
+    function g74PreviewCustomColor(color){
+      g74ApplyTheme('custom',color,false);
+      const name=document.getElementById('g74-theme-name');
+      if(name) name.textContent='Vista previa';
+    }
+
+    async function g74UseCustomColor(){
+      const color=document.getElementById('g74-custom-color')?.value||'#145b4b';
+      g74ApplyTheme('custom',color,true);
+      localData.settings['ui_theme']='custom';
+      localData.settings['ui_custom_color']=color;
+      try{
+        await dbPut('settings',{key:'ui_theme',value:'custom'});
+        await dbPut('settings',{key:'ui_custom_color',value:color});
+        showToast('Color personalizado guardado');
+      }catch(e){
+        console.error('G74 save custom theme',e);
+        showToast('No se pudo guardar el color');
+      }
+    }
+
+    async function g74ResetTheme(){
+      await g74SelectTheme('green');
+      const picker=document.getElementById('g74-custom-color');
+      if(picker) picker.value='#145b4b';
+    }
+
+    function g74LoadThemeFromSettings(){
+      const theme=localData.settings?.['ui_theme']||'green';
+      const custom=localData.settings?.['ui_custom_color']||'#145b4b';
+      g74ApplyTheme(theme,custom,false);
+      const picker=document.getElementById('g74-custom-color');
+      if(picker) picker.value=custom;
+    }
+
+async function toggleHighContrast(enabled) {
       document.body.classList.toggle('high-contrast', enabled);
       localData.settings['high_contrast']=!!enabled;
       try { await dbPut('settings',{key:'high_contrast',value:!!enabled}); } catch(e) { console.error(e); }
@@ -13498,6 +13702,7 @@ function populateReportControls() {
           document.getElementById('global-school-year').innerText = `Ciclo Escolar ${localData.settings['school_year']}`;
         }
         renderSettingsFromStorage();
+        g74LoadThemeFromSettings();
         renderSchoolYearArchives();
         populateReportCycleOptions();
         const analyticsAttendance = document.getElementById('analytics-attendance-threshold');
