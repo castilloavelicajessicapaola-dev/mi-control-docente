@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-control-docente-g77-v1';
+const CACHE_NAME = 'mi-control-docente-g78-v1';
 const APP_SHELL = [
   './',
   './index.html',

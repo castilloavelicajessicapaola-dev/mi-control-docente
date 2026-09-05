@@ -1,0 +1,10 @@
+MI CONTROL DOCENTE G78 · IMPORTADOR INTELIGENTE DE LISTAS
+- Detecta automáticamente la fila de encabezados incluso si el Excel tiene títulos o bloques antes de la lista.
+- Reconoce Nombre completo o Nombre + Apellido paterno + Apellido materno.
+- Ignora filas informativas como TRIMESTRE, MARCADOR, PROMEDIO, TOTAL, etc.
+- Infiere grado y grupo cuando el archivo usa formatos como 1-D, 2-C o 3-A.
+- Permite valores predeterminados de escuela, asignatura, turno y ciclo.
+- Vista previa editable antes de importar.
+- Filas informativas aparecen como IGNORADA y no bloquean la importación.
+- Solo importa alumnos reales; no elimina datos existentes.
+- DB_VERSION permanece en 12.
