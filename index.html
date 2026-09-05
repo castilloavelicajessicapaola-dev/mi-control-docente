@@ -756,6 +756,95 @@
           </div>
         </section>
 
+
+        <!-- G65: AULA TIPO CLASSROOM -->
+        <section id="classroom-group-view" class="view">
+          <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
+            <div>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G65 · Aula del grupo</p>
+              <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
+              <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 no-print">
+              <button type="button" class="rounded-xl border border-[#c7d3c8] px-4 py-2 text-sm font-bold" onclick="showView('groups')">← Grupos</button>
+              <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold" onclick="g65OpenNewActivity()">+ Actividad</button>
+              <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g65OpenPeopleManager()">Gestionar alumnos</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl border border-[#d9e1da] p-2 mb-5 no-print overflow-x-auto">
+            <div class="flex min-w-max gap-1">
+              <button id="g65-tab-board" class="g65-tab px-4 py-2.5 rounded-xl text-sm font-bold bg-[#145b4b] text-white" onclick="g65SetTab('board')">Tablón</button>
+              <button id="g65-tab-work" class="g65-tab px-4 py-2.5 rounded-xl text-sm font-bold text-[#145b4b] hover:bg-emerald-50" onclick="g65SetTab('work')">Trabajo de clase</button>
+              <button id="g65-tab-people" class="g65-tab px-4 py-2.5 rounded-xl text-sm font-bold text-[#145b4b] hover:bg-emerald-50" onclick="g65SetTab('people')">Personas</button>
+              <button id="g65-tab-grades" class="g65-tab px-4 py-2.5 rounded-xl text-sm font-bold text-[#145b4b] hover:bg-emerald-50" onclick="g65SetTab('grades')">Calificaciones</button>
+            </div>
+          </div>
+
+          <div id="g65-panel-board" class="g65-panel space-y-4">
+            <div class="grid lg:grid-cols-[1fr_320px] gap-5">
+              <div class="space-y-4">
+                <div class="bg-white rounded-3xl border border-[#d9e1da] p-5 no-print">
+                  <h3 class="serif text-xl font-bold text-[#145b4b]">Publicar en el tablón</h3>
+                  <p class="text-xs text-[#66767a] mt-1">Avisos locales del docente para este grupo. No se envían mensajes externos.</p>
+                  <textarea id="g65-board-text" rows="3" maxlength="800" class="w-full mt-3 rounded-2xl border border-[#c7d3c8] p-3 text-sm" placeholder="Escribe un aviso, recordatorio o indicación para el grupo..."></textarea>
+                  <div class="flex justify-end mt-2">
+                    <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold" onclick="g65PublishPost()">Publicar aviso</button>
+                  </div>
+                </div>
+                <div id="g65-board-list" class="space-y-3"></div>
+              </div>
+              <aside class="space-y-4">
+                <div class="bg-white rounded-3xl border border-[#d9e1da] p-5">
+                  <h3 class="serif text-lg font-bold">Próximas entregas</h3>
+                  <div id="g65-upcoming-list" class="mt-3 space-y-2 text-sm"></div>
+                </div>
+                <div class="bg-emerald-50 rounded-3xl border border-emerald-200 p-5 text-sm text-emerald-900">
+                  <strong>Diseño tipo Classroom, datos locales.</strong>
+                  <p class="mt-1 text-xs">Esta vista reorganiza información existente de Mi Control Docente. No publica en Google Classroom ni envía datos automáticamente.</p>
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <div id="g65-panel-work" class="g65-panel hidden space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <h3 class="serif text-2xl font-bold">Trabajo de clase</h3>
+                <p class="text-sm text-[#66767a]">Actividades organizadas por trimestre, con fecha y estado.</p>
+              </div>
+              <div class="flex gap-2 no-print">
+                <select id="g65-work-trimester" class="rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm" onchange="g65RenderWork()">
+                  <option value="T1">Trimestre 1</option><option value="T2">Trimestre 2</option><option value="T3">Trimestre 3</option>
+                </select>
+                <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold" onclick="g65OpenNewActivity()">+ Nueva actividad</button>
+              </div>
+            </div>
+            <div id="g65-work-list" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+          </div>
+
+          <div id="g65-panel-people" class="g65-panel hidden space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div><h3 class="serif text-2xl font-bold">Personas</h3><p class="text-sm text-[#66767a]">Alumnos activos del grupo y accesos a su expediente.</p></div>
+              <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold no-print" onclick="g65OpenPeopleManager()">Gestionar alumnos</button>
+            </div>
+            <div id="g65-people-list" class="bg-white rounded-3xl border border-[#d9e1da] overflow-hidden"></div>
+          </div>
+
+          <div id="g65-panel-grades" class="g65-panel hidden space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div><h3 class="serif text-2xl font-bold">Calificaciones</h3><p class="text-sm text-[#66767a]">Concentrado del grupo con T1, T2, T3 y promedio anual.</p></div>
+              <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold no-print" onclick="switchAndSelectGradebook(g65ClassroomGroupId)">Abrir captura completa</button>
+            </div>
+            <div class="bg-white rounded-3xl border border-[#d9e1da] overflow-x-auto">
+              <table class="w-full text-sm min-w-[720px]">
+                <thead class="bg-slate-50"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Alumno</th><th class="px-3 py-3">T1</th><th class="px-3 py-3">T2</th><th class="px-3 py-3">T3</th><th class="px-3 py-3">Anual</th><th class="px-3 py-3">Estado</th></tr></thead>
+                <tbody id="g65-grades-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         <!-- G12: PERFIL INTEGRAL DEL ALUMNO -->
         <section id="student-profile-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
@@ -1005,7 +1094,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G64 · gestión y controles visibles</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G65 · Aula tipo Classroom</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -3612,7 +3701,7 @@
         today: 'Hoy', pending: 'Pendientes', home: 'Inicio', groups: 'Grupos',
         attendance: 'Asistencia', planning: 'Planeación', activities: 'Actividades',
         observations: 'Seguimientos', portfolio: 'Portafolio', reports: 'Reportes',
-        documents: 'Documentos', schedule: 'Horario', calendar: 'Calendario', journal: 'Bitácora docente', 'student-profile': 'Perfil del alumno', 'student-dossier': 'Expediente integral', 'family-center': 'Familias', 'recovery-center': 'Recuperación académica', 'trimester-close-center': 'Cierre trimestral', 'teacher-command-center': 'Dashboard global', 'individual-followup-center': 'Seguimiento individual', 'automatic-reports-center': 'Reportes automáticos', settings: 'Configuración'
+        documents: 'Documentos', schedule: 'Horario', calendar: 'Calendario', journal: 'Bitácora docente', 'student-profile': 'Perfil del alumno', 'student-dossier': 'Expediente integral', 'family-center': 'Familias', 'recovery-center': 'Recuperación académica', 'trimester-close-center': 'Cierre trimestral', 'teacher-command-center': 'Dashboard global', 'individual-followup-center': 'Seguimiento individual', 'automatic-reports-center': 'Reportes automáticos', 'classroom-group': 'Aula del grupo', settings: 'Configuración'
       };
       document.getElementById('top-title').innerText = titles[viewId] || 'Panel';
 
@@ -3638,6 +3727,7 @@
       if (viewId === 'teacher-command-center') { populateCommandSchoolFilter(); renderTeacherCommandCenter(); }
       if (viewId === 'individual-followup-center') { populateIndividualFollowupGroup(); populateIndividualFollowupStudent(); renderIndividualFollowup(); }
       if (viewId === 'automatic-reports-center') { populateAutomaticReportGroup(); populateAutomaticReportStudents(); renderAutomaticReport(); }
+      if (viewId === 'classroom-group') g65RenderClassroom();
       if (viewId === 'settings') renderIntegrityAuditResults();
       if (viewId === 'settings') renderSchoolYearArchives();
 
@@ -3771,9 +3861,11 @@
               </div>
               <span class="w-8 h-8 rounded-full bg-[#f4f6f1] text-[#145b4b] flex items-center justify-center font-bold text-xs" title="Alumnos activos">${activeStudents.length}</span>
             </div>
-            <div class="flex items-center gap-2 mt-4 pt-3 border-t border-[#d9e1da]">
-              <button class="flex-1 py-2 rounded-xl bg-[#145b4b] text-white font-bold text-xs hover:bg-[#0d4036]" onclick="switchAndSelectAttendance('${g.group_id}')">Pase de Lista</button>
-              <button class="py-2 px-3 rounded-xl border border-[#d9e1da] text-[#145b4b] font-bold text-xs hover:bg-emerald-50" onclick="switchAndSelectGradebook('${g.group_id}')">Calificaciones</button>
+            <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-[#d9e1da]">
+              <button class="py-2 rounded-xl bg-[#145b4b] text-white font-bold text-xs hover:bg-[#0d4036]" onclick="g65OpenClassroom('${g.group_id}')">Aula</button>
+              <button class="py-2 rounded-xl border border-[#145b4b] text-[#145b4b] font-bold text-xs hover:bg-emerald-50" onclick="g65OpenPeopleManager('${g.group_id}')">Alumnos</button>
+              <button class="py-2 rounded-xl border border-[#d9e1da] text-[#145b4b] font-bold text-xs hover:bg-emerald-50" onclick="switchAndSelectAttendance('${g.group_id}')">Pase de Lista</button>
+              <button class="py-2 rounded-xl border border-[#d9e1da] text-[#145b4b] font-bold text-xs hover:bg-emerald-50" onclick="switchAndSelectGradebook('${g.group_id}')">Calificaciones</button>
             </div>
           </div>
         `;
@@ -3784,7 +3876,218 @@
       lucide.createIcons();
     }
 
-    function populateGroupDropdowns() {
+    
+    let g65ClassroomGroupId='';
+    let g65ClassroomTab='board';
+
+    function g65OpenClassroom(groupId){
+      g65ClassroomGroupId=groupId;
+      activeGroupId=groupId;
+      g65ClassroomTab='board';
+      showView('classroom-group');
+    }
+
+    function g65SetTab(tab){
+      g65ClassroomTab=tab;
+      document.querySelectorAll('.g65-panel').forEach(x=>x.classList.add('hidden'));
+      document.getElementById(`g65-panel-${tab}`)?.classList.remove('hidden');
+      document.querySelectorAll('.g65-tab').forEach(x=>{
+        x.classList.remove('bg-[#145b4b]','text-white');
+        x.classList.add('text-[#145b4b]');
+      });
+      const b=document.getElementById(`g65-tab-${tab}`);
+      if(b){
+        b.classList.add('bg-[#145b4b]','text-white');
+        b.classList.remove('text-[#145b4b]');
+      }
+      if(tab==='work') g65RenderWork();
+      if(tab==='people') g65RenderPeople();
+      if(tab==='grades') g65RenderGrades();
+    }
+
+    function g65Group(){
+      return (localData.groups||[]).find(g=>g.group_id===g65ClassroomGroupId);
+    }
+
+    function g65BoardKey(){
+      return `classroom_board::${g65ClassroomGroupId}`;
+    }
+
+    function g65GetPosts(){
+      const value=localData.settings?.[g65BoardKey()];
+      return Array.isArray(value) ? value : [];
+    }
+
+    async function g65PublishPost(){
+      const text=(document.getElementById('g65-board-text')?.value||'').trim();
+      if(!text) return showToast('Escribe un aviso antes de publicar');
+      const posts=g65GetPosts().slice();
+      posts.unshift({
+        post_id:generateId('post'),
+        text,
+        created_at:new Date().toISOString()
+      });
+      try{
+        const key=g65BoardKey();
+        await dbPut('settings',{key,value:posts});
+        localData.settings[key]=posts;
+        document.getElementById('g65-board-text').value='';
+        g65RenderBoard();
+        showToast('Aviso guardado en el tablón');
+      }catch(err){
+        console.error('G65 publish post',err);
+        showToast('No se pudo guardar el aviso');
+      }
+    }
+
+    async function g65DeletePost(postId){
+      if(!confirm('¿Eliminar este aviso del tablón?')) return;
+      const posts=g65GetPosts().filter(p=>p.post_id!==postId);
+      try{
+        const key=g65BoardKey();
+        await dbPut('settings',{key,value:posts});
+        localData.settings[key]=posts;
+        g65RenderBoard();
+        showToast('Aviso eliminado');
+      }catch(err){ showToast('No se pudo eliminar el aviso'); }
+    }
+
+    function g65RenderClassroom(){
+      if(!g65ClassroomGroupId) g65ClassroomGroupId=activeGroupId||getActiveCycleGroups()?.[0]?.group_id||'';
+      const g=g65Group();
+      if(!g) return;
+      activeGroupId=g.group_id;
+      const school=(localData.schools||[]).find(s=>s.school_id===g.school_id);
+      const title=document.getElementById('g65-classroom-title');
+      const meta=document.getElementById('g65-classroom-meta');
+      if(title) title.textContent=`${formatGradeDisplay(g.grade,g.group_name)} · ${g.subject||'Aula'}`;
+      if(meta) meta.textContent=`${school?.school_name||'Escuela'} · ${g.shift||''} · ${getGradebookStudentsSafe(g.group_id).length} alumnos activos`;
+      g65RenderBoard();
+      g65SetTab(g65ClassroomTab||'board');
+    }
+
+    function g65RenderBoard(){
+      const list=document.getElementById('g65-board-list');
+      const upcoming=document.getElementById('g65-upcoming-list');
+      if(!list||!upcoming) return;
+      const posts=g65GetPosts();
+      list.innerHTML=posts.length ? posts.map(p=>`
+        <article class="bg-white rounded-3xl border border-[#d9e1da] p-5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold text-[#145b4b]">Docente · ${escapeHTML(new Date(p.created_at).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}))}</p>
+              <p class="mt-3 text-sm whitespace-pre-wrap">${escapeHTML(p.text)}</p>
+            </div>
+            <button type="button" class="no-print text-xs font-bold text-red-700 border border-red-200 rounded-lg px-2 py-1" onclick="g65DeletePost('${p.post_id}')">Eliminar</button>
+          </div>
+        </article>`).join('')
+        : '<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">Todavía no hay avisos publicados para este grupo.</div>';
+
+      const today=getLocalDateISO();
+      const acts=(localData.activities||[])
+        .filter(a=>a.group_id===g65ClassroomGroupId&&(a.status||'ACTIVE')==='ACTIVE'&&a.due_date&&a.due_date>=today)
+        .sort((a,b)=>String(a.due_date).localeCompare(String(b.due_date)))
+        .slice(0,6);
+      upcoming.innerHTML=acts.length ? acts.map(a=>`
+        <button type="button" class="w-full text-left rounded-xl border border-[#d9e1da] p-3 hover:bg-emerald-50" onclick="switchAndSelectGradebook('${g65ClassroomGroupId}')">
+          <strong class="block text-[#145b4b]">${escapeHTML(a.activity_code||'ACT')} · ${escapeHTML(a.activity_name||'Actividad')}</strong>
+          <span class="text-xs text-[#66767a]">${escapeHTML(formatDateForDisplay(a.due_date))}</span>
+        </button>`).join('')
+        : '<p class="text-xs text-[#66767a]">Sin entregas próximas registradas.</p>';
+    }
+
+    function g65OpenNewActivity(){
+      activeGroupId=g65ClassroomGroupId||activeGroupId;
+      populateGroupDropdowns();
+      const sel=document.getElementById('gradebook-group-select');
+      if(sel&&activeGroupId) sel.value=activeGroupId;
+      showView('activities');
+      setTimeout(()=>openActivityModal(''),80);
+    }
+
+    function g65RenderWork(){
+      const box=document.getElementById('g65-work-list');
+      if(!box) return;
+      const tri=document.getElementById('g65-work-trimester')?.value||'T1';
+      const acts=(localData.activities||[])
+        .filter(a=>a.group_id===g65ClassroomGroupId&&(a.trimester||'T1')===tri&&(a.status||'ACTIVE')==='ACTIVE')
+        .sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));
+      box.innerHTML=acts.length ? acts.map(a=>{
+        const results=(localData.activity_results||[]).filter(r=>r.activity_id===a.activity_id);
+        const se=results.filter(r=>r.delivery_status==='SE').length;
+        const graded=results.filter(r=>r.grade!==null&&r.grade!==undefined&&r.grade!=='').length;
+        return `<article class="bg-white rounded-3xl border border-[#d9e1da] p-5">
+          <div class="flex items-start justify-between gap-2">
+            <div><span class="text-[10px] font-bold uppercase text-[#145b4b]">${escapeHTML(activityTypeLabel(a.activity_type))}</span>
+            <h4 class="font-bold text-base mt-1">${escapeHTML(a.activity_code||'ACT')} · ${escapeHTML(a.activity_name||'Actividad')}</h4>
+            <p class="text-xs text-[#66767a] mt-1">Entrega: ${escapeHTML(formatDateForDisplay(a.due_date))} · Máx. ${escapeHTML(String(a.max_grade??10))}</p></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs">
+            <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${results.length}</strong>registros</div>
+            <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${graded}</strong>calificados</div>
+            <div class="rounded-xl bg-red-50 p-2"><strong class="block text-lg text-red-700">${se}</strong>SE</div>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-4 no-print">
+            <button class="rounded-lg bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="switchAndSelectGradebook('${g65ClassroomGroupId}');setTimeout(()=>focusActivityCapture('${a.activity_id}'),80)">Capturar</button>
+            <button class="rounded-lg border border-[#c7d3c8] px-3 py-2 text-xs font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
+          </div>
+        </article>`;
+      }).join('') : '<div class="md:col-span-2 xl:col-span-3 bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay actividades activas en este trimestre.</div>';
+    }
+
+    function g65OpenPeopleManager(groupId=''){
+      if(groupId) g65ClassroomGroupId=groupId;
+      activeGroupId=g65ClassroomGroupId||activeGroupId;
+      populateGroupDropdowns();
+      const att=document.getElementById('attendance-group-select');
+      if(att&&activeGroupId) att.value=activeGroupId;
+      try{
+        renderStudentManageList();
+        openModal('modal-manage-students');
+      }catch(e){
+        showView('attendance');
+        setTimeout(()=>openModal('modal-manage-students'),80);
+      }
+    }
+
+    function g65RenderPeople(){
+      const box=document.getElementById('g65-people-list');
+      if(!box) return;
+      const students=getGradebookStudentsSafe(g65ClassroomGroupId);
+      box.innerHTML=students.length ? students.map((s,i)=>`
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-4 py-3 border-b last:border-b-0">
+          <div><span class="text-xs text-[#66767a] font-bold mr-3">${escapeHTML(String(s.student_number||i+1))}</span><strong>${escapeHTML(s.full_name)}</strong></div>
+          <div class="flex flex-wrap gap-2 no-print">
+            <button class="rounded-lg border border-[#c7d3c8] px-3 py-1.5 text-xs font-bold" onclick="openStudentProfile('${s.student_id}')">Perfil</button>
+            <button class="rounded-lg border border-blue-200 text-blue-700 px-3 py-1.5 text-xs font-bold" onclick="openStudentEdit('${s.student_id}')">Editar</button>
+            <button class="rounded-lg border border-red-200 text-red-700 px-3 py-1.5 text-xs font-bold" onclick="deleteStudentPermanently('${s.student_id}')">Eliminar</button>
+          </div>
+        </div>`).join('')
+        : '<div class="p-8 text-center text-sm text-[#66767a]">No hay alumnos activos.</div>';
+    }
+
+    function g65RenderGrades(){
+      const body=document.getElementById('g65-grades-body');
+      if(!body) return;
+      const students=getGradebookStudentsSafe(g65ClassroomGroupId);
+      const cfg=getEvaluationConfig(g65ClassroomGroupId);
+      body.innerHTML=students.map((s,i)=>{
+        const vals=['T1','T2','T3'].map(t=>getStudentTrimesterEvaluation(s.student_id,g65ClassroomGroupId,t,false).average);
+        const nums=vals.filter(v=>v!==null&&v!==undefined&&Number.isFinite(Number(v))).map(Number);
+        const annual=nums.length ? nums.reduce((a,b)=>a+b,0)/nums.length : null;
+        const pass=Number(cfg?.passing_grade??6);
+        const state=annual===null?'Pendiente':annual>=pass?'Aprobado':'Seguimiento';
+        return `<tr class="border-t">
+          <td class="px-4 py-3 text-xs text-[#66767a]">${escapeHTML(String(s.student_number||i+1))}</td>
+          <td class="px-4 py-3 font-semibold">${escapeHTML(s.full_name)}</td>
+          ${vals.map(v=>`<td class="px-3 py-3 text-center">${v===null?'—':Number(v).toFixed(1)}</td>`).join('')}
+          <td class="px-3 py-3 text-center font-bold">${annual===null?'—':annual.toFixed(1)}</td>
+          <td class="px-3 py-3 text-center font-bold ${state==='Aprobado'?'text-emerald-700':state==='Seguimiento'?'text-amber-700':'text-slate-500'}">${state}</td>
+        </tr>`;
+      }).join('');
+    }
+
+function populateGroupDropdowns() {
       const attSelect = document.getElementById('attendance-group-select');
       const gradeSelect = document.getElementById('gradebook-group-select');
       const planSelect = document.getElementById('plan-group-select');

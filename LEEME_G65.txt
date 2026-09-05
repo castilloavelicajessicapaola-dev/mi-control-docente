@@ -1,0 +1,11 @@
+MI CONTROL DOCENTE G65 · AULA TIPO CLASSROOM
+Primera integración estilo Classroom dentro de Mi Control Docente:
+- Nueva vista Aula por grupo.
+- Pestañas: Tablón, Trabajo de clase, Personas y Calificaciones.
+- Tablón local con avisos del docente guardados en settings; no envía mensajes externos.
+- Próximas entregas derivadas de actividades existentes.
+- Trabajo de clase reutiliza actividades, resultados, SE y captura ya existente.
+- Personas muestra alumnos con Perfil, Editar y Eliminar protegido.
+- Calificaciones concentra T1, T2, T3 y anual.
+- Tarjetas de Grupos ahora incluyen Aula y Alumnos.
+- Sin nueva base ni servicios de pago; DB_VERSION permanece en 12.
