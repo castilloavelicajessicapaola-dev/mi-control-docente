@@ -761,7 +761,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G68 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G69 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -828,8 +828,8 @@
             <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G68 · Organización tipo Classroom</p>
-                  <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema sin duplicar calificaciones ni alumnos.</p>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G69 · Organización tipo Classroom</p>
+                  <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema. Puedes modificar, eliminar y reordenar temas sin duplicar calificaciones ni alumnos.</p>
                 </div>
                 <div id="g66-topic-chips" class="flex flex-wrap gap-1"></div>
               </div>
@@ -1108,7 +1108,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G68 · actividades siempre visibles</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G69 · gestión completa de temas</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -4057,9 +4057,11 @@
       }
       if(chips){
         chips.innerHTML=topics.length
-          ? topics.map(t=>`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-800">${escapeHTML(t.name)}
-              <button type="button" class="text-blue-700 no-print" title="Renombrar tema" onclick="g67RenameTopic('${t.topic_id}')">✎</button>
-              <button type="button" class="text-red-600 no-print" title="Eliminar tema" onclick="g66DeleteTopic('${t.topic_id}')">×</button></span>`).join('')
+          ? topics.map((t,i)=>`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-800">${escapeHTML(t.name)}
+              <button type="button" class="px-1 text-slate-600 no-print ${i===0?'opacity-40':''}" title="Mover arriba" ${i===0?'disabled':''} onclick="g69MoveTopic('${t.topic_id}','up')">↑</button>
+              <button type="button" class="px-1 text-slate-600 no-print ${i===topics.length-1?'opacity-40':''}" title="Mover abajo" ${i===topics.length-1?'disabled':''} onclick="g69MoveTopic('${t.topic_id}','down')">↓</button>
+              <button type="button" class="px-1 text-blue-700 no-print" title="Modificar tema" onclick="g67RenameTopic('${t.topic_id}')">✎</button>
+              <button type="button" class="px-1 text-red-600 no-print" title="Eliminar tema" onclick="g66DeleteTopic('${t.topic_id}')">×</button></span>`).join('')
           : '<span class="text-[10px] text-[#66767a]">Sin temas creados</span>';
       }
     }
@@ -4069,7 +4071,7 @@
       if(!name) return;
       const topics=g66GetTopics().slice();
       if(topics.some(t=>String(t.name).toLowerCase()===name.toLowerCase())) return showToast('Ese tema ya existe');
-      topics.push({topic_id:generateId('topic'),name,created_at:new Date().toISOString()});
+      topics.push({topic_id:generateId('topic'),name,order:topics.length,created_at:new Date().toISOString()});
       try{
         await g66SaveSetting(g66TopicsKey(),topics);
         g66RenderTopicControls();
@@ -4082,7 +4084,27 @@
     }
 
     
-    async function g67RenameTopic(topicId){
+    
+    async function g69MoveTopic(topicId,direction){
+      const topics=g66GetTopics().slice();
+      const idx=topics.findIndex(t=>t.topic_id===topicId);
+      if(idx<0) return;
+      const target=direction==='up'?idx-1:idx+1;
+      if(target<0||target>=topics.length) return showToast('El tema ya está en ese extremo');
+      [topics[idx],topics[target]]=[topics[target],topics[idx]];
+      topics.forEach((t,i)=>t.order=i);
+      try{
+        await g66SaveSetting(g66TopicsKey(),topics);
+        g66RenderTopicControls();
+        g65RenderWork();
+        showToast(direction==='up'?'Tema movido arriba':'Tema movido abajo');
+      }catch(err){
+        console.error('G69 move topic',err);
+        showToast('No se pudo mover el tema');
+      }
+    }
+
+async function g67RenameTopic(topicId){
       const topics=g66GetTopics().slice();
       const topic=topics.find(t=>t.topic_id===topicId);
       if(!topic) return;
@@ -4279,8 +4301,18 @@ function g65RenderWork(){
             <section class="space-y-4">
               <div class="bg-white rounded-3xl border border-emerald-200 p-5">
                 <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema seleccionado</p>
-                <h4 class="serif text-2xl font-bold mt-1">${escapeHTML(title)}</h4>
-                <p class="text-sm text-[#66767a] mt-1">${assignedActs.length+assignedMats.length ? 'Contenido actualmente asignado.' : 'Todavía no tiene contenido asignado.'}</p>
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                  <div>
+                    <h4 class="serif text-2xl font-bold mt-1">${escapeHTML(title)}</h4>
+                    <p class="text-sm text-[#66767a] mt-1">${assignedActs.length+assignedMats.length ? 'Contenido actualmente asignado.' : 'Todavía no tiene contenido asignado.'}</p>
+                  </div>
+                  <div class="flex flex-wrap gap-2 no-print">
+                    <button type="button" class="rounded-lg border border-blue-200 text-blue-700 px-3 py-2 text-xs font-bold" onclick="g67RenameTopic('${selectedTopic}')">Modificar tema</button>
+                    <button type="button" class="rounded-lg border border-slate-300 text-slate-700 px-3 py-2 text-xs font-bold" onclick="g69MoveTopic('${selectedTopic}','up')">↑ Mover arriba</button>
+                    <button type="button" class="rounded-lg border border-slate-300 text-slate-700 px-3 py-2 text-xs font-bold" onclick="g69MoveTopic('${selectedTopic}','down')">↓ Mover abajo</button>
+                    <button type="button" class="rounded-lg border border-red-200 text-red-700 px-3 py-2 text-xs font-bold" onclick="g66DeleteTopic('${selectedTopic}')">Eliminar tema</button>
+                  </div>
+                </div>
               </div>
               ${assignedActs.length||assignedMats.length?`
                 <div>

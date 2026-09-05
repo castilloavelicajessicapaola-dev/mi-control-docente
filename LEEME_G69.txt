@@ -1,0 +1,6 @@
+MI CONTROL DOCENTE G69 · GESTIÓN COMPLETA DE TEMAS
+- Modificar tema: renombrar sin afectar actividades, materiales ni calificaciones.
+- Eliminar tema: conserva el contenido y lo deja Sin tema.
+- Mover tema arriba/abajo: cambia el orden visual de los temas.
+- Controles visibles tanto en los chips como dentro del tema seleccionado.
+- Conserva asignación de actividades, materiales, calificaciones y DB_VERSION 12.
