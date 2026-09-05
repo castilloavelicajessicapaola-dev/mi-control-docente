@@ -761,7 +761,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G66 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G67 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -820,7 +820,7 @@
                 <select id="g66-work-topic" class="rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm" onchange="g65RenderWork()">
                   <option value="all">Todos los temas</option>
                 </select>
-                <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g66AddTopic()">+ Tema</button>
+                <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g66AddTopic()">+ Crear tema</button>
                 <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g66AddMaterial()">+ Material</button>
                 <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold" onclick="g65OpenNewActivity()">+ Nueva actividad</button>
               </div>
@@ -828,7 +828,7 @@
             <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G66 · Organización tipo Classroom</p>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G67 · Organización tipo Classroom</p>
                   <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema sin duplicar calificaciones ni alumnos.</p>
                 </div>
                 <div id="g66-topic-chips" class="flex flex-wrap gap-1"></div>
@@ -1108,7 +1108,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G66 · Temas y trabajo de clase</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G67 · temas con asignación guiada</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -4058,6 +4058,7 @@
       if(chips){
         chips.innerHTML=topics.length
           ? topics.map(t=>`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-800">${escapeHTML(t.name)}
+              <button type="button" class="text-blue-700 no-print" title="Renombrar tema" onclick="g67RenameTopic('${t.topic_id}')">✎</button>
               <button type="button" class="text-red-600 no-print" title="Eliminar tema" onclick="g66DeleteTopic('${t.topic_id}')">×</button></span>`).join('')
           : '<span class="text-[10px] text-[#66767a]">Sin temas creados</span>';
       }
@@ -4080,7 +4081,41 @@
       }
     }
 
-    async function g66DeleteTopic(topicId){
+    
+    async function g67RenameTopic(topicId){
+      const topics=g66GetTopics().slice();
+      const topic=topics.find(t=>t.topic_id===topicId);
+      if(!topic) return;
+      const name=(prompt('Nuevo nombre del tema:',topic.name)||'').trim();
+      if(!name || name===topic.name) return;
+      if(topics.some(t=>t.topic_id!==topicId && String(t.name).toLowerCase()===name.toLowerCase())) return showToast('Ya existe otro tema con ese nombre');
+      topic.name=name;
+      topic.updated_at=new Date().toISOString();
+      try{
+        await g66SaveSetting(g66TopicsKey(),topics);
+        g66RenderTopicControls();
+        g65RenderWork();
+        showToast('Tema renombrado');
+      }catch(err){ showToast('No se pudo renombrar el tema'); }
+    }
+
+    async function g67MoveActivityToTopic(activityId,topicId){
+      await g66AssignActivityTopic(activityId,topicId);
+    }
+
+    async function g67MoveMaterialToTopic(materialId,topicId){
+      const materials=g66GetMaterials().slice();
+      const m=materials.find(x=>x.material_id===materialId);
+      if(!m) return;
+      m.topic_id=topicId||'';
+      try{
+        await g66SaveSetting(g66MaterialsKey(),materials);
+        g65RenderWork();
+        showToast('Material movido de tema');
+      }catch(err){ showToast('No se pudo mover el material'); }
+    }
+
+async function g66DeleteTopic(topicId){
       const topic=g66GetTopics().find(t=>t.topic_id===topicId);
       if(!topic) return;
       if(!confirm(`¿Eliminar el tema "${topic.name}"?\n\nLas actividades y materiales no se borrarán; quedarán sin tema.`)) return;
@@ -4161,11 +4196,13 @@ function g65RenderWork(){
       const topicMap=g66GetActivityTopicMap();
       const topicName=new Map(topics.map(t=>[t.topic_id,t.name]));
 
-      let acts=(localData.activities||[])
+      const allActs=(localData.activities||[])
         .filter(a=>a.group_id===g65ClassroomGroupId&&(a.trimester||'T1')===tri&&(a.status||'ACTIVE')==='ACTIVE')
         .sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));
+      const allMaterials=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri);
 
-      let materials=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri);
+      let acts=allActs.slice();
+      let materials=allMaterials.slice();
 
       if(topicFilter==='none'){
         acts=acts.filter(a=>!topicMap[a.activity_id]);
@@ -4178,11 +4215,12 @@ function g65RenderWork(){
       const topicOptions=(selected='')=>'<option value="">Sin tema</option>'+
         topics.map(t=>`<option value="${escapeHTML(t.topic_id)}" ${selected===t.topic_id?'selected':''}>${escapeHTML(t.name)}</option>`).join('');
 
-      const activityCard=(a)=>{
+      const activityCard=(a,showQuickMove=false)=>{
         const results=(localData.activity_results||[]).filter(r=>r.activity_id===a.activity_id);
         const se=results.filter(r=>r.delivery_status==='SE').length;
         const graded=results.filter(r=>r.grade!==null&&r.grade!==undefined&&r.grade!=='').length;
         const tid=topicMap[a.activity_id]||'';
+        const selectedTopic=(topicFilter!=='all'&&topicFilter!=='none')?topicFilter:'';
         return `<article class="bg-white rounded-3xl border border-[#d9e1da] p-5">
           <div class="flex items-start justify-between gap-2">
             <div>
@@ -4196,6 +4234,7 @@ function g65RenderWork(){
             <select class="w-full rounded-xl border border-[#c7d3c8] px-2 py-2 text-xs" onchange="g66AssignActivityTopic('${a.activity_id}',this.value)">
               ${topicOptions(tid)}
             </select>
+            ${showQuickMove&&selectedTopic?`<button type="button" class="mt-2 w-full rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 px-3 py-2 text-xs font-bold" onclick="g67MoveActivityToTopic('${a.activity_id}','${selectedTopic}')">Mover a ${escapeHTML(topicName.get(selectedTopic)||'este tema')}</button>`:''}
           </div>
           <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs">
             <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${results.length}</strong>registros</div>
@@ -4209,35 +4248,72 @@ function g65RenderWork(){
         </article>`;
       };
 
-      const materialCard=(m)=>`<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
-        <span class="text-[10px] font-bold uppercase text-amber-800">Material</span>
-        <h4 class="font-bold text-base mt-1">${escapeHTML(m.title||'Material')}</h4>
-        ${m.notes?`<p class="text-xs text-[#66767a] mt-2">${escapeHTML(m.notes)}</p>`:''}
-        <p class="text-[10px] text-[#66767a] mt-2">${m.topic_id?`Tema: ${escapeHTML(topicName.get(m.topic_id)||'Sin tema')}`:'Sin tema'}</p>
-        <div class="flex flex-wrap gap-2 mt-4 no-print">
-          ${m.url?`<button class="rounded-lg bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g66OpenMaterial('${m.material_id}')">Abrir material</button>`:''}
-          <button class="rounded-lg border border-red-200 text-red-700 px-3 py-2 text-xs font-bold" onclick="g66DeleteMaterial('${m.material_id}')">Eliminar</button>
-        </div>
-      </article>`;
+      const materialCard=(m,showQuickMove=false)=>{
+        const selectedTopic=(topicFilter!=='all'&&topicFilter!=='none')?topicFilter:'';
+        return `<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
+          <span class="text-[10px] font-bold uppercase text-amber-800">Material</span>
+          <h4 class="font-bold text-base mt-1">${escapeHTML(m.title||'Material')}</h4>
+          ${m.notes?`<p class="text-xs text-[#66767a] mt-2">${escapeHTML(m.notes)}</p>`:''}
+          <p class="text-[10px] text-[#66767a] mt-2">${m.topic_id?`Tema: ${escapeHTML(topicName.get(m.topic_id)||'Sin tema')}`:'Sin tema'}</p>
+          ${showQuickMove&&selectedTopic?`<button type="button" class="mt-3 w-full rounded-xl bg-white border border-amber-300 text-amber-800 px-3 py-2 text-xs font-bold" onclick="g67MoveMaterialToTopic('${m.material_id}','${selectedTopic}')">Mover a ${escapeHTML(topicName.get(selectedTopic)||'este tema')}</button>`:''}
+          <div class="flex flex-wrap gap-2 mt-4 no-print">
+            ${m.url?`<button class="rounded-lg bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g66OpenMaterial('${m.material_id}')">Abrir material</button>`:''}
+            <button class="rounded-lg border border-red-200 text-red-700 px-3 py-2 text-xs font-bold" onclick="g66DeleteMaterial('${m.material_id}')">Eliminar</button>
+          </div>
+        </article>`;
+      };
 
-      if(!acts.length && !materials.length){
-        box.innerHTML='<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay actividades ni materiales con este filtro.</div>';
+      if(topicFilter!=='all'){
+        const currentTopic=topics.find(t=>t.topic_id===topicFilter);
+        const title=topicFilter==='none'?'Sin tema':(currentTopic?.name||'Tema');
+        const unassignedActs=allActs.filter(a=>!topicMap[a.activity_id]);
+        const unassignedMats=allMaterials.filter(m=>!m.topic_id);
+
+        if(!acts.length && !materials.length && topicFilter!=='none'){
+          box.innerHTML=`
+            <section class="space-y-4">
+              <div class="bg-white rounded-3xl border border-emerald-200 p-5">
+                <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema seleccionado</p>
+                <h4 class="serif text-2xl font-bold mt-1">${escapeHTML(title)}</h4>
+                <p class="text-sm text-[#66767a] mt-1">Todavía no tiene contenido. Puedes mover actividades o materiales que estén sin tema.</p>
+              </div>
+              ${(unassignedActs.length||unassignedMats.length)?`
+                <div>
+                  <h4 class="serif text-xl font-bold mb-3">Contenido disponible para mover a ${escapeHTML(title)}</h4>
+                  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    ${unassignedActs.map(a=>activityCard(a,true)).join('')}
+                    ${unassignedMats.map(m=>materialCard(m,true)).join('')}
+                  </div>
+                </div>`:
+                '<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay contenido sin tema disponible.</div>'}
+            </section>`;
+          return;
+        }
+
+        box.innerHTML=`
+          <section class="space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema / Unidad</p><h4 class="serif text-xl font-bold">${escapeHTML(title)}</h4></div>
+              <span class="text-xs text-[#66767a]">${acts.length} actividad(es) · ${materials.length} material(es)</span>
+            </div>
+            <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${acts.map(a=>activityCard(a,false)).join('')}${materials.map(m=>materialCard(m,false)).join('')}</div>
+          </section>`;
         return;
       }
 
-      if(topicFilter!=='all'){
-        box.innerHTML=`<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${acts.map(activityCard).join('')}${materials.map(materialCard).join('')}</div>`;
+      if(!allActs.length && !allMaterials.length){
+        box.innerHTML='<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay actividades ni materiales registrados en este trimestre.</div>';
         return;
       }
 
       const groups=[];
       topics.forEach(t=>{
-        const a=acts.filter(x=>topicMap[x.activity_id]===t.topic_id);
-        const m=materials.filter(x=>x.topic_id===t.topic_id);
+        const a=allActs.filter(x=>topicMap[x.activity_id]===t.topic_id);
+        const m=allMaterials.filter(x=>x.topic_id===t.topic_id);
         if(a.length||m.length) groups.push({id:t.topic_id,name:t.name,acts:a,mats:m});
       });
-      const unassignedActs=acts.filter(x=>!topicMap[x.activity_id]||!topicName.has(topicMap[x.activity_id]));
-      const unassignedMats=materials.filter(x=>!x.topic_id||!topicName.has(x.topic_id));
+      const unassignedActs=allActs.filter(x=>!topicMap[x.activity_id]||!topicName.has(topicMap[x.activity_id]));
+      const unassignedMats=allMaterials.filter(x=>!x.topic_id||!topicName.has(x.topic_id));
       if(unassignedActs.length||unassignedMats.length) groups.push({id:'',name:'Sin tema',acts:unassignedActs,mats:unassignedMats});
 
       box.innerHTML=groups.map(g=>`
@@ -4249,7 +4325,7 @@ function g65RenderWork(){
             </div>
             <span class="text-xs text-[#66767a]">${g.acts.length} actividad(es) · ${g.mats.length} material(es)</span>
           </div>
-          <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${g.acts.map(activityCard).join('')}${g.mats.map(materialCard).join('')}</div>
+          <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${g.acts.map(a=>activityCard(a,false)).join('')}${g.mats.map(m=>materialCard(m,false)).join('')}</div>
         </section>`).join('');
     }
 

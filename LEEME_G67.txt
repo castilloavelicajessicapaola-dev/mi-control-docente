@@ -1,0 +1,7 @@
+MI CONTROL DOCENTE G67 · TEMAS CON ASIGNACIÓN GUIADA
+- + Tema cambia a + Crear tema.
+- Los temas se pueden renombrar.
+- Si seleccionas un tema vacío, la app muestra actividades/materiales sin tema disponibles para mover.
+- Botón directo “Mover a [tema]”.
+- Eliminar un tema sigue conservando actividades y materiales.
+- Conserva G66/G65, calificaciones y DB_VERSION 12.
