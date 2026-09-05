@@ -1,0 +1,11 @@
+MI CONTROL DOCENTE G71 · MATERIALES TIPO CLASSROOM
+- + Material abre un formulario propio, no prompts encadenados.
+- Campos: título, descripción, trimestre, tema, fecha, estado y enlace/referencia.
+- Editar material.
+- Cambiar/mover de tema.
+- Archivar y reactivar.
+- Eliminar con confirmación.
+- Abrir material solo cuando la referencia es una URL http/https válida.
+- Los materiales nunca generan calificaciones ni entregas.
+- No se almacenan archivos pesados en IndexedDB; solo metadatos/referencias.
+- DB_VERSION permanece en 12.

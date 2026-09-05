@@ -761,7 +761,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G70 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G71 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -821,19 +821,20 @@
                   <option value="all">Todos los temas</option>
                 </select>
                 <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g66AddTopic()">+ Crear tema</button>
-                <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g66AddMaterial()">+ Material</button>
+                <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g71OpenMaterialModal()">+ Material</button>
                 <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold" onclick="g65OpenNewActivity()">+ Nueva actividad</button>
               </div>
             </div>
             <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G70 · Organización tipo Classroom</p>
-                  <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema. Usa Modificar, Mover arriba/abajo o Eliminar. Si eliminas un tema, su contenido se conserva como Sin tema.</p>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G71 · Organización tipo Classroom</p>
+                  <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema. Usa Modificar, Mover arriba/abajo o Eliminar. Los materiales ahora pueden editarse, moverse, archivarse o eliminarse sin generar calificaciones.</p>
                 </div>
                 <div class="flex flex-col gap-1">
                   <span class="text-[10px] uppercase tracking-wide font-bold text-[#66767a]">Administrar temas</span>
                   <div id="g66-topic-chips" class="flex flex-wrap gap-2"></div>
+                  <button type="button" class="mt-1 self-start rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold text-slate-700" onclick="g71ShowArchivedMaterials()">Ver materiales archivados</button>
                 </div>
               </div>
             </div>
@@ -1111,7 +1112,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G70 · controles de tema visibles</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G71 · materiales tipo Classroom</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -4170,7 +4171,110 @@ async function g66DeleteTopic(topicId){
       }catch(err){ showToast('No se pudo actualizar el tema'); }
     }
 
-    async function g66AddMaterial(){
+    
+    function g71PopulateMaterialTopicSelect(selected=''){
+      const sel=document.getElementById('g71-material-topic');
+      if(!sel) return;
+      const topics=g66GetTopics();
+      sel.innerHTML='<option value="">Sin tema</option>'+
+        topics.map(t=>`<option value="${escapeHTML(t.topic_id)}">${escapeHTML(t.name)}</option>`).join('');
+      if([...sel.options].some(o=>o.value===selected)) sel.value=selected;
+    }
+
+    function g71OpenMaterialModal(materialId=''){
+      const m=materialId ? g66GetMaterials().find(x=>x.material_id===materialId) : null;
+      const currentTri=document.getElementById('g65-work-trimester')?.value||'T1';
+      const topicFilter=document.getElementById('g66-work-topic')?.value||'all';
+      const defaultTopic=(topicFilter!=='all'&&topicFilter!=='none')?topicFilter:'';
+
+      document.getElementById('g71-material-id').value=m?.material_id||'';
+      document.getElementById('g71-material-title').value=m?.title||'';
+      document.getElementById('g71-material-notes').value=m?.notes||'';
+      document.getElementById('g71-material-trimester').value=m?.trimester||currentTri;
+      g71PopulateMaterialTopicSelect(m?.topic_id||defaultTopic);
+      document.getElementById('g71-material-date').value=m?.material_date||m?.created_at?.slice?.(0,10)||getLocalDateISO();
+      document.getElementById('g71-material-status').value=m?.status||'ACTIVE';
+      document.getElementById('g71-material-url').value=m?.url||'';
+      const title=document.getElementById('g71-material-modal-title');
+      if(title) title.textContent=m?'Editar material':'Nuevo material';
+      openModal('modal-g71-material');
+      setTimeout(()=>document.getElementById('g71-material-title')?.focus(),50);
+    }
+
+    async function g71SaveMaterial(){
+      const id=document.getElementById('g71-material-id')?.value||'';
+      const title=(document.getElementById('g71-material-title')?.value||'').trim();
+      if(!title) return showToast('Escribe el título del material');
+
+      const materials=g66GetMaterials().slice();
+      const existing=id?materials.find(m=>m.material_id===id):null;
+      const now=new Date().toISOString();
+      const record={
+        material_id: existing?.material_id || generateId('mat'),
+        title,
+        notes:(document.getElementById('g71-material-notes')?.value||'').trim(),
+        trimester:document.getElementById('g71-material-trimester')?.value||'T1',
+        topic_id:document.getElementById('g71-material-topic')?.value||'',
+        material_date:document.getElementById('g71-material-date')?.value||'',
+        status:document.getElementById('g71-material-status')?.value||'ACTIVE',
+        url:(document.getElementById('g71-material-url')?.value||'').trim(),
+        created_at:existing?.created_at||now,
+        updated_at:now
+      };
+
+      try{
+        const next=existing ? materials.map(m=>m.material_id===record.material_id?record:m) : [record,...materials];
+        await g66SaveSetting(g66MaterialsKey(),next);
+        closeModal('modal-g71-material');
+        const tri=document.getElementById('g65-work-trimester');
+        if(tri) tri.value=record.trimester;
+        g65RenderWork();
+        showToast(existing?'Material actualizado':'Material creado');
+      }catch(err){
+        console.error('G71 save material',err);
+        showToast('No se pudo guardar el material');
+      }
+    }
+
+    async function g71ToggleArchiveMaterial(materialId){
+      const materials=g66GetMaterials().slice();
+      const m=materials.find(x=>x.material_id===materialId);
+      if(!m) return;
+      m.status=(m.status||'ACTIVE')==='ARCHIVED'?'ACTIVE':'ARCHIVED';
+      m.updated_at=new Date().toISOString();
+      try{
+        await g66SaveSetting(g66MaterialsKey(),materials);
+        g65RenderWork();
+        showToast(m.status==='ARCHIVED'?'Material archivado':'Material reactivado');
+      }catch(err){ showToast('No se pudo cambiar el estado'); }
+    }
+
+    function g71MaterialHasWebUrl(m){
+      if(!m?.url) return false;
+      try{
+        const u=new URL(m.url);
+        return ['http:','https:'].includes(u.protocol);
+      }catch(e){ return false; }
+    }
+
+    function g71ShowArchivedMaterials(){
+      const tri=document.getElementById('g65-work-trimester')?.value||'T1';
+      const archived=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri && (m.status||'ACTIVE')==='ARCHIVED');
+      if(!archived.length) return showToast('No hay materiales archivados en este trimestre');
+      const names=archived.map((m,i)=>`${i+1}. ${m.title}`).join('\n');
+      const pick=(prompt(`Materiales archivados:\n\n${names}\n\nEscribe el número del material que quieres reactivar o editar:`)||'').trim();
+      if(!pick) return;
+      const idx=Number(pick)-1;
+      if(!Number.isInteger(idx)||idx<0||idx>=archived.length) return showToast('Selección no válida');
+      const m=archived[idx];
+      const action=(prompt(`"${m.title}"\n\nEscribe:\n1 = Reactivar\n2 = Editar\n3 = Eliminar`)||'').trim();
+      if(action==='1') return g71ToggleArchiveMaterial(m.material_id);
+      if(action==='2') return g71OpenMaterialModal(m.material_id);
+      if(action==='3') return g66DeleteMaterial(m.material_id);
+    }
+
+
+async function g66AddMaterial(){
       const title=(prompt('Título del material:')||'').trim();
       if(!title) return;
       const url=(prompt('Enlace o referencia del material (opcional):')||'').trim();
@@ -4223,7 +4327,7 @@ function g65RenderWork(){
         const topicFilter=document.getElementById('g66-work-topic')?.value||'all';
         const topics=g66GetTopics();
         const topicMap=g66GetActivityTopicMap();
-        const materialsAll=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri);
+        const materialsAll=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri && (m.status||'ACTIVE')==='ACTIVE');
 
         // G68: obtener actividades directamente de la misma fuente usada por Calificaciones.
         const groupId=g65ClassroomGroupId||activeGroupId||'';
@@ -4279,14 +4383,25 @@ function g65RenderWork(){
         };
 
         const materialCard=(m,quickTopic='')=>`<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
-          <span class="text-[10px] font-bold uppercase text-amber-800">Material</span>
-          <h4 class="font-bold text-base mt-1">${escapeHTML(m.title||'Material')}</h4>
-          ${m.notes?`<p class="text-xs text-[#66767a] mt-2">${escapeHTML(m.notes)}</p>`:''}
-          <p class="text-[10px] text-[#66767a] mt-2">${m.topic_id?`Tema: ${escapeHTML(topicName.get(m.topic_id)||'Sin tema')}`:'Sin tema'}</p>
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-bold uppercase text-amber-800">Material</span>
+              <h4 class="font-bold text-base mt-1">${escapeHTML(m.title||'Material')}</h4>
+            </div>
+            <span class="text-[10px] font-bold rounded-full bg-white border border-amber-200 px-2 py-1 text-amber-800">Sin calificación</span>
+          </div>
+          ${m.notes?`<p class="text-xs text-[#66767a] mt-2 whitespace-pre-wrap">${escapeHTML(m.notes)}</p>`:''}
+          <div class="mt-3 space-y-1 text-[10px] text-[#66767a]">
+            <p>${m.topic_id?`Tema: ${escapeHTML(topicName.get(m.topic_id)||'Sin tema')}`:'Sin tema'}</p>
+            ${m.material_date?`<p>Fecha: ${escapeHTML(fmtDate(m.material_date))}</p>`:''}
+            ${m.url?`<p class="truncate" title="${escapeHTML(m.url)}">Referencia: ${escapeHTML(m.url)}</p>`:''}
+          </div>
           ${quickTopic?`<button type="button" class="mt-3 w-full rounded-xl bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g67MoveMaterialToTopic('${m.material_id}','${quickTopic}')">Mover a ${escapeHTML(topicName.get(quickTopic)||'este tema')}</button>`:''}
           <div class="flex flex-wrap gap-2 mt-4 no-print">
-            ${m.url?`<button class="rounded-lg bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g66OpenMaterial('${m.material_id}')">Abrir material</button>`:''}
-            <button class="rounded-lg border border-red-200 text-red-700 px-3 py-2 text-xs font-bold" onclick="g66DeleteMaterial('${m.material_id}')">Eliminar</button>
+            ${g71MaterialHasWebUrl(m)?`<button class="rounded-lg bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g66OpenMaterial('${m.material_id}')">Abrir material</button>`:''}
+            <button class="rounded-lg border border-blue-200 text-blue-700 bg-white px-3 py-2 text-xs font-bold" onclick="g71OpenMaterialModal('${m.material_id}')">Editar</button>
+            <button class="rounded-lg border border-slate-300 text-slate-700 bg-white px-3 py-2 text-xs font-bold" onclick="g71ToggleArchiveMaterial('${m.material_id}')">Archivar</button>
+            <button class="rounded-lg border border-red-200 text-red-700 bg-white px-3 py-2 text-xs font-bold" onclick="g66DeleteMaterial('${m.material_id}')">Eliminar</button>
           </div>
         </article>`;
 
@@ -13739,5 +13854,67 @@ window.addEventListener('beforeunload',function(e){
 });
 </script>
 
+
+    <!-- G71: MODAL MATERIAL TIPO CLASSROOM -->
+    <div id="modal-g71-material" class="modal fixed inset-0 bg-black/50 z-[90] hidden items-center justify-center p-4">
+      <div class="bg-white w-full max-w-2xl rounded-3xl shadow-xl max-h-[92vh] overflow-y-auto">
+        <div class="p-6 border-b border-[#d9e1da] flex items-start justify-between gap-3">
+          <div>
+            <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G71 · Material del aula</p>
+            <h3 id="g71-material-modal-title" class="serif text-2xl font-bold mt-1">Nuevo material</h3>
+            <p class="text-xs text-[#66767a] mt-1">Los materiales no generan calificaciones ni entregas.</p>
+          </div>
+          <button type="button" class="rounded-xl border border-[#d9e1da] px-3 py-2 text-sm font-bold" onclick="closeModal('modal-g71-material')">✕</button>
+        </div>
+        <div class="p-6 space-y-4">
+          <input type="hidden" id="g71-material-id">
+          <div>
+            <label class="block text-xs font-bold text-[#66767a] mb-1">Título *</label>
+            <input id="g71-material-title" maxlength="140" class="w-full rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm" placeholder="Ej. Guía de herramientas">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#66767a] mb-1">Descripción / indicaciones</label>
+            <textarea id="g71-material-notes" rows="4" maxlength="1200" class="w-full rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm" placeholder="Qué debe revisar el alumno o cómo usar el material..."></textarea>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-[#66767a] mb-1">Trimestre</label>
+              <select id="g71-material-trimester" class="w-full rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm">
+                <option value="T1">Trimestre 1</option><option value="T2">Trimestre 2</option><option value="T3">Trimestre 3</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#66767a] mb-1">Tema / unidad</label>
+              <select id="g71-material-topic" class="w-full rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm"></select>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-[#66767a] mb-1">Fecha de publicación / referencia</label>
+              <input id="g71-material-date" type="date" class="w-full rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#66767a] mb-1">Estado</label>
+              <select id="g71-material-status" class="w-full rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm">
+                <option value="ACTIVE">Activo</option>
+                <option value="ARCHIVED">Archivado</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#66767a] mb-1">Enlace o referencia</label>
+            <input id="g71-material-url" maxlength="1000" class="w-full rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm" placeholder="https://... o una referencia como Drive / libro / página">
+            <p class="text-[10px] text-[#66767a] mt-1">Si escribes una URL válida, aparecerá el botón Abrir material.</p>
+          </div>
+          <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+            Este registro guarda metadatos y referencias. No almacena archivos pesados dentro de IndexedDB.
+          </div>
+        </div>
+        <div class="p-5 border-t border-[#d9e1da] flex flex-wrap justify-end gap-2">
+          <button type="button" class="rounded-xl border border-[#c7d3c8] px-4 py-2 text-sm font-bold" onclick="closeModal('modal-g71-material')">Cancelar</button>
+          <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold" onclick="g71SaveMaterial()">Guardar material</button>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
