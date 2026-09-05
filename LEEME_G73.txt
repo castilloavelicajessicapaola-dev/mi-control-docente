@@ -1,0 +1,8 @@
+MI CONTROL DOCENTE G73 · MATERIALES REUTILIZABLES Y ORDENADOS
+- Conserva G72 y el sistema de calificaciones.
+- Materiales con tarjeta más clara y distintivo 📚 Material / Sin calificación.
+- Reutilizar material: copiar a otro grupo activo, elegir trimestre y tema destino.
+- Copiar material no copia alumnos, resultados ni calificaciones.
+- Reordenar materiales dentro de un mismo tema con ↑ / ↓.
+- Mantiene Editar, Abrir, Archivar, Reactivar y Eliminar.
+- Persistencia en settings; DB_VERSION permanece en 12.

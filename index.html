@@ -761,7 +761,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G72 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G73 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -828,8 +828,8 @@
             <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G72 · Organización tipo Classroom</p>
-                  <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema. Usa Modificar, Mover arriba/abajo o Eliminar. Los materiales ahora pueden editarse, moverse, archivarse o eliminarse sin generar calificaciones.</p>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G73 · Organización tipo Classroom</p>
+                  <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema. Usa Modificar, Mover arriba/abajo o Eliminar. Los materiales pueden editarse, reutilizarse en otros grupos, reordenarse, archivarse o eliminarse sin generar calificaciones.</p>
                 </div>
                 <div class="flex flex-col gap-1">
                   <span class="text-[10px] uppercase tracking-wide font-bold text-[#66767a]">Administrar temas</span>
@@ -1112,7 +1112,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G72 · botón Materiales corregido</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G73 · materiales reutilizables y ordenados</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -4172,7 +4172,118 @@ async function g66DeleteTopic(topicId){
     }
 
     
-    function g71PopulateMaterialTopicSelect(selected=''){
+    
+    function g73MaterialsKeyForGroup(groupId){
+      return `classroom_materials::${groupId}`;
+    }
+
+    function g73TopicsKeyForGroup(groupId){
+      return `classroom_topics::${groupId}`;
+    }
+
+    function g73GetGroupMaterials(groupId){
+      const v=localData.settings?.[g73MaterialsKeyForGroup(groupId)];
+      return Array.isArray(v) ? v : [];
+    }
+
+    function g73GetGroupTopics(groupId){
+      const v=localData.settings?.[g73TopicsKeyForGroup(groupId)];
+      return Array.isArray(v) ? v : [];
+    }
+
+    async function g73DuplicateMaterial(materialId){
+      const source=g66GetMaterials().find(m=>m.material_id===materialId);
+      if(!source) return showToast('Material no encontrado');
+
+      const groups=(typeof getActiveCycleGroups==='function' ? getActiveCycleGroups() : (localData.groups||[]).filter(g=>(g.status||'ACTIVE')==='ACTIVE'));
+      if(!groups.length) return showToast('No hay grupos activos');
+
+      const options=groups.map((g,i)=>{
+        const school=(localData.schools||[]).find(s=>s.school_id===g.school_id);
+        return `${i+1}. ${formatGradeDisplay(g.grade,g.group_name)} · ${g.subject||''}${school?` · ${school.school_name}`:''}`;
+      }).join('\n');
+
+      const pick=(prompt(`Reutilizar material "${source.title}"\n\nElige el grupo destino:\n${options}\n\nEscribe el número:`)||'').trim();
+      if(!pick) return;
+      const idx=Number(pick)-1;
+      if(!Number.isInteger(idx)||idx<0||idx>=groups.length) return showToast('Grupo no válido');
+
+      const targetGroup=groups[idx];
+      const tri=(prompt('Trimestre destino: T1, T2 o T3',source.trimester||'T1')||'').trim().toUpperCase();
+      if(!['T1','T2','T3'].includes(tri)) return showToast('Trimestre no válido');
+
+      const targetTopics=g73GetGroupTopics(targetGroup.group_id);
+      let targetTopic='';
+      if(targetTopics.length){
+        const topicOptions=targetTopics.map((t,i)=>`${i+1}. ${t.name}`).join('\n');
+        const topicPick=(prompt(`Tema destino (opcional):\n0. Sin tema\n${topicOptions}\n\nEscribe el número:`)||'0').trim();
+        if(topicPick!=='0'){
+          const ti=Number(topicPick)-1;
+          if(Number.isInteger(ti)&&ti>=0&&ti<targetTopics.length) targetTopic=targetTopics[ti].topic_id;
+          else return showToast('Tema no válido');
+        }
+      }
+
+      const targetMaterials=g73GetGroupMaterials(targetGroup.group_id).slice();
+      const now=new Date().toISOString();
+      const copy={
+        ...source,
+        material_id:generateId('mat'),
+        trimester:tri,
+        topic_id:targetTopic,
+        status:'ACTIVE',
+        created_at:now,
+        updated_at:now,
+        copied_from_material_id:source.material_id,
+        copied_from_group_id:g65ClassroomGroupId||activeGroupId||''
+      };
+      targetMaterials.unshift(copy);
+
+      try{
+        await g66SaveSetting(g73MaterialsKeyForGroup(targetGroup.group_id),targetMaterials);
+        showToast(`Material reutilizado en ${formatGradeDisplay(targetGroup.grade,targetGroup.group_name)}`);
+      }catch(err){
+        console.error('G73 duplicate material',err);
+        showToast('No se pudo reutilizar el material');
+      }
+    }
+
+    async function g73MoveMaterialOrder(materialId,direction){
+      const materials=g66GetMaterials().slice();
+      const current=materials.find(m=>m.material_id===materialId);
+      if(!current) return;
+      const siblings=materials
+        .filter(m=>(m.status||'ACTIVE')==='ACTIVE' &&
+                   (m.trimester||'T1')===(current.trimester||'T1') &&
+                   (m.topic_id||'')===(current.topic_id||''))
+        .sort((a,b)=>{
+          const ao=Number.isFinite(Number(a.order))?Number(a.order):999999;
+          const bo=Number.isFinite(Number(b.order))?Number(b.order):999999;
+          if(ao!==bo) return ao-bo;
+          return String(a.created_at||'').localeCompare(String(b.created_at||''));
+        });
+
+      const idx=siblings.findIndex(m=>m.material_id===materialId);
+      const target=direction==='up'?idx-1:idx+1;
+      if(idx<0||target<0||target>=siblings.length) return showToast('El material ya está en ese extremo');
+
+      [siblings[idx],siblings[target]]=[siblings[target],siblings[idx]];
+      siblings.forEach((m,i)=>{
+        const real=materials.find(x=>x.material_id===m.material_id);
+        if(real) real.order=i;
+      });
+
+      try{
+        await g66SaveSetting(g66MaterialsKey(),materials);
+        g65RenderWork();
+        showToast(direction==='up'?'Material movido arriba':'Material movido abajo');
+      }catch(err){
+        console.error('G73 move material',err);
+        showToast('No se pudo mover el material');
+      }
+    }
+
+function g71PopulateMaterialTopicSelect(selected=''){
       const sel=document.getElementById('g71-material-topic');
       if(!sel) return;
       const topics=g66GetTopics();
@@ -4224,7 +4335,8 @@ async function g66DeleteTopic(topicId){
         status:document.getElementById('g71-material-status')?.value||'ACTIVE',
         url:(document.getElementById('g71-material-url')?.value||'').trim(),
         created_at:existing?.created_at||now,
-        updated_at:now
+        updated_at:now,
+        order: existing?.order ?? g66GetMaterials().filter(m=>(m.trimester||'T1')===(document.getElementById('g71-material-trimester')?.value||'T1') && (m.topic_id||'')===(document.getElementById('g71-material-topic')?.value||'')).length
       };
 
       try{
@@ -4332,7 +4444,14 @@ function g65RenderWork(){
         const topicFilter=document.getElementById('g66-work-topic')?.value||'all';
         const topics=g66GetTopics();
         const topicMap=g66GetActivityTopicMap();
-        const materialsAll=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri && (m.status||'ACTIVE')==='ACTIVE');
+        const materialsAll=g66GetMaterials()
+          .filter(m=>(m.trimester||'T1')===tri && (m.status||'ACTIVE')==='ACTIVE')
+          .sort((a,b)=>{
+            const ao=Number.isFinite(Number(a.order))?Number(a.order):999999;
+            const bo=Number.isFinite(Number(b.order))?Number(b.order):999999;
+            if(ao!==bo) return ao-bo;
+            return String(a.material_date||a.created_at||'').localeCompare(String(b.material_date||b.created_at||''));
+          });
 
         // G68: obtener actividades directamente de la misma fuente usada por Calificaciones.
         const groupId=g65ClassroomGroupId||activeGroupId||'';
@@ -4387,28 +4506,42 @@ function g65RenderWork(){
           </article>`;
         };
 
-        const materialCard=(m,quickTopic='')=>`<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
+        const materialCard=(m,quickTopic='')=>{
+          const siblings=materialsAll
+            .filter(x=>(x.topic_id||'')===(m.topic_id||''))
+            .sort((a,b)=>{
+              const ao=Number.isFinite(Number(a.order))?Number(a.order):999999;
+              const bo=Number.isFinite(Number(b.order))?Number(b.order):999999;
+              if(ao!==bo) return ao-bo;
+              return String(a.material_date||a.created_at||'').localeCompare(String(b.material_date||b.created_at||''));
+            });
+          const idx=siblings.findIndex(x=>x.material_id===m.material_id);
+          return `<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="text-[10px] font-bold uppercase text-amber-800">Material</span>
-              <h4 class="font-bold text-base mt-1">${escapeHTML(m.title||'Material')}</h4>
+              <span class="inline-flex items-center rounded-full bg-amber-100 border border-amber-200 px-2 py-1 text-[10px] font-bold uppercase text-amber-800">📚 Material</span>
+              <h4 class="font-bold text-base mt-2">${escapeHTML(m.title||'Material')}</h4>
             </div>
             <span class="text-[10px] font-bold rounded-full bg-white border border-amber-200 px-2 py-1 text-amber-800">Sin calificación</span>
           </div>
           ${m.notes?`<p class="text-xs text-[#66767a] mt-2 whitespace-pre-wrap">${escapeHTML(m.notes)}</p>`:''}
-          <div class="mt-3 space-y-1 text-[10px] text-[#66767a]">
-            <p>${m.topic_id?`Tema: ${escapeHTML(topicName.get(m.topic_id)||'Sin tema')}`:'Sin tema'}</p>
-            ${m.material_date?`<p>Fecha: ${escapeHTML(fmtDate(m.material_date))}</p>`:''}
-            ${m.url?`<p class="truncate" title="${escapeHTML(m.url)}">Referencia: ${escapeHTML(m.url)}</p>`:''}
+          <div class="mt-3 grid gap-1 text-[10px] text-[#66767a]">
+            <p><strong>Tema:</strong> ${m.topic_id?escapeHTML(topicName.get(m.topic_id)||'Sin tema'):'Sin tema'}</p>
+            ${m.material_date?`<p><strong>Fecha:</strong> ${escapeHTML(fmtDate(m.material_date))}</p>`:''}
+            ${m.url?`<p class="truncate" title="${escapeHTML(m.url)}"><strong>Referencia:</strong> ${escapeHTML(m.url)}</p>`:''}
           </div>
           ${quickTopic?`<button type="button" class="mt-3 w-full rounded-xl bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g67MoveMaterialToTopic('${m.material_id}','${quickTopic}')">Mover a ${escapeHTML(topicName.get(quickTopic)||'este tema')}</button>`:''}
           <div class="flex flex-wrap gap-2 mt-4 no-print">
             ${g71MaterialHasWebUrl(m)?`<button class="rounded-lg bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g66OpenMaterial('${m.material_id}')">Abrir material</button>`:''}
             <button class="rounded-lg border border-blue-200 text-blue-700 bg-white px-3 py-2 text-xs font-bold" onclick="g71OpenMaterialModal('${m.material_id}')">Editar</button>
+            <button class="rounded-lg border border-violet-200 text-violet-700 bg-white px-3 py-2 text-xs font-bold" onclick="g73DuplicateMaterial('${m.material_id}')">Reutilizar</button>
+            <button class="rounded-lg border border-slate-300 text-slate-700 bg-white px-3 py-2 text-xs font-bold ${idx<=0?'opacity-40 cursor-not-allowed':''}" ${idx<=0?'disabled':''} onclick="g73MoveMaterialOrder('${m.material_id}','up')">↑</button>
+            <button class="rounded-lg border border-slate-300 text-slate-700 bg-white px-3 py-2 text-xs font-bold ${idx<0||idx>=siblings.length-1?'opacity-40 cursor-not-allowed':''}" ${idx<0||idx>=siblings.length-1?'disabled':''} onclick="g73MoveMaterialOrder('${m.material_id}','down')">↓</button>
             <button class="rounded-lg border border-slate-300 text-slate-700 bg-white px-3 py-2 text-xs font-bold" onclick="g71ToggleArchiveMaterial('${m.material_id}')">Archivar</button>
             <button class="rounded-lg border border-red-200 text-red-700 bg-white px-3 py-2 text-xs font-bold" onclick="g66DeleteMaterial('${m.material_id}')">Eliminar</button>
           </div>
         </article>`;
+        };
 
         // Always show a small count so the teacher can see what the app detected.
         const info=`<div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-[#66767a]">
