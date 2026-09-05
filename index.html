@@ -761,7 +761,7 @@
         <section id="classroom-group-view" class="view">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
             <div>
-              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G65 · Aula del grupo</p>
+              <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">G66 · Aula del grupo</p>
               <h2 id="g65-classroom-title" class="serif text-3xl font-semibold mt-1">Aula</h2>
               <p id="g65-classroom-meta" class="text-sm text-[#66767a] mt-1">Tablón, trabajo de clase, personas y calificaciones en una sola vista.</p>
             </div>
@@ -813,14 +813,28 @@
                 <h3 class="serif text-2xl font-bold">Trabajo de clase</h3>
                 <p class="text-sm text-[#66767a]">Actividades organizadas por trimestre, con fecha y estado.</p>
               </div>
-              <div class="flex gap-2 no-print">
+              <div class="flex flex-wrap gap-2 no-print">
                 <select id="g65-work-trimester" class="rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm" onchange="g65RenderWork()">
                   <option value="T1">Trimestre 1</option><option value="T2">Trimestre 2</option><option value="T3">Trimestre 3</option>
                 </select>
+                <select id="g66-work-topic" class="rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm" onchange="g65RenderWork()">
+                  <option value="all">Todos los temas</option>
+                </select>
+                <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g66AddTopic()">+ Tema</button>
+                <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-sm font-bold" onclick="g66AddMaterial()">+ Material</button>
                 <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold" onclick="g65OpenNewActivity()">+ Nueva actividad</button>
               </div>
             </div>
-            <div id="g65-work-list" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+            <div class="bg-white rounded-3xl border border-[#d9e1da] p-4 no-print">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wide text-[#145b4b]">G66 · Organización tipo Classroom</p>
+                  <p class="text-xs text-[#66767a] mt-1">Agrupa actividades y materiales por tema sin duplicar calificaciones ni alumnos.</p>
+                </div>
+                <div id="g66-topic-chips" class="flex flex-wrap gap-1"></div>
+              </div>
+            </div>
+            <div id="g65-work-list" class="space-y-5"></div>
           </div>
 
           <div id="g65-panel-people" class="g65-panel hidden space-y-4">
@@ -1094,7 +1108,7 @@
             <div>
               <p class="text-xs font-bold tracking-[.15em] uppercase text-[#145b4b]">Evaluación Continua</p>
               <h2 class="serif text-3xl font-semibold mt-1">Actividades y Calificaciones</h2>
-              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G65 · Aula tipo Classroom</div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-[11px] font-extrabold text-emerald-900">G66 · Temas y trabajo de clase</div>
             </div>
             <div class="flex flex-wrap gap-2">
               <select id="gradebook-group-select" class="rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm font-semibold" onchange="handleGradebookContextChange('group', this)">
@@ -3963,6 +3977,7 @@
       if(title) title.textContent=`${formatGradeDisplay(g.grade,g.group_name)} · ${g.subject||'Aula'}`;
       if(meta) meta.textContent=`${school?.school_name||'Escuela'} · ${g.shift||''} · ${getGradebookStudentsSafe(g.group_id).length} alumnos activos`;
       g65RenderBoard();
+      g66RenderTopicControls();
       g65SetTab(g65ClassroomTab||'board');
     }
 
@@ -4005,22 +4020,182 @@
       setTimeout(()=>openActivityModal(''),80);
     }
 
-    function g65RenderWork(){
+    
+    function g66TopicsKey(){ return `classroom_topics::${g65ClassroomGroupId}`; }
+    function g66MapKey(){ return `classroom_activity_topics::${g65ClassroomGroupId}`; }
+    function g66MaterialsKey(){ return `classroom_materials::${g65ClassroomGroupId}`; }
+
+    function g66GetTopics(){
+      const v=localData.settings?.[g66TopicsKey()];
+      return Array.isArray(v) ? v : [];
+    }
+
+    function g66GetActivityTopicMap(){
+      const v=localData.settings?.[g66MapKey()];
+      return v && typeof v==='object' && !Array.isArray(v) ? v : {};
+    }
+
+    function g66GetMaterials(){
+      const v=localData.settings?.[g66MaterialsKey()];
+      return Array.isArray(v) ? v : [];
+    }
+
+    async function g66SaveSetting(key,value){
+      await dbPut('settings',{key,value});
+      localData.settings[key]=value;
+    }
+
+    function g66RenderTopicControls(){
+      const select=document.getElementById('g66-work-topic');
+      const chips=document.getElementById('g66-topic-chips');
+      const topics=g66GetTopics();
+      if(select){
+        const current=select.value||'all';
+        select.innerHTML='<option value="all">Todos los temas</option><option value="none">Sin tema</option>'+
+          topics.map(t=>`<option value="${escapeHTML(t.topic_id)}">${escapeHTML(t.name)}</option>`).join('');
+        if([...select.options].some(o=>o.value===current)) select.value=current;
+      }
+      if(chips){
+        chips.innerHTML=topics.length
+          ? topics.map(t=>`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-800">${escapeHTML(t.name)}
+              <button type="button" class="text-red-600 no-print" title="Eliminar tema" onclick="g66DeleteTopic('${t.topic_id}')">×</button></span>`).join('')
+          : '<span class="text-[10px] text-[#66767a]">Sin temas creados</span>';
+      }
+    }
+
+    async function g66AddTopic(){
+      const name=(prompt('Nombre del nuevo tema o unidad:')||'').trim();
+      if(!name) return;
+      const topics=g66GetTopics().slice();
+      if(topics.some(t=>String(t.name).toLowerCase()===name.toLowerCase())) return showToast('Ese tema ya existe');
+      topics.push({topic_id:generateId('topic'),name,created_at:new Date().toISOString()});
+      try{
+        await g66SaveSetting(g66TopicsKey(),topics);
+        g66RenderTopicControls();
+        g65RenderWork();
+        showToast('Tema creado');
+      }catch(err){
+        console.error('G66 add topic',err);
+        showToast('No se pudo crear el tema');
+      }
+    }
+
+    async function g66DeleteTopic(topicId){
+      const topic=g66GetTopics().find(t=>t.topic_id===topicId);
+      if(!topic) return;
+      if(!confirm(`¿Eliminar el tema "${topic.name}"?\n\nLas actividades y materiales no se borrarán; quedarán sin tema.`)) return;
+      const topics=g66GetTopics().filter(t=>t.topic_id!==topicId);
+      const map={...g66GetActivityTopicMap()};
+      Object.keys(map).forEach(k=>{ if(map[k]===topicId) delete map[k]; });
+      const materials=g66GetMaterials().map(m=>m.topic_id===topicId?{...m,topic_id:''}:m);
+      try{
+        await g66SaveSetting(g66TopicsKey(),topics);
+        await g66SaveSetting(g66MapKey(),map);
+        await g66SaveSetting(g66MaterialsKey(),materials);
+        g66RenderTopicControls();
+        g65RenderWork();
+        showToast('Tema eliminado; contenido conservado');
+      }catch(err){ showToast('No se pudo eliminar el tema'); }
+    }
+
+    async function g66AssignActivityTopic(activityId,topicId){
+      const map={...g66GetActivityTopicMap()};
+      if(topicId) map[activityId]=topicId; else delete map[activityId];
+      try{
+        await g66SaveSetting(g66MapKey(),map);
+        g65RenderWork();
+        showToast('Tema actualizado');
+      }catch(err){ showToast('No se pudo actualizar el tema'); }
+    }
+
+    async function g66AddMaterial(){
+      const title=(prompt('Título del material:')||'').trim();
+      if(!title) return;
+      const url=(prompt('Enlace o referencia del material (opcional):')||'').trim();
+      const notes=(prompt('Descripción breve o indicaciones (opcional):')||'').trim();
+      const topicSelect=document.getElementById('g66-work-topic');
+      const selected=topicSelect?.value||'all';
+      const topicId=(selected!=='all'&&selected!=='none')?selected:'';
+      const trimester=document.getElementById('g65-work-trimester')?.value||'T1';
+      const materials=g66GetMaterials().slice();
+      materials.unshift({
+        material_id:generateId('mat'),
+        title,url,notes,topic_id:topicId,trimester,
+        created_at:new Date().toISOString()
+      });
+      try{
+        await g66SaveSetting(g66MaterialsKey(),materials);
+        g65RenderWork();
+        showToast('Material agregado');
+      }catch(err){ showToast('No se pudo guardar el material'); }
+    }
+
+    async function g66DeleteMaterial(materialId){
+      if(!confirm('¿Eliminar este material del aula?')) return;
+      try{
+        await g66SaveSetting(g66MaterialsKey(),g66GetMaterials().filter(m=>m.material_id!==materialId));
+        g65RenderWork();
+        showToast('Material eliminado');
+      }catch(err){ showToast('No se pudo eliminar el material'); }
+    }
+
+    function g66OpenMaterial(materialId){
+      const m=g66GetMaterials().find(x=>x.material_id===materialId);
+      if(!m?.url) return showToast('Este material no tiene enlace registrado');
+      try{
+        const u=new URL(m.url,location.href);
+        window.open(u.href,'_blank','noopener');
+      }catch(e){
+        showToast('El enlace del material no es válido');
+      }
+    }
+
+function g65RenderWork(){
       const box=document.getElementById('g65-work-list');
       if(!box) return;
+      g66RenderTopicControls();
+
       const tri=document.getElementById('g65-work-trimester')?.value||'T1';
-      const acts=(localData.activities||[])
+      const topicFilter=document.getElementById('g66-work-topic')?.value||'all';
+      const topics=g66GetTopics();
+      const topicMap=g66GetActivityTopicMap();
+      const topicName=new Map(topics.map(t=>[t.topic_id,t.name]));
+
+      let acts=(localData.activities||[])
         .filter(a=>a.group_id===g65ClassroomGroupId&&(a.trimester||'T1')===tri&&(a.status||'ACTIVE')==='ACTIVE')
         .sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));
-      box.innerHTML=acts.length ? acts.map(a=>{
+
+      let materials=g66GetMaterials().filter(m=>(m.trimester||'T1')===tri);
+
+      if(topicFilter==='none'){
+        acts=acts.filter(a=>!topicMap[a.activity_id]);
+        materials=materials.filter(m=>!m.topic_id);
+      }else if(topicFilter!=='all'){
+        acts=acts.filter(a=>topicMap[a.activity_id]===topicFilter);
+        materials=materials.filter(m=>m.topic_id===topicFilter);
+      }
+
+      const topicOptions=(selected='')=>'<option value="">Sin tema</option>'+
+        topics.map(t=>`<option value="${escapeHTML(t.topic_id)}" ${selected===t.topic_id?'selected':''}>${escapeHTML(t.name)}</option>`).join('');
+
+      const activityCard=(a)=>{
         const results=(localData.activity_results||[]).filter(r=>r.activity_id===a.activity_id);
         const se=results.filter(r=>r.delivery_status==='SE').length;
         const graded=results.filter(r=>r.grade!==null&&r.grade!==undefined&&r.grade!=='').length;
+        const tid=topicMap[a.activity_id]||'';
         return `<article class="bg-white rounded-3xl border border-[#d9e1da] p-5">
           <div class="flex items-start justify-between gap-2">
-            <div><span class="text-[10px] font-bold uppercase text-[#145b4b]">${escapeHTML(activityTypeLabel(a.activity_type))}</span>
-            <h4 class="font-bold text-base mt-1">${escapeHTML(a.activity_code||'ACT')} · ${escapeHTML(a.activity_name||'Actividad')}</h4>
-            <p class="text-xs text-[#66767a] mt-1">Entrega: ${escapeHTML(formatDateForDisplay(a.due_date))} · Máx. ${escapeHTML(String(a.max_grade??10))}</p></div>
+            <div>
+              <span class="text-[10px] font-bold uppercase text-[#145b4b]">${escapeHTML(activityTypeLabel(a.activity_type))}</span>
+              <h4 class="font-bold text-base mt-1">${escapeHTML(a.activity_code||'ACT')} · ${escapeHTML(a.activity_name||'Actividad')}</h4>
+              <p class="text-xs text-[#66767a] mt-1">Entrega: ${escapeHTML(formatDateForDisplay(a.due_date))} · Máx. ${escapeHTML(String(a.max_grade??10))}</p>
+            </div>
+          </div>
+          <div class="mt-3 no-print">
+            <label class="block text-[10px] font-bold uppercase text-[#66767a] mb-1">Tema</label>
+            <select class="w-full rounded-xl border border-[#c7d3c8] px-2 py-2 text-xs" onchange="g66AssignActivityTopic('${a.activity_id}',this.value)">
+              ${topicOptions(tid)}
+            </select>
           </div>
           <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs">
             <div class="rounded-xl bg-slate-50 p-2"><strong class="block text-lg text-[#145b4b]">${results.length}</strong>registros</div>
@@ -4032,7 +4207,50 @@
             <button class="rounded-lg border border-[#c7d3c8] px-3 py-2 text-xs font-bold" onclick="openActivityModal('${a.activity_id}')">Editar</button>
           </div>
         </article>`;
-      }).join('') : '<div class="md:col-span-2 xl:col-span-3 bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay actividades activas en este trimestre.</div>';
+      };
+
+      const materialCard=(m)=>`<article class="bg-amber-50 rounded-3xl border border-amber-200 p-5">
+        <span class="text-[10px] font-bold uppercase text-amber-800">Material</span>
+        <h4 class="font-bold text-base mt-1">${escapeHTML(m.title||'Material')}</h4>
+        ${m.notes?`<p class="text-xs text-[#66767a] mt-2">${escapeHTML(m.notes)}</p>`:''}
+        <p class="text-[10px] text-[#66767a] mt-2">${m.topic_id?`Tema: ${escapeHTML(topicName.get(m.topic_id)||'Sin tema')}`:'Sin tema'}</p>
+        <div class="flex flex-wrap gap-2 mt-4 no-print">
+          ${m.url?`<button class="rounded-lg bg-amber-700 text-white px-3 py-2 text-xs font-bold" onclick="g66OpenMaterial('${m.material_id}')">Abrir material</button>`:''}
+          <button class="rounded-lg border border-red-200 text-red-700 px-3 py-2 text-xs font-bold" onclick="g66DeleteMaterial('${m.material_id}')">Eliminar</button>
+        </div>
+      </article>`;
+
+      if(!acts.length && !materials.length){
+        box.innerHTML='<div class="bg-white rounded-3xl border border-dashed border-[#c7d3c8] p-8 text-center text-sm text-[#66767a]">No hay actividades ni materiales con este filtro.</div>';
+        return;
+      }
+
+      if(topicFilter!=='all'){
+        box.innerHTML=`<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${acts.map(activityCard).join('')}${materials.map(materialCard).join('')}</div>`;
+        return;
+      }
+
+      const groups=[];
+      topics.forEach(t=>{
+        const a=acts.filter(x=>topicMap[x.activity_id]===t.topic_id);
+        const m=materials.filter(x=>x.topic_id===t.topic_id);
+        if(a.length||m.length) groups.push({id:t.topic_id,name:t.name,acts:a,mats:m});
+      });
+      const unassignedActs=acts.filter(x=>!topicMap[x.activity_id]||!topicName.has(topicMap[x.activity_id]));
+      const unassignedMats=materials.filter(x=>!x.topic_id||!topicName.has(x.topic_id));
+      if(unassignedActs.length||unassignedMats.length) groups.push({id:'',name:'Sin tema',acts:unassignedActs,mats:unassignedMats});
+
+      box.innerHTML=groups.map(g=>`
+        <section class="space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">Tema / Unidad</p>
+              <h4 class="serif text-xl font-bold">${escapeHTML(g.name)}</h4>
+            </div>
+            <span class="text-xs text-[#66767a]">${g.acts.length} actividad(es) · ${g.mats.length} material(es)</span>
+          </div>
+          <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${g.acts.map(activityCard).join('')}${g.mats.map(materialCard).join('')}</div>
+        </section>`).join('');
     }
 
     function g65OpenPeopleManager(groupId=''){

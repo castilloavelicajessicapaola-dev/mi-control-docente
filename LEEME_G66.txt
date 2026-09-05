@@ -1,0 +1,9 @@
+MI CONTROL DOCENTE G66 · TEMAS Y TRABAJO DE CLASE
+- Conserva G65 y el guardado verificado de calificaciones.
+- Trabajo de clase ahora permite crear Temas/Unidades.
+- Cada actividad se puede asignar a un tema sin modificar la actividad ni sus calificaciones.
+- Filtro por tema y trimestre.
+- Materiales locales con título, enlace/referencia, descripción y tema.
+- Eliminar un tema no borra actividades ni materiales: solo los deja sin tema.
+- Todo se guarda en settings; DB_VERSION permanece en 12.
+- Sin integración externa automática con Google Classroom.
