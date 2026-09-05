@@ -1,0 +1,1 @@
+G76: nombre docente visible + importación Excel/CSV/pegado con vista previa y creación de escuelas/grupos/alumnos. DB_VERSION 12.
