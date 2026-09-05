@@ -1,0 +1,13 @@
+MI CONTROL DOCENTE G77 · IMPORTACIÓN ASISTIDA DE GRUPOS Y ALUMNOS
+- Nombre del docente visible como “Mtra. <nombre>” en encabezado y menú lateral.
+- Menú lateral deja de truncar el nombre y permite dos líneas.
+- Grupos > Importar Excel abre un asistente paso a paso.
+- Compatible con .xlsx/.xls mediante SheetJS, CSV/TSV o filas pegadas desde Excel.
+- Detección automática de columnas: Escuela, Grado, Grupo, Asignatura, Turno, Número de lista y Alumno.
+- Mapeo manual de columnas si la detección automática no coincide.
+- Vista previa editable antes de importar.
+- Estados LISTO / REVISAR / ERROR.
+- Crea escuelas y grupos faltantes solo al confirmar.
+- Omite alumnos duplicados detectados en el mismo grupo.
+- No elimina ni sobrescribe datos existentes.
+- DB_VERSION permanece en 12.
