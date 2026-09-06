@@ -1,0 +1,12 @@
+MI CONTROL DOCENTE G80 · IMPORTACIÓN POR HOJA Y CONTEXTO
+Corrección dirigida al formato real del archivo del docente:
+- Interpreta nombres de hojas como V25 1A / M25 1D:
+  V = Vespertino, M = Matutino, 25 = escuela, 1 = grado, A/D = grupo.
+- Detecta por contenido la columna que contiene nombres de alumnos.
+- Detecta secuencias 1,2,3... como número de lista.
+- Si la columna seleccionada como Grupo contiene nombres, deja de usarla como grupo.
+- El grupo/grado/turno de la hoja tienen prioridad sobre encabezados defectuosos.
+- Ignora filas como APELLIDOS Y NOMBRE, TRIMESTRE, MARCADOR, TOTAL y PROMEDIO.
+- La vista previa debe mostrar al alumno en la columna Alumno y no en Grupo.
+- Solo filas OK se importan.
+- DB_VERSION permanece en 12.
