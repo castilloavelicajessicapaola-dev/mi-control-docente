@@ -1,0 +1,11 @@
+MI CONTROL DOCENTE G79 · DETECCIÓN ESTRUCTURAL DE LISTAS
+- Analiza el contenido de las columnas, no solo los encabezados.
+- Detecta automáticamente qué columna parece contener nombres de personas.
+- Detecta secuencias 1,2,3... para inferir número de lista.
+- Si la columna “Grupo” contiene nombres, deja de usarla como grupo.
+- Reconoce formatos contextuales: “Grupo: 1-D” seguido de “Apellidos y nombre” y luego alumnos.
+- Busca contexto de grupo/grado/turno hacia filas superiores.
+- Ignora encabezados intermedios como APELLIDOS Y NOMBRE, TRIMESTRE, MARCADOR, PROMEDIO, TOTAL.
+- Muestra advertencias si el mapeo automático es incoherente.
+- Conserva vista previa editable y no importa hasta confirmar.
+- DB_VERSION permanece en 12.
