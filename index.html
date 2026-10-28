@@ -2859,14 +2859,14 @@
     </div>
   </div>
 
-  <!-- G80: IMPORTAR GRUPOS Y ALUMNOS -->
+  <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G80 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV o filas copiadas desde Excel. Primero revisas la vista previa.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G81 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV o filas copiadas desde Excel. Primero revisas la vista previa.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" value="https://excel.cloud.microsoft/open/onedrive/?docId=8bdabe0c9f77bc49%21s4e4f911fbdaf432693ee4e88b02b0a26&driveId=8BDABE0C9F77BC49"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div id="g76-mapping-section" class="hidden space-y-3"><div class="flex items-center justify-between"><div><h4 class="font-bold">3. Relacionar columnas</h4><p class="text-xs text-[#66767a]">La detección es automática, pero puedes corregirla.</p></div><span id="g76-row-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">0 filas</span><div id="g80-import-detection-note" class="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">G80 analizará la hoja y detectará automáticamente alumno, número de lista, grado, grupo y turno.</div></div><div id="g76-map-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><label class="text-xs font-bold">Escuela predeterminada<input id="g76-default-school" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Secundaria #57"></label><label class="text-xs font-bold">Asignatura<input id="g76-default-subject" class="mt-1 w-full rounded-xl border p-2 text-sm" value="Tecnología"></label><label class="text-xs font-bold">Turno<select id="g76-default-shift" class="mt-1 w-full rounded-xl border p-2 text-sm"><option>Matutino</option><option>Vespertino</option><option>Mixto</option></select></label><label class="text-xs font-bold">Ciclo escolar<input id="g76-default-year" class="mt-1 w-full rounded-xl border p-2 text-sm" value="2026-2027"></label></div></div>
+        <div id="g76-mapping-section" class="hidden space-y-3"><div class="flex items-center justify-between"><div><h4 class="font-bold">3. Relacionar columnas</h4><p class="text-xs text-[#66767a]">La detección es automática, pero puedes corregirla.</p></div><span id="g76-row-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">0 filas</span><div id="g80-import-detection-note" class="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">G81 analizará la hoja y detectará automáticamente alumno, número de lista, grado, grupo y turno.</div></div><div id="g76-map-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><label class="text-xs font-bold">Escuela predeterminada<input id="g76-default-school" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Secundaria #57"></label><label class="text-xs font-bold">Asignatura<input id="g76-default-subject" class="mt-1 w-full rounded-xl border p-2 text-sm" value="Tecnología"></label><label class="text-xs font-bold">Turno<select id="g76-default-shift" class="mt-1 w-full rounded-xl border p-2 text-sm"><option>Matutino</option><option>Vespertino</option><option>Mixto</option></select></label><label class="text-xs font-bold">Ciclo escolar<input id="g76-default-year" class="mt-1 w-full rounded-xl border p-2 text-sm" value="2026-2027"></label></div></div>
         <div id="g76-preview-section" class="hidden space-y-3"><div class="flex items-center justify-between"><h4 class="font-bold">4. Vista previa</h4><button type="button" class="rounded-xl border px-3 py-2 text-xs font-bold" onclick="g76BuildRosterPreview()">Actualizar</button></div><div id="g76-summary" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2"></div><div class="overflow-x-auto rounded-2xl border"><table class="w-full text-xs min-w-[900px]"><thead class="bg-slate-50"><tr><th class="p-2">Estado</th><th class="p-2">Escuela</th><th class="p-2">Grado</th><th class="p-2">Grupo</th><th class="p-2">Asignatura</th><th class="p-2">Turno</th><th class="p-2">#</th><th class="p-2 text-left">Alumno</th><th class="p-2 text-left">Observación</th></tr></thead><tbody id="g76-preview-body"></tbody></table></div></div>
       </div><div class="p-5 border-t flex justify-between gap-2"><button class="rounded-xl border px-4 py-2 text-sm font-bold" onclick="closeModal('modal-g76-roster-import')">Cancelar</button><button id="g76-import-btn" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold disabled:opacity-40" disabled onclick="g76ImportRoster()">Importar grupos y alumnos</button></div>
     </div>
@@ -3882,31 +3882,22 @@
     }
 
         let g76RosterRows=[],g76Workbook=null,g76RosterPreview=[];
-    const G80_FIELDS=[['school','Escuela',['escuela','plantel','school']],['grade','Grado',['grado','grade']],['group','Grupo',['grupo','group','seccion','sección']],['subject','Asignatura',['asignatura','materia','subject']],['shift','Turno',['turno','shift']],['number','Núm. lista',['numero','número','num','no','lista','numero de lista','número de lista']],['student','Nombre del alumno',['alumno','estudiante','nombre','nombre completo','nombre del alumno','student']],['paternal','Apellido paterno',['apellido paterno','paterno']],['maternal','Apellido materno',['apellido materno','materno']]];
+    const G81_FIELDS=[['school','Escuela',['escuela','plantel','school']],['grade','Grado',['grado','grade']],['group','Grupo',['grupo','group','seccion','sección']],['subject','Asignatura',['asignatura','materia','subject']],['shift','Turno',['turno','shift']],['number','Núm. lista',['numero','número','num','no','lista','numero de lista','número de lista']],['student','Nombre del alumno',['alumno','estudiante','nombre','nombre completo','nombre del alumno','student']],['paternal','Apellido paterno',['apellido paterno','paterno']],['maternal','Apellido materno',['apellido materno','materno']]];
     
     let g80CurrentSheetName='';
     let g80CurrentFileName='';
 
     function g80ParseSheetContext(name){
-      const s=String(name||'').trim().toUpperCase().replace(/[._-]+/g,' ');
-      // Examples: V25 1A, M25 1D, V 25 2 C
-      const compact=s.replace(/\s+/g,'');
-      const m=compact.match(/^([MV])?(\d{1,3})?([1-3])([A-Z])$/);
-      if(m){
-        return {
-          shift:m[1]==='V'?'Vespertino':m[1]==='M'?'Matutino':'',
-          schoolNumber:m[2]||'',
-          grade:m[3]||'',
-          group:m[4]||''
-        };
-      }
-      const g=s.match(/\b([1-3])\s*([A-Z])\b/);
-      return {
-        shift:/\bV(?:ESP)?\b|VESPERTINO/.test(s)?'Vespertino':(/\bM(?:AT)?\b|MATUTINO/.test(s)?'Matutino':''),
-        schoolNumber:'',
-        grade:g?.[1]||'',
-        group:g?.[2]||''
-      };
+      const raw=String(name||'').trim().toUpperCase();
+      const compact=raw.replace(/[\s._-]+/g,'');
+      // A school number and a grade/group suffix must be parsed separately.
+      // V25 1A => school 25, grade 1, group A, Vespertino.
+      const m=compact.match(/^([MV])?(\d{1,3}?)([1-3])([A-Z])$/);
+      if(m) return {shift:m[1]==='V'?'Vespertino':m[1]==='M'?'Matutino':'',schoolNumber:m[2],grade:m[3],group:m[4]};
+      const standalone=compact.match(/^([1-3])([A-Z])$/);
+      if(standalone) return {shift:'',schoolNumber:'',grade:standalone[1],group:standalone[2]};
+      const g=raw.match(/(?:^|\s)([1-3])\s*[-º°]?\s*([A-Z])(?:\s|$)/);
+      return {shift:/VESPERTINO/.test(raw)?'Vespertino':/MATUTINO/.test(raw)?'Matutino':'',schoolNumber:'',grade:g?.[1]||'',group:g?.[2]||''};
     }
 
     function g80LooksLikeStudentName(v){
@@ -3993,7 +3984,7 @@
 
       const note=document.getElementById('g80-import-detection-note');
       if(note){
-        note.innerHTML=`<strong>Detección G80:</strong> hoja <strong>${escapeHTML(g80CurrentSheetName||'—')}</strong> · `+
+        note.innerHTML=`<strong>Detección G81:</strong> hoja <strong>${escapeHTML(g80CurrentSheetName||'—')}</strong> · `+
           `grado <strong>${escapeHTML(ctx.grade||'—')}</strong> · grupo <strong>${escapeHTML(ctx.group||'—')}</strong> · `+
           `turno <strong>${escapeHTML(ctx.shift||'—')}</strong> · `+
           `alumno: <strong>${escapeHTML(bestStudent.header||'no detectado')}</strong> (${Math.round(bestStudent.score*100)}%).`;
@@ -4009,11 +4000,11 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
     function g76OpenRosterImport(){const s=document.getElementById('g76-source-url');if(s)s.value=localData.settings?.student_import_source_url||s.value||'';const y=document.getElementById('g76-default-year');if(y)y.value=localData.settings?.school_year||'2026-2027';const sc=document.getElementById('g76-default-school');if(sc&&!sc.value&&localData.schools?.length===1)sc.value=localData.schools[0].school_name||'';openModal('modal-g76-roster-import');}
     function g76OpenSourceWorkbook(){const u=(document.getElementById('g76-source-url')?.value||'').trim();if(!u)return showToast('Pega el enlace');window.open(u,'_blank','noopener');}
     async function g76SaveSourceUrl(){const u=(document.getElementById('g76-source-url')?.value||'').trim();localData.settings.student_import_source_url=u;try{await dbPut('settings',{key:'student_import_source_url',value:u});showToast('Enlace guardado');}catch(e){showToast('No se pudo guardar');}}
-    function g76RowsFromMatrix(matrix){const rows=(matrix||[]).filter(r=>Array.isArray(r)&&r.some(v=>String(v??'').trim()));if(!rows.length)return[];let best=0,score=-1;for(let i=0;i<Math.min(12,rows.length);i++){const hs=rows[i].map(g76NormalizeHeader);const s=G80_FIELDS.reduce((a,[,,al])=>a+(hs.some(h=>al.map(g76NormalizeHeader).includes(h))?1:0),0);if(s>score){score=s;best=i;}}const headers=rows[best].map((v,i)=>String(v??'').trim()||`Columna ${i+1}`);return rows.slice(best+1).map(r=>{const o={};headers.forEach((hh,i)=>o[hh]=r[i]??'');return o;}).filter(o=>Object.values(o).some(v=>String(v??'').trim()));}
+    function g76RowsFromMatrix(matrix){const rows=(matrix||[]).filter(r=>Array.isArray(r)&&r.some(v=>String(v??'').trim()));if(!rows.length)return[];let best=0,score=-1;for(let i=0;i<Math.min(12,rows.length);i++){const hs=rows[i].map(g76NormalizeHeader);const s=G81_FIELDS.reduce((a,[,,al])=>a+(hs.some(h=>al.map(g76NormalizeHeader).includes(h))?1:0),0);if(s>score){score=s;best=i;}}const headers=rows[best].map((v,i)=>String(v??'').trim()||`Columna ${i+1}`);return rows.slice(best+1).map(r=>{const o={};headers.forEach((hh,i)=>o[hh]=r[i]??'');return o;}).filter(o=>Object.values(o).some(v=>String(v??'').trim()));}
     async function g76ReadRosterFile(e){const f=e.target.files?.[0];if(!f)return;g80CurrentFileName=f.name||'';const st=document.getElementById('g76-file-status');try{const ext=(f.name.split('.').pop()||'').toLowerCase();if(['csv','tsv'].includes(ext)){const t=await f.text(),d=ext==='tsv'?'\t':(t.includes('\t')?'\t':',');const m=t.split(/\r?\n/).filter(Boolean).map(l=>d==='\t'?l.split('\t'):l.split(','));g76RosterRows=g76RowsFromMatrix(m);g76AfterRowsLoaded(f.name);return;}if(typeof XLSX==='undefined'){if(st)st.textContent='No se cargó el lector Excel; usa CSV o verifica internet.';return showToast('Para .xlsx se necesita conexión al lector Excel');}g76Workbook=XLSX.read(await f.arrayBuffer(),{type:'array'});const sel=document.getElementById('g76-sheet-select');sel.innerHTML=g76Workbook.SheetNames.map(n=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');document.getElementById('g76-sheet-wrap').classList.remove('hidden');g76UseSelectedSheet();if(st)st.textContent=`${f.name} · ${g76Workbook.SheetNames.length} hoja(s)`;}catch(err){console.error(err);showToast('No se pudo leer el archivo');}}
     function g76UseSelectedSheet(){if(!g76Workbook)return;const n=document.getElementById('g76-sheet-select')?.value||g76Workbook.SheetNames[0],ws=g76Workbook.Sheets[n];g80CurrentSheetName=n;g76RosterRows=g76RowsFromMatrix(XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false}));g76AfterRowsLoaded(n);}
     function g76ParsePastedRoster(){const t=document.getElementById('g76-paste-data')?.value||'';if(!t.trim())return showToast('Pega datos desde Excel');g76RosterRows=g76RowsFromMatrix(t.split(/\r?\n/).filter(Boolean).map(r=>r.split('\t')));g76AfterRowsLoaded('Datos pegados');}
-    function g76AfterRowsLoaded(label){if(!g76RosterRows.length)return showToast('No se encontraron filas');const headers=Object.keys(g76RosterRows[0]||{}),grid=document.getElementById('g76-map-grid');grid.innerHTML=G80_FIELDS.map(([k,l,a])=>{const aliases=a.map(g76NormalizeHeader),det=headers.find(h=>aliases.includes(g76NormalizeHeader(h)))||'';return `<label class="text-xs font-bold">${escapeHTML(l)}<select id="g76-map-${k}" class="mt-1 w-full rounded-xl border p-2 text-xs" onchange="g76BuildRosterPreview()"><option value="">— No usar —</option>${headers.map(h=>`<option value="${escapeHTML(h)}" ${h===det?'selected':''}>${escapeHTML(h)}</option>`).join('')}</select></label>`;}).join('');document.getElementById('g76-row-count').textContent=`${g76RosterRows.length} fila(s)`;document.getElementById('g76-mapping-section').classList.remove('hidden');document.getElementById('g76-preview-section').classList.remove('hidden');g80AutoMapRoster();g76BuildRosterPreview();showToast(`${label}: ${g76RosterRows.length} filas`);}
+    function g76AfterRowsLoaded(label){if(!g76RosterRows.length)return showToast('No se encontraron filas');const headers=Object.keys(g76RosterRows[0]||{}),grid=document.getElementById('g76-map-grid');grid.innerHTML=G81_FIELDS.map(([k,l,a])=>{const aliases=a.map(g76NormalizeHeader),det=headers.find(h=>aliases.includes(g76NormalizeHeader(h)))||'';return `<label class="text-xs font-bold">${escapeHTML(l)}<select id="g76-map-${k}" class="mt-1 w-full rounded-xl border p-2 text-xs" onchange="g76BuildRosterPreview()"><option value="">— No usar —</option>${headers.map(h=>`<option value="${escapeHTML(h)}" ${h===det?'selected':''}>${escapeHTML(h)}</option>`).join('')}</select></label>`;}).join('');document.getElementById('g76-row-count').textContent=`${g76RosterRows.length} fila(s)`;document.getElementById('g76-mapping-section').classList.remove('hidden');document.getElementById('g76-preview-section').classList.remove('hidden');g80AutoMapRoster();g76BuildRosterPreview();showToast(`${label}: ${g76RosterRows.length} filas`);}
     function g76Field(r,k){const c=document.getElementById(`g76-map-${k}`)?.value||'';return c?String(r?.[c]??'').trim():'';}
     function g76ParseGrade(v,g=''){const m=String(v||g||'').match(/(^|\D)([1-3])(?:\D|$)/);return m?Number(m[2]):null;}
     function g76CleanGroup(v){let s=String(v??'').trim();s=s.replace(/^([1-3])\s*[°ºo.]?\s*/i,'').trim();return s||String(v??'').trim();}
@@ -4037,6 +4028,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         // when no better student value exists.
         if(!student && g80LooksLikeStudentName(rg)){
           student=rg;
+          rg='';
+        } else if(student && g80LooksLikeStudentName(rg)) {
           rg='';
         }
 
@@ -4197,7 +4190,7 @@ async function handleCreateSchool(e) {
     }
 
     
-    const G80_SOURCE_EXCEL_URL='https://excel.cloud.microsoft/open/onedrive/?docId=8bdabe0c9f77bc49%21s4e4f911fbdaf432693ee4e88b02b0a26&driveId=8BDABE0C9F77BC49';
+    const G81_SOURCE_EXCEL_URL='https://excel.cloud.microsoft/open/onedrive/?docId=8bdabe0c9f77bc49%21s4e4f911fbdaf432693ee4e88b02b0a26&driveId=8BDABE0C9F77BC49';
     let g77RawRows=[];
     let g77Headers=[];
     let g77MappedRows=[];
@@ -4209,7 +4202,7 @@ async function handleCreateSchool(e) {
     }
 
     function g77OpenSourceExcel(){
-      window.open(G80_SOURCE_EXCEL_URL,'_blank','noopener');
+      window.open(G81_SOURCE_EXCEL_URL,'_blank','noopener');
     }
 
     function g77NormalizeHeader(v){
@@ -4317,7 +4310,7 @@ async function handleCreateSchool(e) {
         }
         showToast('Formato no compatible');
       }catch(err){
-        console.error('G80 import file',err);
+        console.error('G81 import file',err);
         showToast('No se pudo leer el archivo');
       }
     }
@@ -4873,7 +4866,7 @@ function g77BuildPreview(){
         closeModal('modal-g77-import');
         showToast(`Importación lista: ${createdGroups} grupo(s), ${createdStudents} alumno(s), ${skipped} duplicado(s) omitido(s)`);
       }catch(err){
-        console.error('G80 commit import',err);
+        console.error('G81 commit import',err);
         showToast('No se pudo completar la importación');
       }
     }
@@ -15239,12 +15232,12 @@ window.addEventListener('beforeunload',function(e){
       </div>
     </div>
 
-  <!-- G80: ASISTENTE DE IMPORTACIÓN DE GRUPOS Y ALUMNOS -->
+  <!-- G81: ASISTENTE DE IMPORTACIÓN DE GRUPOS Y ALUMNOS -->
   <div id="modal-g77-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[95] items-center justify-center p-4">
     <div class="bg-white rounded-3xl w-full max-w-6xl shadow-xl max-h-[94vh] flex flex-col">
       <div class="p-5 border-b border-[#d9e1da] flex items-start justify-between gap-3">
         <div>
-          <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G80 · Detección estructural de listas</p>
+          <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G81 · Detección estructural de listas</p>
           <h3 class="serif text-2xl font-bold mt-1">Importar grupos y asignar alumnos</h3>
           <p class="text-xs text-[#66767a] mt-1">Detecta automáticamente la fila real de encabezados, ignora títulos como TRIMESTRE/MARCADOR y reconoce nombre completo o nombres/apellidos separados. Revisa antes de guardar.</p>
         </div>
@@ -15281,7 +15274,7 @@ window.addEventListener('beforeunload',function(e){
               <div id="g77-mapping-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3"></div>
 
               <div id="g79-structural-note" class="mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">
-                G80 analiza el contenido de las columnas, no solo los encabezados. Puede detectar listas con estructura “Grupo → Apellidos y nombre → alumnos”.
+                G81 analiza el contenido de las columnas, no solo los encabezados. Puede detectar listas con estructura “Grupo → Apellidos y nombre → alumnos”.
               </div>
               <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-[#e5ebe6]">
                 <label class="text-[11px] font-bold text-[#66767a]">Escuela predeterminada

@@ -1,0 +1,1 @@
+G81: separación corregida de escuela, grado y grupo desde el nombre de hoja. Validar vista previa antes de importar. No modifica base de datos.
