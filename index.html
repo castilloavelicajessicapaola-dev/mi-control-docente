@@ -3461,6 +3461,23 @@
       return `${year}-${month}-${day}`;
     }
 
+    // G95 · Formato seguro de fechas locales. No convierte YYYY-MM-DD a UTC.
+    function formatDateForDisplay(value) {
+      if (value === null || value === undefined || value === '') return '—';
+      if (value instanceof Date) {
+        return Number.isNaN(value.getTime()) ? '—' : value.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      }
+      const raw = String(value).trim();
+      const match = /^(\d{4})-(\d{2})-(\d{2})(?:$|[T\s])/.exec(raw);
+      if (match) {
+        const y = Number(match[1]), m = Number(match[2]), d = Number(match[3]);
+        const check = new Date(y, m - 1, d);
+        if (check.getFullYear() !== y || check.getMonth() !== m - 1 || check.getDate() !== d) return raw;
+        return `${match[3]}/${match[2]}/${match[1]}`;
+      }
+      return raw;
+    }
+
     function formatGradeDisplay(grade, groupName) {
       return `${grade}.º ${groupName}`;
     }
