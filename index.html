@@ -4388,7 +4388,7 @@ async function handleCreateSchool(e) {
         script.onerror=()=>reject(new Error('No se pudo cargar el lector PDF'));document.head.appendChild(script);
       });return window.g86PdfPromise;
     }
-    // G91 · OCR de listas: preprocesamiento legible y dos configuraciones de página.
+    // G92 · OCR de listas: preprocesamiento legible y dos configuraciones de página.
     // Las propuestas se revisan siempre antes de guardar; nunca se inventan nombres.
     async function g91PrepareImage(source){
       const img=await createImageBitmap(source);
@@ -4429,6 +4429,19 @@ async function handleCreateSchool(e) {
           results.push({text:r.data?.text||'',confidence:r.data?.confidence||0,psm});
         }
         results.sort((a,b)=>g91OCRQuality(b.text)-g91OCRQuality(a.text)||(b.confidence-a.confidence));
+        // G92: rescatar filas numeradas de ambas lecturas; no inventar nombres.
+        const merged=new Map();
+        for(const result of results){
+          const parsed=g88ParseRosterOCR(result.text);
+          for(const [num,name] of parsed.rows){
+            const existing=merged.get(num);
+            const score=n=>n.split(/\s+/).filter(x=>x.length>=3).length*3+n.length*.1-(n.match(/\b[A-Z]\b/g)||[]).length*4;
+            if(!existing||score(name)>score(existing))merged.set(num,name);
+          }
+        }
+        if(merged.size>g88ParseRosterOCR(results[0].text).rows.length){
+          return {text:[...merged].sort((a,b)=>a[0]-b[0]).map(([n,name])=>`${n} ${name}`).join('\n'),confidence:results[0].confidence,psm:'combinado'};
+        }
         return results[0];
       }finally{await worker?.terminate();if(!(source instanceof HTMLCanvasElement)){canvas.width=canvas.height=0;}}
     }
@@ -4497,7 +4510,7 @@ async function handleCreateSchool(e) {
       const parsed=g88ParseRosterOCR(raw);
       if(!parsed.rows.length){showToast('No se detectaron alumnos numerados. Corrige el texto: 1 APELLIDO NOMBRE.');return;}
       g80CurrentSheetName='';
-      for(const id of ['g87-default-grade','g87-default-group']){const el=document.getElementById(id);if(el)el.value='';}
+      // G92: conservar grado y grupo ingresados; nunca borrarlos al reanalizar OCR.
       g76RosterRows=parsed.rows.map(([number,name])=>({'NÚM. LISTA':number,'NOMBRE COMPLETO':name}));
       g76AfterRowsLoaded('Imagen/PDF revisado');
       // OCR tiene dos columnas conocidas: nunca solicitar mapeo heurístico.
@@ -4508,7 +4521,7 @@ async function handleCreateSchool(e) {
       const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Confirmar escuela, grado y grupo';
       g76BuildRosterPreview();
       const status=document.getElementById('g86-document-status');
-      if(status)status.textContent=`${parsed.rows.length} alumnos detectados. ${parsed.rejected.length} líneas requieren revisión. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
+      if(status)status.textContent=`${parsed.rows.length} alumnos detectados. ${parsed.rejected.length} líneas requieren revisión. Verifica los números faltantes en la secuencia antes de importar. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
       document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'start'});
     }
 
