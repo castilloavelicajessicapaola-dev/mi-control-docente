@@ -2863,7 +2863,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G97 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G109 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" placeholder="Pega aquí el enlace a tu archivo (opcional)"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -2878,7 +2878,7 @@
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
         <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G106 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
         <div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
-          <p class="font-bold text-teal-950">G108 · Revisión estable de listas</p>
+          <p class="font-bold text-teal-950">G109 · Importación verificada</p>
           <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
           <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
           <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
@@ -4146,7 +4146,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       const repeatedNumbers=new Set([...numberGroupCounts].filter(([,count])=>count>1).map(([key])=>key));
       const seenNames=new Set();
       for(const x of p){const nameKey=x.key+'|'+normalizeStudentName(x.fullName);if(x.fullName&&seenNames.has(nameKey)){x.state='ERROR';x.note='Nombre repetido en esta lista';}else if(x.fullName)seenNames.add(nameKey);}
-      for(const x of p){if(x.number!==null&&(!Number.isInteger(x.number)||x.number<1)){x.state='ERROR';x.note='Número de lista inválido';}}
+      for(const x of p){if(x.number===null||!Number.isInteger(x.number)||x.number<1){x.state='ERROR';x.note='Número de lista inválido';}}
       for(const x of p){
         if(repeatedNumbers.has(x.key+'|'+x.number)){
           x.state='ERROR';x.note='Número de lista repetido: corrige antes de importar';
@@ -4257,6 +4257,17 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       if(g76RosterPreview.some(x=>x.state!=='OK'))return showToast('Importación detenida: corrige primero las filas marcadas ERROR o REVISAR.');
       const ready=g76RosterPreview.filter(x=>x.state==='OK');
       if(!ready.length)return showToast('No hay filas listas: revisa grado, grupo y nombres.');
+      // G109: verificar colisiones con números ya ocupados antes de escribir.
+      const collisions=[];
+      for(const x of ready){
+        const school=localData.schools.find(s=>g76NormalizeHeader(s.school_name)===g76NormalizeHeader(x.school));
+        const group=school&&localData.groups.find(g=>g.school_id===school.school_id&&Number(g.grade)===Number(x.grade)&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&g76NormalizeHeader(g.shift||x.shift)===g76NormalizeHeader(x.shift)&&String(g.school_year||x.year)===String(x.year)&&(g.status||'ACTIVE')!=='ARCHIVED');
+        if(!group||!Number.isInteger(x.number)||x.number<1)continue;
+        const occupant=localData.students.find(st=>st.group_id===group.group_id&&Number(st.student_number)===x.number&&normalizeStudentName(st.full_name)!==normalizeStudentName(x.fullName));
+        if(occupant)collisions.push(`${x.number}: ${x.fullName} / ${occupant.full_name}`);
+      }
+      if(collisions.length){window.alert('Hay números de lista ocupados por otros alumnos. Corrige antes de importar:\n'+collisions.slice(0,12).join('\n'));return;}
+      if(ready.some(x=>!Number.isInteger(x.number)||x.number<1))return showToast('Cada alumno debe tener un número de lista entero y positivo.');
       if(!confirm(`¿Importar ${ready.length} alumnos? Se conservarán los historiales existentes. Los nombres repetidos no se duplicarán.`))return;
       const now=new Date().toISOString(),map=new Map();let sc=0,gc=0,stc=0,updated=0,skipped=0;
       try{
@@ -4264,7 +4275,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           if(map.has(x.key))continue;
           let school=localData.schools.find(s=>g76NormalizeHeader(s.school_name)===g76NormalizeHeader(x.school));
           if(!school){school={school_id:generateId('sch'),school_name:x.school,created_at:now};await dbPut('schools',school);localData.schools.push(school);sc++;}
-          let group=localData.groups.find(g=>g.school_id===school.school_id&&Number(g.grade)===x.grade&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&(g.status||'ACTIVE')!=='ARCHIVED');
+          let group=localData.groups.find(g=>g.school_id===school.school_id&&Number(g.grade)===x.grade&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&g76NormalizeHeader(g.shift||x.shift)===g76NormalizeHeader(x.shift)&&String(g.school_year||x.year)===String(x.year)&&(g.status||'ACTIVE')!=='ARCHIVED');
           if(!group){group={group_id:generateId('grp'),school_id:school.school_id,school_year:x.year,grade:x.grade,group_name:x.group,subject:x.subject,shift:x.shift,status:'ACTIVE',created_at:now,updated_at:now};await dbPut('groups',group);localData.groups.push(group);gc++;}
           map.set(x.key,{school,group});
         }
@@ -4279,7 +4290,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
             continue;
           }
           if(newStudents.some(s=>s.group_id===z.group.group_id&&normalizeStudentName(s.full_name)===nameKey)){skipped++;continue;}
-          const num=x.number!==null?x.number:nextAvailableStudentNumber(z.group.group_id);
+          const num=x.number;
           newStudents.push({student_id:generateId('stu'),group_id:z.group.group_id,school_id:z.school.school_id,student_number:num,first_name:x.fullName,paternal_surname:x.paternal,maternal_surname:x.maternal,full_name:x.fullName,status:'ACTIVE',created_at:now,updated_at:now});
         }
         if(updates.length){
@@ -4288,10 +4299,29 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           }else skipped+=updates.length;
         }
         for(const stu of newStudents){await dbPut('students',stu);stc++;}
-        await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();closeModal('modal-g76-roster-import');
-        const message=`Importación finalizada: ${stc} alumnos nuevos, ${updated} números actualizados, ${skipped} omitidos y ${gc} grupos nuevos.`;
+        await refreshLocalCache();
+        // G109: leer nuevamente IndexedDB, no confiar solo en contadores de intentos.
+        const savedStudents=await dbGetAll('students');
+        const verification=[];
+        for(const x of ready){
+          const z=map.get(x.key);if(!z)continue;
+          const matching=savedStudents.filter(st=>st.group_id===z.group.group_id&&normalizeStudentName(st.full_name)===normalizeStudentName(x.fullName));
+          verification.push({x,z,matching});
+        }
+        const verified=verification.filter(v=>v.matching.length===1);
+        const notVerified=verification.filter(v=>v.matching.length!==1);
+        const differentNumbers=verified.filter(v=>Number(v.matching[0].student_number)!==v.x.number);
+        renderGroups();populateSchoolDropdowns();populateGroupDropdowns();
+        if(notVerified.length||differentNumbers.length){
+          const detail=[...notVerified.map(v=>`Sin registro único: ${v.x.fullName}`),...differentNumbers.map(v=>`Número diferente: ${v.x.fullName} (lista ${v.x.number}, guardado ${v.matching[0].student_number})`)];
+          window.alert(`G109 · Verificación posterior: ${verified.length}/${ready.length} alumnos localizados.\n${stc} nuevos · ${updated} números actualizados · ${skipped} omitidos.\n\nRevisa estas diferencias antes de registrar asistencia:\n${detail.slice(0,20).join('\n')}`);
+          showToast('Importación guardada con diferencias; revisa el resumen.');
+          return;
+        }
+        closeModal('modal-g76-roster-import');
+        const message=`G109 · Guardado verificado: ${verified.length}/${ready.length} alumnos localizados en IndexedDB; ${stc} nuevos, ${updated} números actualizados, ${skipped} omitidos y ${gc} grupos nuevos.`;
         showToast(message);
-        window.alert(message+'\nVerifica el listado del grupo antes de registrar asistencia.');
+        window.alert(message+'\nLos alumnos se verificaron en su grupo.');
       }catch(err){console.error(err);showToast('Importación interrumpida: algunos registros podrían haberse guardado. Actualiza el listado antes de reintentar.');}
     }
 
