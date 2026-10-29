@@ -2876,7 +2876,13 @@
             <textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
             <button type="button" class="rounded-xl bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="g86AnalyzeRosterDocument()">Revisar alumnos detectados</button>
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G105 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
+        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G106 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
+        <div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
+          <p class="font-bold text-teal-950">G106 · Asistente de corrección de lista</p>
+          <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
+          <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
+          <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
+        </div>
         <div id="g76-mapping-section" class="hidden space-y-3"><div class="flex items-center justify-between"><div><h4 class="font-bold">3. Relacionar columnas</h4><p class="text-xs text-[#66767a]">La detección es automática, pero puedes corregirla.</p></div><span id="g76-row-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">0 filas</span><div id="g80-import-detection-note" class="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">Revisa escuela, grado, grupo, número y nombre. Los datos del OCR pueden contener errores.</div></div><div id="g76-map-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><label class="text-xs font-bold">Escuela predeterminada<input id="g76-default-school" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Secundaria #57" onchange="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Asignatura<input id="g76-default-subject" class="mt-1 w-full rounded-xl border p-2 text-sm" value="Tecnología" onchange="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Turno<select id="g76-default-shift" class="mt-1 w-full rounded-xl border p-2 text-sm" onchange="g76BuildRosterPreview()"><option>Matutino</option><option>Vespertino</option><option>Mixto</option></select></label><label class="text-xs font-bold">Grado predeterminado<input id="g87-default-grade" type="number" min="1" max="3" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Ej. 2" oninput="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Grupo predeterminado<input id="g87-default-group" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Ej. A" oninput="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Ciclo escolar<input id="g76-default-year" class="mt-1 w-full rounded-xl border p-2 text-sm" value="2026-2027" onchange="g76BuildRosterPreview()"></label></div></div>
         <div id="g76-preview-section" class="hidden space-y-3"><div class="flex items-center justify-between"><h4 class="font-bold">4. Vista previa</h4><button type="button" class="rounded-xl border px-3 py-2 text-xs font-bold" onclick="g76BuildRosterPreview()">Actualizar</button></div><div class="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3"><button type="button" class="rounded-xl bg-[#145b4b] px-3 py-2 text-xs font-bold text-white" onclick="g103ApplyGroupToAll()">Aplicar datos del grupo a todos los alumnos</button><span class="text-xs text-emerald-950">Utiliza los campos predeterminados de arriba. Conserva los nombres y números corregidos.</span></div><div id="g76-summary" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2"></div><div class="overflow-x-auto rounded-2xl border"><table class="w-full text-xs min-w-[900px]"><thead class="bg-slate-50"><tr><th class="p-2">Estado</th><th class="p-2">Escuela</th><th class="p-2">Grado</th><th class="p-2">Grupo</th><th class="p-2">Asignatura</th><th class="p-2">Turno</th><th class="p-2">#</th><th class="p-2 text-left">Alumno</th><th class="p-2 text-left">Observación</th></tr></thead><tbody id="g76-preview-body"></tbody></table></div></div>
       </div><div class="p-5 border-t flex justify-between gap-2"><button class="rounded-xl border px-4 py-2 text-sm font-bold" onclick="closeModal('modal-g76-roster-import')">Cancelar</button><button id="g76-import-btn" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold disabled:opacity-40" disabled onclick="g76ImportRoster()">Importar grupos y alumnos</button></div>
@@ -4140,11 +4146,15 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         }
       }
       g76RosterPreview=p;
+      const expectedCount=g105ExpectedRosterCount();
+      const mismatch=expectedCount>0 && (p.length!==expectedCount || numbers.length!==expectedCount || missingNumbers.length>0);
+      const repairStatus=document.getElementById('g106-repair-status');
+      if(repairStatus)repairStatus.textContent=`Esperados: ${expectedCount||'sin indicar'} · Detectados: ${p.length} · Listos: ${p.filter(x=>x.state==='OK').length} · Por revisar: ${p.filter(x=>x.state!=='OK').length}${missingNumbers.length?' · Números faltantes: '+missingNumbers.join(', '):''}.`;
       const valid=p.filter(x=>x.state==='OK');
       const groups=new Set(valid.map(x=>x.key));
 
       document.getElementById('g76-summary').innerHTML=[
-        ['Filas',p.length],
+        ['Esperados',expectedCount||'—'],['Detectados',p.length],
         ['Grupos',groups.size],
         ['Listos',p.filter(x=>x.state==='OK').length],
         ['Por revisar',p.filter(x=>x.state==='REVISAR'||x.state==='ERROR').length],
@@ -4166,10 +4176,10 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
 
       let audit=document.getElementById('g102-roster-audit');
       if(!audit){audit=document.createElement('div');audit.id='g102-roster-audit';audit.className='rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-semibold text-amber-950 my-3';document.getElementById('g76-summary')?.after(audit);}
-      if(audit) audit.textContent=missingNumbers.length
+      if(audit) audit.textContent=mismatch?`G106 · Importación detenida: se esperaban ${expectedCount} alumnos, pero hay ${p.length} filas. ${missingNumbers.length?'Faltan números '+missingNumbers.join(', ')+'. ':''}Verifica y agrega únicamente los nombres reales faltantes.`:missingNumbers.length
         ?`G102 · Revisión obligatoria: hay ${p.length} registros detectados y la numeración llega hasta ${expected}. Faltan los números ${missingNumbers.join(', ')}. Corrige el texto OCR y vuelve a revisar. No se crearán alumnos inexistentes.`
         :`G102 · Numeración: ${p.length} registros; ${expected||'sin máximo'} como último número detectado. Verifica visualmente los nombres antes de importar.`;
-      document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR'||x.state==='ERROR') || missingNumbers.length>0;
+      document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR'||x.state==='ERROR') || missingNumbers.length>0 || mismatch;
     }
     // G104: asignar contexto escolar sin reanalizar ni sustituir nombres corregidos.
     function g103ApplyGroupToAll(){
@@ -4197,6 +4207,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
     }
     async function g76ImportRoster(){
       g76BuildRosterPreview();
+      const expectedCount=g105ExpectedRosterCount();
+      if(expectedCount && g76RosterPreview.length!==expectedCount)return showToast(`Importación detenida: ${g76RosterPreview.length} detectados de ${expectedCount} esperados.`);
       const nums=g76RosterPreview.map(x=>x.number).filter(n=>Number.isInteger(n)&&n>0);
       const maxNum=nums.length?Math.max(...nums):0;
       const numberSet=new Set(nums);
@@ -4614,10 +4626,30 @@ async function handleCreateSchool(e) {
       if(rows.length)for(let n=1;n<=rows[rows.length-1][0];n++)if(!seen.has(n))missing.push(n);
       return {rows,rejected,missing};
     }
+    function g106AddVerifiedStudent(){
+      const number=Number(document.getElementById('g106-missing-number')?.value||0);
+      const name=g93CleanName(document.getElementById('g106-missing-name')?.value||'');
+      const status=document.getElementById('g106-repair-status');
+      if(!Number.isInteger(number)||number<1||number>250||!g80LooksLikeStudentName(name)){
+        if(status)status.textContent='Indica un número válido y un nombre completo verificable (mínimo dos palabras).';return;
+      }
+      const box=document.getElementById('g86-document-text');
+      if(!box){showToast('No está disponible el editor de la lista OCR.');return;}
+      const existing=g88ParseRosterOCR(box.value).rows;
+      if(existing.some(row=>row[0]===number)){
+        if(status)status.textContent=`El número ${number} ya aparece. Corrige ese renglón directamente en el texto OCR, sin duplicarlo.`;return;
+      }
+      box.value=box.value.trimEnd()+`\n${number} ${name}`;
+      document.getElementById('g106-missing-number').value='';
+      document.getElementById('g106-missing-name').value='';
+      g86AnalyzeRosterDocument();
+      if(status)status.textContent=`Se agregó el número ${number} con el nombre verificado. Comprueba la vista previa antes de importar.`;
+    }
     function g105UpdateExpectedCount(){
-      const expected=g105ExpectedRosterCount(),actual=g76RosterRows?.length||0;
+      const expected=g105ExpectedRosterCount(),actual=g76RosterPreview?.length||g76RosterRows?.length||0;
       const el=document.getElementById('g105-count-warning');
-      if(el)el.textContent=expected?(actual===expected?`Coinciden ${actual} alumnos detectados.`:`Se detectaron ${actual} de ${expected} esperados. Revisa la lista completa.`):'Indica la cantidad esperada para comprobar la lectura.';
+      if(el)el.textContent=expected?(actual===expected?`Coinciden ${actual} alumnos detectados; revisa también nombres y números.`:`Se detectaron ${actual} de ${expected} esperados. La importación se bloqueará hasta completar y validar la lista.`):'Indica la cantidad esperada para comprobar la lectura.';
+      if(g76RosterRows?.length)g76BuildRosterPreview();
     }
     function g86AnalyzeRosterDocument(){
       const raw=document.getElementById('g86-document-text')?.value||'';
