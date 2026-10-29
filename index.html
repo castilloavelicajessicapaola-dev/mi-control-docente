@@ -4129,6 +4129,18 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         });
       }
 
+      // G102: comprobar la continuidad de la numeración; nunca completar alumnos ficticios.
+      const numbers=p.map(x=>x.number).filter(n=>Number.isInteger(n)&&n>0);
+      const seenNumbers=new Set(numbers);
+      const expected=numbers.length?Math.max(...numbers):0;
+      const missingNumbers=[];
+      for(let n=1;n<=Math.min(expected,250);n++)if(!seenNumbers.has(n))missingNumbers.push(n);
+      const repeatedNumbers=numbers.filter((n,i)=>numbers.indexOf(n)!==i);
+      for(const x of p){
+        if(repeatedNumbers.includes(x.number)){
+          x.state='REVISAR';x.note='Número de lista repetido: verifica antes de importar';
+        }
+      }
       g76RosterPreview=p;
       const valid=p.filter(x=>x.state==='OK');
       const groups=new Set(valid.map(x=>x.key));
@@ -4137,7 +4149,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         ['Filas',p.length],
         ['Grupos',groups.size],
         ['Listos',p.filter(x=>x.state==='OK').length],
-        ['Por revisar',p.filter(x=>x.state==='REVISAR'||x.state==='ERROR').length]
+        ['Por revisar',p.filter(x=>x.state==='REVISAR'||x.state==='ERROR').length],
+        ['Números faltantes',missingNumbers.length]
       ].map(([l,v])=>`<div class="rounded-xl bg-slate-50 border p-3"><p class="text-[10px] uppercase font-bold">${l}</p><p class="serif text-xl font-bold text-[#145b4b]">${v}</p></div>`).join('');
 
       document.getElementById('g76-preview-body').innerHTML=p.slice(0,250).map(x=>`
@@ -4153,7 +4166,12 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           <td class="p-2">${escapeHTML(x.note)}</td>
         </tr>`).join('');
 
-      document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR'||x.state==='ERROR');
+      let audit=document.getElementById('g102-roster-audit');
+      if(!audit){audit=document.createElement('div');audit.id='g102-roster-audit';audit.className='rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-semibold text-amber-950 my-3';document.getElementById('g76-summary')?.after(audit);}
+      if(audit) audit.textContent=missingNumbers.length
+        ?`G102 · Revisión obligatoria: hay ${p.length} registros detectados y la numeración llega hasta ${expected}. Faltan los números ${missingNumbers.join(', ')}. Corrige el texto OCR y vuelve a revisar. No se crearán alumnos inexistentes.`
+        :`G102 · Numeración: ${p.length} registros; ${expected||'sin máximo'} como último número detectado. Verifica visualmente los nombres antes de importar.`;
+      document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR'||x.state==='ERROR') || missingNumbers.length>0;
     }
     function g87EditRosterRow(index,field,value){
       if(!g76RosterRows[index]) return;
@@ -4165,6 +4183,12 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
     }
     async function g76ImportRoster(){
       g76BuildRosterPreview();
+      const nums=g76RosterPreview.map(x=>x.number).filter(n=>Number.isInteger(n)&&n>0);
+      const maxNum=nums.length?Math.max(...nums):0;
+      const numberSet=new Set(nums);
+      const missing=[];for(let n=1;n<=Math.min(maxNum,250);n++)if(!numberSet.has(n))missing.push(n);
+      if(missing.length)return showToast('Importación detenida: faltan números de lista '+missing.join(', '));
+      if(numberSet.size!==nums.length)return showToast('Importación detenida: hay números de lista repetidos.');
       const ready=g76RosterPreview.filter(x=>x.state==='OK');
       if(!ready.length)return showToast('No hay filas listas: revisa grado, grupo y nombres.');
       if(!confirm(`¿Importar ${ready.length} alumnos? Se conservarán los historiales existentes. Los nombres repetidos no se duplicarán.`))return;
@@ -4514,7 +4538,7 @@ async function handleCreateSchool(e) {
           }
           box.value=chunks.join('\n');
         }
-        const audit=g88ParseRosterOCR(box.value);status.textContent=`Lectura G100: ${audit.rows.length} filas numeradas; ${audit.missing.length?('faltan números '+audit.missing.join(', ')+'. '):''}${audit.rejected.length} renglones no interpretados. Revisa la fotografía y corrige el texto antes de importar. Nada se ha guardado.`;
+        const audit=g88ParseRosterOCR(box.value);status.textContent=`Lectura G102: ${audit.rows.length} filas numeradas; ${audit.missing.length?('faltan números '+audit.missing.join(', ')+'. '):''}${audit.rejected.length} renglones no interpretados. Revisa la fotografía y corrige el texto antes de importar. Nada se ha guardado.`;
       }catch(err){console.error('G86 documento',err);status.textContent='No se pudo leer automáticamente: '+(err.message||err)+'. Puedes escribir o pegar los nombres en el cuadro.';}
     }
     // G91: OCR tolerante a separadores de listas impresas; siempre requiere revisión humana.
@@ -4524,11 +4548,11 @@ async function handleCreateSchool(e) {
     // G97: lectura de renglones numerados con protección de nombres y auditoría de huecos.
     // G100: numeración OCR tolerante a bordes y auditoría de renglones sin importar automáticamente.
     // Nunca se crean nombres ni números ausentes: se señalan para revisión.
-    // G101: análisis conservador de listas numeradas, con separación de filas OCR pegadas.
+    // G102: auditoría de continuidad y preservación de correcciones en listas OCR.
     function g88ParseRosterOCR(raw){
       const rows=[],rejected=[],seen=new Set();
       const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|APELLIDOS Y NOMBRE|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|PROMEDIO|TOTAL)\b/i;
-      const source=String(raw||'').replace(/\r/g,'\n');
+      const source=String(raw||'').replace(/\r/g,'\n').replace(/[\u00a0\u2007\u202f]/g,' ');
       const fragments=[];
       for(const original of source.split('\n')){
         const line=original.trim();
@@ -4575,7 +4599,7 @@ async function handleCreateSchool(e) {
       const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Confirmar escuela, grado y grupo';
       g76BuildRosterPreview();
       const status=document.getElementById('g86-document-status');
-      if(status)status.textContent=`${parsed.rows.length} alumnos detectados. ${parsed.missing.length ? "Números ausentes: "+parsed.missing.join(", ")+". " : ""}${parsed.rejected.length} líneas requieren revisión. Verifica los números faltantes en la secuencia antes de importar. No se completan nombres automáticamente. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
+      if(status)status.textContent=`G102 · ${parsed.rows.length} alumnos detectados. ${parsed.missing.length ? "Números ausentes: "+parsed.missing.join(", ")+". " : ""}${parsed.rejected.length} líneas requieren revisión. Verifica los números faltantes en la secuencia antes de importar. No se completan nombres automáticamente. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
       if(parsed.missing.length)showToast('Atención: faltan números de lista: '+parsed.missing.join(', '));
       document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'start'});
     }
