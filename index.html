@@ -4524,15 +4524,22 @@ async function handleCreateSchool(e) {
     // G97: lectura de renglones numerados con protección de nombres y auditoría de huecos.
     // G100: numeración OCR tolerante a bordes y auditoría de renglones sin importar automáticamente.
     // Nunca se crean nombres ni números ausentes: se señalan para revisión.
+    // G101: análisis conservador de listas numeradas, con separación de filas OCR pegadas.
     function g88ParseRosterOCR(raw){
       const rows=[],rejected=[],seen=new Set();
-      const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|APELLIDOS Y NOMBRE|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|GRADO|TURNO|PROMEDIO|TOTAL)\b/i;
+      const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|APELLIDOS Y NOMBRE|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|PROMEDIO|TOTAL)\b/i;
       const source=String(raw||'').replace(/\r/g,'\n');
+      const fragments=[];
       for(const original of source.split('\n')){
-        let line=original.trim();if(!line||noise.test(line))continue;
-        // La numeración puede estar rodeada de bordes OCR: "| 12 |", "_3]", "[ 4".
-        line=line.replace(/^[\s|¦\[\]{}:;._\-]+/g,'').trim();
-        const m=line.match(/^(?:[Nn][Oo]\.?\s*)?([0-9]{1,3}|[Il|!][0-9]{0,2})\s*[\]\[).:;º°|!\-–—_]*\s*(.+)$/);
+        const line=original.trim();
+        if(!line||noise.test(line))continue;
+        // Separa dos números de lista cuando el OCR unió dos renglones.
+        const pieces=line.split(/(?=\s(?:[1-9]|[12][0-9]|3[0-9])\s*[)\].:|º°-]\s*[A-ZÁÉÍÓÚÑ])/g);
+        for(const part of pieces)if(part.trim())fragments.push(part.trim());
+      }
+      for(const original of fragments){
+        let line=original.replace(/^[\s|¦\[\]{}:;._\-]+/g,'').trim();
+        let m=line.match(/^(?:[Nn][Oo]\.?\s*)?([0-9]{1,3}|[Il|!][0-9]{0,2})\s*[\]\[).:;º°|!\-–—_]*\s*(.+)$/);
         if(!m){rejected.push(original);continue;}
         const number=Number(m[1].replace(/[Il|!]/g,'1'));
         if(!Number.isInteger(number)||number<1||number>250){rejected.push(original);continue;}
@@ -4543,7 +4550,7 @@ async function handleCreateSchool(e) {
       }
       rows.sort((a,b)=>a[0]-b[0]);
       const missing=[];
-      if(rows.length){for(let n=1;n<=rows[rows.length-1][0];n++)if(!seen.has(n))missing.push(n);}
+      if(rows.length)for(let n=1;n<=rows[rows.length-1][0];n++)if(!seen.has(n))missing.push(n);
       return {rows,rejected,missing};
     }
     function g86AnalyzeRosterDocument(){
@@ -4944,6 +4951,8 @@ function g77BuildPreview(){
       const defaultShift=(document.getElementById('g77-default-shift')?.value||'').trim();
       const globalCtx=g79InferContextDefaults();
       const sheetCtx=g82SheetContext(g82SheetName);
+      const manualGrade=g77ParseGrade(document.getElementById('g77-default-grade')?.value||'');
+      const manualGroup=g77NormalizeGroup(document.getElementById('g77-default-group')?.value||'');
 
       g77MappedRows=g77RawRows.map((row,i)=>{
         const rowCtx=g79GetRowContext(i);
@@ -4954,7 +4963,9 @@ function g77BuildPreview(){
         if(g79LooksLikePersonName(rawGroup)) rawGroup='';
 
         let group=g77NormalizeGroup(rawGroup || rowCtx.group || globalCtx.group || sheetCtx.group);
-        let grade=g77ParseGrade(rawGrade || rowCtx.grade || globalCtx.grade || sheetCtx.grade);
+        let grade=g77ParseGrade(rawGrade || rowCtx.grade || globalCtx.grade || sheetCtx.grade || manualGrade);
+        if(!group && manualGroup)group=manualGroup;
+        if(!grade && manualGrade)grade=manualGrade;
 
         const compound=(group||'').match(/^([1-3])\s*[-º°]?\s*([A-Z])$/i);
         if(compound){
