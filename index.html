@@ -4425,18 +4425,26 @@ async function handleCreateSchool(e) {
     }
     // G89: OCR tolerante a separadores de listas impresas; siempre requiere revisión humana.
     function g88ParseRosterOCR(raw){
-      const rows=[], rejected=[];
-      const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|GRADO|TURNO|PROMEDIO|TOTAL)\b/i;
+      const rows=[],rejected=[];
+      const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|APELLIDOS Y NOMBRE|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|GRADO|TURNO|PROMEDIO|TOTAL)\b/i;
+      let previous=0;
       for(const original of String(raw||'').split(/\r?\n/)){
         let line=original.trim();if(!line||noise.test(line))continue;
         line=line.replace(/^[\s|¦!Il\[\]{}:;._-]+/g,'').replace(/[|¦]/g,' ').replace(/\s+/g,' ').trim();
-        // Acepta 1], | 2 |, -3|, 4.- y variantes habituales de OCR.
         const m=line.match(/^(\d{1,3})\s*[\]\[).:;º°|!\-–—]*\s*(.+)$/);
-        if(!m){if(/[A-Za-zÁÉÍÓÚÑ]/.test(line))rejected.push(original);continue;}
-        const num=Number(m[1]);
-        const name=m[2].replace(/^[\s\]\[|:;.,_\-]+/g,'').replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'\-]/g,' ').replace(/\s+/g,' ').trim().toUpperCase();
-        if(num<1||num>250||name.length<7||name.split(' ').length<2||noise.test(name)){rejected.push(original);continue;}
-        rows.push([num,name]);
+        let number=m?Number(m[1]):null;
+        let candidate=m?m[2]:line;
+        candidate=candidate.replace(/^[\s\]\[|:;.,_\-]+/g,'').replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'\-]/g,' ').replace(/\s+/g,' ').trim().toUpperCase();
+        const plausible=candidate.length>=7&&candidate.split(' ').length>=2&&!noise.test(candidate)&&!/^COLUMNA|^PAGINA/.test(candidate);
+        if(!plausible){rejected.push(original);continue;}
+        // El OCR puede omitir el número. Recuperarlo únicamente cuando la secuencia
+        // entre dos filas numeradas permite deducirlo; el docente debe revisarlo.
+        if(number===null){
+          if(previous>0){number=previous+1;rejected.push('REVISAR NÚMERO INFERIDO: '+original);}
+          else {rejected.push(original);continue;}
+        }
+        if(number<1||number>250){rejected.push(original);continue;}
+        rows.push([number,candidate]);previous=number;
       }
       return {rows,rejected};
     }
@@ -4456,7 +4464,7 @@ async function handleCreateSchool(e) {
       const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Confirmar escuela, grado y grupo';
       g76BuildRosterPreview();
       const status=document.getElementById('g86-document-status');
-      if(status)status.textContent=`${parsed.rows.length} alumnos detectados; ${parsed.rejected.length} líneas no reconocidas. Completa escuela, grado y grupo debajo; corrige los nombres y números en la vista previa.`;
+      if(status)status.textContent=`${parsed.rows.length} alumnos detectados. ${parsed.rejected.length} líneas requieren revisión. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
       document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'start'});
     }
 
