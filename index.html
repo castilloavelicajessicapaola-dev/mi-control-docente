@@ -2878,7 +2878,7 @@
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
         <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G106 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
         <div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
-          <p class="font-bold text-teal-950">G107 · Asistente de corrección de lista</p>
+          <p class="font-bold text-teal-950">G108 · Revisión estable de listas</p>
           <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
           <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
           <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
@@ -4045,6 +4045,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
     function g76CleanGroup(v){let s=String(v??'').trim();s=s.replace(/^([1-3])\s*[°ºo.]?\s*/i,'').trim();return s||String(v??'').trim();}
     function g76BuildRosterPreview(){
       if(!g76RosterRows.length) return;
+      // G108: capturar cualquier edición activa antes de reconstruir la tabla.
+      g108CaptureActiveEdit();
 
       const ds=(document.getElementById('g76-default-school')?.value||'').trim();
       const dsub=(document.getElementById('g76-default-subject')?.value||'Tecnología').trim();
@@ -4139,12 +4141,14 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       const expected=numbers.length?Math.max(...numbers):0;
       const missingNumbers=[];
       for(let n=1;n<=Math.min(expected,250);n++)if(!seenNumbers.has(n))missingNumbers.push(n);
-      const repeatedNumbers=numbers.filter((n,i)=>numbers.indexOf(n)!==i);
+      const numberGroupCounts=new Map();
+      for(const x of p){if(Number.isInteger(x.number)&&x.number>0){const nk=x.key+'|'+x.number;numberGroupCounts.set(nk,(numberGroupCounts.get(nk)||0)+1);}}
+      const repeatedNumbers=new Set([...numberGroupCounts].filter(([,count])=>count>1).map(([key])=>key));
       const seenNames=new Set();
       for(const x of p){const nameKey=x.key+'|'+normalizeStudentName(x.fullName);if(x.fullName&&seenNames.has(nameKey)){x.state='ERROR';x.note='Nombre repetido en esta lista';}else if(x.fullName)seenNames.add(nameKey);}
       for(const x of p){if(x.number!==null&&(!Number.isInteger(x.number)||x.number<1)){x.state='ERROR';x.note='Número de lista inválido';}}
       for(const x of p){
-        if(repeatedNumbers.includes(x.number)){
+        if(repeatedNumbers.has(x.key+'|'+x.number)){
           x.state='ERROR';x.note='Número de lista repetido: corrige antes de importar';
         }
       }
@@ -4167,15 +4171,15 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       ].map(([l,v])=>`<div class="rounded-xl bg-slate-50 border p-3"><p class="text-[10px] uppercase font-bold">${l}</p><p class="serif text-xl font-bold text-[#145b4b]">${v}</p></div>`).join('');
 
       document.getElementById('g76-preview-body').innerHTML=p.slice(0,250).map(x=>`
-        <tr data-g107-issue="${x.state!=='OK'?'yes':'no'}" class="border-t ${x.state==='ERROR'?'bg-red-50':x.state==='REVISAR'?'bg-amber-50':''}">
+        <tr data-source-index="${x.sourceIndex}" data-g107-issue="${x.state!=='OK'?'yes':'no'}" class="border-t ${x.state==='ERROR'?'bg-red-50':x.state==='REVISAR'?'bg-amber-50':''}">
           <td class="p-2 font-bold">${x.state}</td>
           <td class="p-2">${escapeHTML(x.school)}</td>
           <td class="p-2">${x.grade??'—'}</td>
-          <td class="p-2"><input aria-label="Grupo" class="w-14 rounded-lg border px-2 py-1" value="${escapeHTML(x.group||'')}" onchange="g87EditRosterRow(${x.sourceIndex},'group',this.value)"></td>
+          <td class="p-2"><input aria-label="Grupo" class="w-14 rounded-lg border px-2 py-1" value="${escapeHTML(x.group||'')}" onchange="g87EditRosterRow(${x.sourceIndex},'group',this.value)" data-roster-field="group"></td>
           <td class="p-2">${escapeHTML(x.subject)}</td>
           <td class="p-2">${escapeHTML(x.shift)}</td>
-          <td class="p-2"><input type="number" min="1" class="w-16 rounded-lg border px-1 py-1" value="${x.number??''}" onchange="g87EditRosterRow(${x.sourceIndex},'number',this.value)"></td>
-          <td class="p-2 font-semibold"><div class="flex gap-1 items-center"><input class="w-64 rounded-lg border px-2 py-1" value="${escapeHTML(x.fullName)}" onchange="g87EditRosterRow(${x.sourceIndex},'student',this.value)"><button type="button" class="rounded border px-2 py-1 text-[10px] font-bold" title="Confirmar que el nombre coincide con la lista original" onclick="g107VerifyRosterName(${x.sourceIndex})">✓ Revisado</button></div></td>
+          <td class="p-2"><input type="number" min="1" class="w-16 rounded-lg border px-1 py-1" value="${x.number??''}" onchange="g87EditRosterRow(${x.sourceIndex},'number',this.value)" data-roster-field="number"></td>
+          <td class="p-2 font-semibold"><div class="flex gap-1 items-center"><input class="w-64 rounded-lg border px-2 py-1" value="${escapeHTML(x.fullName)}" onchange="g87EditRosterRow(${x.sourceIndex},'student',this.value)" data-roster-field="student"><button type="button" class="rounded border px-2 py-1 text-[10px] font-bold" title="Confirmar que el nombre coincide con la lista original" onclick="g107VerifyRosterName(${x.sourceIndex})">✓ Revisado</button></div></td>
           <td class="p-2">${escapeHTML(x.note)}</td>
         </tr>`).join('');
 
@@ -4201,6 +4205,19 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       }
       g76BuildRosterPreview();
       showToast(`Datos escolares aplicados a ${g76RosterPreview.length} filas. Revisa nombres y numeración antes de importar.`);
+    }
+    // G108: conservar la edición activa al pulsar Actualizar, aplicar grupo o cambiar controles.
+    function g108CaptureActiveEdit(){
+      const el=document.activeElement;
+      if(!el || !el.matches?.('#g76-preview-body [data-roster-field]'))return;
+      const tr=el.closest('tr[data-source-index]');
+      if(!tr)return;
+      const index=Number(tr.dataset.sourceIndex),field=el.dataset.rosterField;
+      if(!g76RosterRows[index]||!['student','number','group'].includes(field))return;
+      const edit=g98RosterEdits.get(index)||{};
+      const val=String(el.value??'').trim();
+      const next=field==='number'?(val===''?'':Number(val)):val.toUpperCase();
+      if(edit[field]!==next){edit[field]=next;if(field==='student')edit.verified=false;g98RosterEdits.set(index,edit);}
     }
     function g87EditRosterRow(index,field,value){
       if(!g76RosterRows[index]) return;
@@ -4236,7 +4253,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       const numberSet=new Set(nums);
       const missing=[];for(let n=1;n<=Math.min(maxNum,250);n++)if(!numberSet.has(n))missing.push(n);
       if(missing.length)return showToast('Importación detenida: faltan números de lista '+missing.join(', '));
-      if(numberSet.size!==nums.length)return showToast('Importación detenida: hay números de lista repetidos.');
+      if(g76RosterPreview.some(x=>x.note?.includes('Número de lista repetido')))return showToast('Importación detenida: hay números de lista repetidos en un grupo.');
       if(g76RosterPreview.some(x=>x.state!=='OK'))return showToast('Importación detenida: corrige primero las filas marcadas ERROR o REVISAR.');
       const ready=g76RosterPreview.filter(x=>x.state==='OK');
       if(!ready.length)return showToast('No hay filas listas: revisa grado, grupo y nombres.');
@@ -4272,8 +4289,10 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         }
         for(const stu of newStudents){await dbPut('students',stu);stc++;}
         await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();closeModal('modal-g76-roster-import');
-        showToast(`${stc} alumnos nuevos · ${updated} números actualizados · ${skipped} omitidos · ${gc} grupos`);
-      }catch(err){console.error(err);showToast('Importación detenida: revisa los datos; lo guardado se conserva.');}
+        const message=`Importación finalizada: ${stc} alumnos nuevos, ${updated} números actualizados, ${skipped} omitidos y ${gc} grupos nuevos.`;
+        showToast(message);
+        window.alert(message+'\nVerifica el listado del grupo antes de registrar asistencia.');
+      }catch(err){console.error(err);showToast('Importación interrumpida: algunos registros podrían haberse guardado. Actualiza el listado antes de reintentar.');}
     }
 
 async function handleCreateSchool(e) {
