@@ -3909,6 +3909,7 @@
     }
 
         let g76RosterRows=[],g76Workbook=null,g76RosterPreview=[];
+    const g98RosterEdits=new Map();
     const G81_FIELDS=[['school','Escuela',['escuela','plantel','school']],['grade','Grado',['grado','grade']],['group','Grupo',['grupo','group','seccion','sección']],['subject','Asignatura',['asignatura','materia','subject']],['shift','Turno',['turno','shift']],['number','Núm. lista',['numero','número','num','no','lista','numero de lista','número de lista']],['student','Nombre del alumno',['alumno','estudiante','nombre','nombre completo','nombre del alumno','student']],['paternal','Apellido paterno',['apellido paterno','paterno']],['maternal','Apellido materno',['apellido materno','materno']]];
     
     let g80CurrentSheetName='';
@@ -4031,7 +4032,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
     async function g76ReadRosterFile(e){const f=e.target.files?.[0];if(!f)return;g80CurrentFileName=f.name||'';const st=document.getElementById('g76-file-status');try{const ext=(f.name.split('.').pop()||'').toLowerCase();if(['csv','tsv'].includes(ext)){const t=await f.text(),d=ext==='tsv'?'\t':(t.includes('\t')?'\t':',');const m=t.split(/\r?\n/).filter(Boolean).map(l=>d==='\t'?l.split('\t'):l.split(','));g76RosterRows=g76RowsFromMatrix(m);g76AfterRowsLoaded(f.name);return;}if(typeof XLSX==='undefined'){if(st)st.textContent='No se cargó el lector Excel; usa CSV o verifica internet.';return showToast('Para .xlsx se necesita conexión al lector Excel');}g76Workbook=XLSX.read(await f.arrayBuffer(),{type:'array'});const sel=document.getElementById('g76-sheet-select');sel.innerHTML=g76Workbook.SheetNames.map(n=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');document.getElementById('g76-sheet-wrap').classList.remove('hidden');g76UseSelectedSheet();if(st)st.textContent=`${f.name} · ${g76Workbook.SheetNames.length} hoja(s)`;}catch(err){console.error(err);showToast('No se pudo leer el archivo');}}
     function g76UseSelectedSheet(){if(!g76Workbook)return;const n=document.getElementById('g76-sheet-select')?.value||g76Workbook.SheetNames[0],ws=g76Workbook.Sheets[n];g80CurrentSheetName=n;g76RosterRows=g76RowsFromMatrix(XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false}));g76AfterRowsLoaded(n);}
     function g76ParsePastedRoster(){const t=document.getElementById('g76-paste-data')?.value||'';if(!t.trim())return showToast('Pega datos desde Excel');g76RosterRows=g76RowsFromMatrix(t.split(/\r?\n/).filter(Boolean).map(r=>r.split('\t')));g76AfterRowsLoaded('Datos pegados');}
-    function g76AfterRowsLoaded(label){if(!g76RosterRows.length)return showToast('No se encontraron filas');const mapGrid=document.getElementById('g76-map-grid');if(mapGrid)mapGrid.classList.remove('hidden');const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Relacionar columnas';const headers=Object.keys(g76RosterRows[0]||{}),grid=document.getElementById('g76-map-grid');grid.innerHTML=G81_FIELDS.map(([k,l,a])=>{const aliases=a.map(g76NormalizeHeader),det=headers.find(h=>aliases.includes(g76NormalizeHeader(h)))||'';return `<label class="text-xs font-bold">${escapeHTML(l)}<select id="g76-map-${k}" class="mt-1 w-full rounded-xl border p-2 text-xs" onchange="g76BuildRosterPreview()"><option value="">— No usar —</option>${headers.map(h=>`<option value="${escapeHTML(h)}" ${h===det?'selected':''}>${escapeHTML(h)}</option>`).join('')}</select></label>`;}).join('');document.getElementById('g76-row-count').textContent=`${g76RosterRows.length} fila(s)`;document.getElementById('g76-mapping-section').classList.remove('hidden');document.getElementById('g76-preview-section').classList.remove('hidden');g80AutoMapRoster();g76BuildRosterPreview();showToast(`${label}: ${g76RosterRows.length} filas`);}
+    function g76AfterRowsLoaded(label){g98RosterEdits.clear();if(!g76RosterRows.length)return showToast('No se encontraron filas');const mapGrid=document.getElementById('g76-map-grid');if(mapGrid)mapGrid.classList.remove('hidden');const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Relacionar columnas';const headers=Object.keys(g76RosterRows[0]||{}),grid=document.getElementById('g76-map-grid');grid.innerHTML=G81_FIELDS.map(([k,l,a])=>{const aliases=a.map(g76NormalizeHeader),det=headers.find(h=>aliases.includes(g76NormalizeHeader(h)))||'';return `<label class="text-xs font-bold">${escapeHTML(l)}<select id="g76-map-${k}" class="mt-1 w-full rounded-xl border p-2 text-xs" onchange="g76BuildRosterPreview()"><option value="">— No usar —</option>${headers.map(h=>`<option value="${escapeHTML(h)}" ${h===det?'selected':''}>${escapeHTML(h)}</option>`).join('')}</select></label>`;}).join('');document.getElementById('g76-row-count').textContent=`${g76RosterRows.length} fila(s)`;document.getElementById('g76-mapping-section').classList.remove('hidden');document.getElementById('g76-preview-section').classList.remove('hidden');g80AutoMapRoster();g76BuildRosterPreview();showToast(`${label}: ${g76RosterRows.length} filas`);}
     function g76Field(r,k){const c=document.getElementById(`g76-map-${k}`)?.value||'';return c?String(r?.[c]??'').trim():'';}
     function g76ParseGrade(v,g=''){const m=String(v||g||'').match(/(^|\D)([1-3])(?:\D|$)/);return m?Number(m[2]):null;}
     function g76CleanGroup(v){let s=String(v??'').trim();s=s.replace(/^([1-3])\s*[°ºo.]?\s*/i,'').trim();return s||String(v??'').trim();}
@@ -4062,10 +4063,11 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           rg='';
         }
 
-        const name=(student||[pat,mat].filter(Boolean).join(' ')).trim();
+        const edit=g98RosterEdits.get(sourceIndex)||{};
+        const name=(edit.student??(student||[pat,mat].filter(Boolean).join(' ')).trim()).trim();
         if(g80IsNoiseRosterName(name) && !Number.isInteger(Number(g76Field(r,'number')))) continue;
 
-        const school=g76Field(r,'school')||ds||(g80CurrentSheetName?'Escuela Principal':'');
+        const school=g76Field(r,'school')||ds;
 
         let grade=g76ParseGrade(g76Field(r,'grade'),rg);
         let group=g76CleanGroup(rg);
@@ -4075,6 +4077,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         if(ctx.group) group=ctx.group;
         if(defaultGrade) grade=Number(defaultGrade);
         if(defaultGroup) group=defaultGroup;
+        if(edit.group!==undefined) group=edit.group;
 
         // Fallback to compound values such as 1-A.
         const compound=String(rg||'').trim().toUpperCase().match(/^([1-3])\s*[-º°]?\s*([A-Z])$/);
@@ -4086,7 +4089,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         const subject=g76Field(r,'subject')||dsub;
         const shift=ctx.shift || g76Field(r,'shift') || dsh;
         const raw=g76Field(r,'number');
-        const num=raw!==''&&Number.isFinite(Number(raw))?Number(raw):null;
+        const chosenNumber=edit.number!==undefined?edit.number:raw;
+        const num=chosenNumber!==''&&chosenNumber!==null&&Number.isFinite(Number(chosenNumber))?Number(chosenNumber):null;
         const key=`${g76NormalizeHeader(school)}|${grade||''}|${g76NormalizeHeader(group)}|${g76NormalizeHeader(subject)}|${g76NormalizeHeader(shift)}`;
 
         let state='OK',note='Listo';
@@ -4140,7 +4144,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           <td class="p-2 font-bold">${x.state}</td>
           <td class="p-2">${escapeHTML(x.school)}</td>
           <td class="p-2">${x.grade??'—'}</td>
-          <td class="p-2">${escapeHTML(x.group||'—')}</td>
+          <td class="p-2"><input aria-label="Grupo" class="w-14 rounded-lg border px-2 py-1" value="${escapeHTML(x.group||'')}" onchange="g87EditRosterRow(${x.sourceIndex},'group',this.value)"></td>
           <td class="p-2">${escapeHTML(x.subject)}</td>
           <td class="p-2">${escapeHTML(x.shift)}</td>
           <td class="p-2"><input type="number" min="1" class="w-16 rounded-lg border px-1 py-1" value="${x.number??''}" onchange="g87EditRosterRow(${x.sourceIndex},'number',this.value)"></td>
@@ -4148,13 +4152,14 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           <td class="p-2">${escapeHTML(x.note)}</td>
         </tr>`).join('');
 
-      document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR');
+      document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR'||x.state==='ERROR');
     }
     function g87EditRosterRow(index,field,value){
-      const row=g76RosterRows[index];if(!row)return;
-      const key=document.getElementById('g76-map-'+field)?.value;
-      if(!key){showToast('Selecciona primero la columna de '+field);return;}
-      row[key]=field==='number'?(value.trim()===''?'':Number(value)):String(value||'').trim().toUpperCase();
+      if(!g76RosterRows[index]) return;
+      const previous=g98RosterEdits.get(index)||{};
+      const cleaned=String(value??'').trim();
+      previous[field]=field==='number'?(cleaned===''?'':Number(cleaned)):cleaned.toUpperCase();
+      g98RosterEdits.set(index,previous);
       g76BuildRosterPreview();
     }
     async function g76ImportRoster(){
