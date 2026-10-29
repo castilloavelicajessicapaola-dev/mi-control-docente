@@ -8,6 +8,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
@@ -4195,6 +4196,8 @@ async function handleCreateSchool(e) {
     let g77Headers=[];
     let g77MappedRows=[];
     let g77Mapping={};
+    let g82Workbook=null;
+    let g82SheetName="";
 
     function g77OpenImportWizard(){
       g77ClearImport(false);
@@ -4286,31 +4289,102 @@ async function handleCreateSchool(e) {
       });
     }
 
+    function g82SheetContext(name){
+      const n=String(name||'').trim().toUpperCase();
+      // M25 1D, V25 1A, 1-D, 2° C, MATUTINO 3B.
+      const match=n.match(/(?:^|[^0-9])([123])\s*[-°º._ ]*([A-Z])(?:$|[^A-Z])/);
+      const grade=match?match[1]:'';
+      const group=match?match[2]:'';
+      const shift=/^(V\d{0,3}\b)|VESPERTINO|\bTV\b/.test(n)?'Vespertino':
+        (/^(M\d{0,3}\b)|MATUTINO|\bTM\b/.test(n)?'Matutino':'');
+      const schoolCode=n.match(/^[MV]\s*(\d{2,3})\b/);
+      return {grade,group,shift,school:schoolCode?'Secundaria #'+Number(schoolCode[1]):''};
+    }
+
+    function g82LoadSheet(){
+      if(!g82Workbook) return;
+      const select=document.getElementById('g82-sheet-select');
+      const name=select?.value||g82Workbook.SheetNames[0];
+      const ws=g82Workbook.Sheets[name];
+      if(!ws) return;
+      g82SheetName=name;
+      const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',blankrows:false});
+      const ctx=g82SheetContext(name);
+      const school=document.getElementById('g77-default-school');
+      const shift=document.getElementById('g77-default-shift');
+      if(school&&ctx.school) school.value=ctx.school;
+      if(shift&&ctx.shift) shift.value=ctx.shift;
+      g77LoadMatrix(matrix);
+      const note=document.getElementById('g82-sheet-context');
+      if(note) note.textContent=`Hoja: ${name} · ${ctx.grade&&ctx.group?ctx.grade+'° '+ctx.group:'Grado/grupo por revisar'} · ${ctx.shift||'Turno por revisar'}. Revisa la vista previa antes de importar.`;
+    }
+
+    // G85: foto -> OCR local en navegador -> texto revisable -> vista previa existente.
+    async function g85ReadListPhoto(event){
+      const file=event.target.files?.[0]; if(!file) return;
+      const panel=document.getElementById('g85-photo-panel');
+      const status=document.getElementById('g85-photo-status');
+      const preview=document.getElementById('g85-photo-preview');
+      panel?.classList.remove('hidden');
+      if(!/^image\/(jpeg|png|webp)$/.test(file.type)){status.textContent='Formato no admitido. Usa JPG, PNG o WEBP.';return;}
+      if(file.size>15*1024*1024){status.textContent='La fotografía supera 15 MB. Reduce su tamaño.';return;}
+      const url=URL.createObjectURL(file);
+      if(preview){preview.onload=()=>URL.revokeObjectURL(url);preview.src=url;}
+      if(!window.Tesseract){status.textContent='No se cargó el reconocimiento de texto. Conéctate a internet, recarga e inténtalo de nuevo. También puedes escribir la lista manualmente.';return;}
+      status.textContent='Reconociendo texto de la fotografía. Puede tardar un momento…';
+      try{
+        const result=await Tesseract.recognize(file,'spa',{logger:m=>{if(m.status==='recognizing text')status.textContent='Reconociendo texto: '+Math.round((m.progress||0)*100)+'%';}});
+        document.getElementById('g85-photo-text').value=result.data?.text||'';
+        status.textContent='Texto detectado. Corrige los nombres y números y pulsa «Revisar alumnos detectados». No se ha guardado nada.';
+      }catch(err){console.error('G85 OCR',err);status.textContent='No se pudo reconocer la imagen. Comprueba la conexión o transcribe la lista en el cuadro editable.';}
+    }
+    function g85AnalyzePhotoText(){
+      const text=document.getElementById('g85-photo-text')?.value||'';
+      const rows=[];
+      for(const raw of text.split(/\r?\n/)){
+        const line=raw.trim();
+        const match=line.match(/^(\d{1,3})\s*[.\-)\s:|]+\s*(.+)$/);
+        if(!match)continue;
+        const name=match[2].replace(/\s+/g,' ').trim();
+        if(name.length<7||!/[A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(name))continue;
+        rows.push([match[1],name]);
+      }
+      if(!rows.length){showToast('No se detectaron filas «número nombre». Corrige el texto manualmente.');return;}
+      // Reutiliza el importador con encabezados explícitos y revisión antes de guardar.
+      g77LoadMatrix([['NÚM. LISTA','NOMBRE COMPLETO'],...rows]);
+      const status=document.getElementById('g85-photo-status');
+      if(status)status.textContent=`${rows.length} filas candidatas. Revisa escuela, grupo, turno y vista previa antes de importar.`;
+    }
+
     async function g77HandleImportFile(event){
       const file=event.target.files?.[0];
       if(!file) return;
       const name=file.name.toLowerCase();
       try{
+        g82Workbook=null;g82SheetName='';
+        const picker=document.getElementById('g82-sheet-picker');
+        if(picker) picker.classList.add('hidden');
         if(name.endsWith('.csv')||name.endsWith('.tsv')){
-          const text=await file.text();
-          g77LoadMatrix(g77SplitText(text));
+          g77LoadMatrix(g77SplitText(await file.text()));
           return;
         }
         if(name.endsWith('.xlsx')||name.endsWith('.xls')){
           if(typeof XLSX==='undefined'){
-            showToast('Para Excel, usa CSV/TSV o pega las filas desde Excel');
+            showToast('No se cargó el lector Excel. Comprueba internet o utiliza CSV/TSV.');
             return;
           }
-          const buf=await file.arrayBuffer();
-          const wb=XLSX.read(buf,{type:'array'});
-          const ws=wb.Sheets[wb.SheetNames[0]];
-          const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-          g77LoadMatrix(matrix);
+          const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+          if(!wb.SheetNames.length) return showToast('El Excel no contiene hojas');
+          g82Workbook=wb;
+          const select=document.getElementById('g82-sheet-select');
+          if(select) select.innerHTML=wb.SheetNames.map((n,i)=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');
+          if(picker) picker.classList.remove('hidden');
+          g82LoadSheet();
           return;
         }
         showToast('Formato no compatible');
       }catch(err){
-        console.error('G81 import file',err);
+        console.error('G82 import file',err);
         showToast('No se pudo leer el archivo');
       }
     }
@@ -4401,6 +4475,18 @@ function g77LoadMatrix(matrix){
 
       g77GuessMapping();
       g79DetectStructuralMapping();
+      // G83: Las hojas escolares incluyen rótulos (GRUPO, TURNO, 1-D)
+      // que no son columnas de datos. No asignarlos a Escuela/Alumno.
+      const sampleValues=(idx)=>idx>=0?g77RawRows.slice(0,45).map(r=>String(r[idx]??'').trim()).filter(Boolean):[];
+      const schoolVals=sampleValues(g77Mapping.school);
+      if(schoolVals.length && schoolVals.filter(v=>/^(?:[1-3]\s*[-º°]?\s*[A-Z]|GRUPO|TURNO|MATUTINO|VESPERTINO)$/i.test(v)).length>=Math.ceil(schoolVals.length*.5)) g77Mapping.school=-1;
+      const groupVals=sampleValues(g77Mapping.group);
+      if(groupVals.length && groupVals.filter(v=>g79LooksLikePersonName(v)).length>=Math.ceil(groupVals.length*.5)) g77Mapping.group=-1;
+      const nameVals=sampleValues(g77Mapping.student);
+      if(nameVals.length && nameVals.filter(v=>g79LooksLikePersonName(v)).length<Math.ceil(nameVals.length*.4)){
+        const guess=g79DetectStructuralMapping();
+        if(guess.bestName.idx>=0 && guess.bestName.score>=.9) g77Mapping.student=guess.bestName.idx;
+      }
       g77RenderMapping();
       g77BuildPreview();
     }
@@ -4603,6 +4689,7 @@ function g77BuildPreview(){
       const defaultSubject=(document.getElementById('g77-default-subject')?.value||'').trim() || 'Tecnología';
       const defaultShift=(document.getElementById('g77-default-shift')?.value||'').trim();
       const globalCtx=g79InferContextDefaults();
+      const sheetCtx=g82SheetContext(g82SheetName);
 
       g77MappedRows=g77RawRows.map((row,i)=>{
         const rowCtx=g79GetRowContext(i);
@@ -4612,8 +4699,8 @@ function g77BuildPreview(){
 
         if(g79LooksLikePersonName(rawGroup)) rawGroup='';
 
-        let group=g77NormalizeGroup(rawGroup || rowCtx.group || globalCtx.group);
-        let grade=g77ParseGrade(rawGrade || rowCtx.grade || globalCtx.grade);
+        let group=g77NormalizeGroup(rawGroup || rowCtx.group || globalCtx.group || sheetCtx.group);
+        let grade=g77ParseGrade(rawGrade || rowCtx.grade || globalCtx.grade || sheetCtx.grade);
 
         const compound=(group||'').match(/^([1-3])\s*[-º°]?\s*([A-Z])$/i);
         if(compound){
@@ -4623,11 +4710,11 @@ function g77BuildPreview(){
 
         const item={
           row_index:i,
-          school:g77Cell(row,'school')||defaultSchool,
+          school:(/^(?:[1-3]\s*[-º°]?\s*[A-Z]|GRUPO|TURNO)$/i.test(g77Cell(row,'school'))?'':g77Cell(row,'school'))||sheetCtx.school||defaultSchool,
           grade,
           group,
           subject:g77Cell(row,'subject')||defaultSubject,
-          shift:g77NormalizeShift(g77Cell(row,'shift')||rowCtx.shift||globalCtx.shift||defaultShift),
+          shift:g77NormalizeShift(g77Cell(row,'shift')||rowCtx.shift||globalCtx.shift||sheetCtx.shift||defaultShift),
           number:g77Cell(row,'number'),
           student,
           status:'ok',
@@ -4780,8 +4867,8 @@ function g77BuildPreview(){
         <div class="flex justify-between text-amber-700"><span>Revisar</span><strong>${review}</strong></div>
         <div class="flex justify-between text-red-700"><span>Error</span><strong>${error}</strong></div>
         <div class="flex justify-between text-slate-600"><span>Filas informativas ignoradas</span><strong>${ignored}</strong></div>`;
-      if(btn) btn.disabled=!total||error>0;
-      if(note) note.textContent=error?`Corrige ${error} fila(s) con error antes de importar.`:`Listo para importar ${total} fila(s).`;
+      if(btn) btn.disabled=!total||error>0||review>0;
+      if(note) note.textContent=error?`Corrige ${error} fila(s) con error antes de importar.`:review?`Revisa ${review} fila(s) antes de importar.`:`Listo para importar ${total} fila(s).`;
     }
 
     async function g77CommitImport(){
@@ -5828,7 +5915,7 @@ function populateGroupDropdowns() {
         const currentStatus = tempAttendanceState[s.student_id];
         
         return `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-2xl border border-[#d9e1da] bg-white gap-2">
+          <div data-attendance-student-id="${escapeHTML(s.student_id)}" class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-2xl border border-[#d9e1da] bg-white gap-2">
             <div class="flex items-center gap-3">
               <span class="w-6 text-xs text-gray-400 font-bold">${s.student_number || (idx + 1)}</span>
               <div>
@@ -5837,12 +5924,12 @@ function populateGroupDropdowns() {
               </div>
             </div>
             <div class="flex items-center gap-1 flex-wrap">
-              <button type="button" class="px-2.5 py-1 rounded-xl text-xs font-bold ${currentStatus === 'P' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-emerald-100'}" onclick="setTempStatus('${s.student_id}', 'P')">P</button>
-              <button type="button" class="px-2.5 py-1 rounded-xl text-xs font-bold ${currentStatus === 'F' ? 'bg-red-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-red-100'}" onclick="setTempStatus('${s.student_id}', 'F')">F</button>
-              <button type="button" class="px-2.5 py-1 rounded-xl text-xs font-bold ${currentStatus === 'R' ? 'bg-amber-500 text-white' : 'bg-slate-100 text-gray-600 hover:bg-amber-100'}" onclick="setTempStatus('${s.student_id}', 'R')">R</button>
-              <button type="button" class="px-2 py-1 rounded-xl text-xs font-bold ${currentStatus === 'FJ' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-blue-100'}" onclick="setTempStatus('${s.student_id}', 'FJ')">FJ</button>
-              <button type="button" class="px-2 py-1 rounded-xl text-xs font-bold ${currentStatus === 'RJ' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-indigo-100'}" onclick="setTempStatus('${s.student_id}', 'RJ')">RJ</button>
-              <button type="button" class="px-2 py-1 rounded-xl text-xs font-bold ${currentStatus === 'SA' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-purple-100'}" onclick="setTempStatus('${s.student_id}', 'SA')">SA</button>
+              <button type="button" class="px-2.5 py-1 rounded-xl text-xs font-bold ${currentStatus === 'P' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-emerald-100'}" data-attendance-status="P" onclick="setTempStatus('${s.student_id}', 'P')">P</button>
+              <button type="button" class="px-2.5 py-1 rounded-xl text-xs font-bold ${currentStatus === 'F' ? 'bg-red-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-red-100'}" data-attendance-status="F" onclick="setTempStatus('${s.student_id}', 'F')">F</button>
+              <button type="button" class="px-2.5 py-1 rounded-xl text-xs font-bold ${currentStatus === 'R' ? 'bg-amber-500 text-white' : 'bg-slate-100 text-gray-600 hover:bg-amber-100'}" data-attendance-status="R" onclick="setTempStatus('${s.student_id}', 'R')">R</button>
+              <button type="button" class="px-2 py-1 rounded-xl text-xs font-bold ${currentStatus === 'FJ' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-blue-100'}" data-attendance-status="FJ" onclick="setTempStatus('${s.student_id}', 'FJ')">FJ</button>
+              <button type="button" class="px-2 py-1 rounded-xl text-xs font-bold ${currentStatus === 'RJ' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-indigo-100'}" data-attendance-status="RJ" onclick="setTempStatus('${s.student_id}', 'RJ')">RJ</button>
+              <button type="button" class="px-2 py-1 rounded-xl text-xs font-bold ${currentStatus === 'SA' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-gray-600 hover:bg-purple-100'}" data-attendance-status="SA" onclick="setTempStatus('${s.student_id}', 'SA')">SA</button>
             </div>
           </div>
         `;
@@ -5853,18 +5940,35 @@ function populateGroupDropdowns() {
       tempAttendanceState[studentId] = status;
       const group = localData.groups.find(g => g.group_id === activeGroupId);
       let students = localData.students.filter(s => s.group_id === activeGroupId && s.status !== 'INACTIVE');
+      // Mantener el mismo orden estable que al abrir la lista; nunca reordenar al marcar asistencia.
+      students.sort((a, b) => a.full_name.localeCompare(b.full_name, 'es-MX'));
       if (attendanceFilterQuery.trim() !== '') {
         const q = attendanceFilterQuery.toLowerCase();
         students = students.filter(s => s.full_name.toLowerCase().includes(q));
       }
-      renderStudentAttendanceRows(students);
+      // Actualizar solamente la fila marcada: evita saltos de lista y desplazamiento.
+      const row=document.querySelector(`[data-attendance-student-id="${CSS.escape(studentId)}"]`);
+      if(row){
+        const selected=String(status);
+        row.querySelectorAll('button[data-attendance-status]').forEach(btn=>{
+          const active=btn.dataset.attendanceStatus===selected;
+          btn.setAttribute('aria-pressed',String(active));
+          btn.classList.toggle('ring-2',active);
+          btn.classList.toggle('ring-offset-1',active);
+        });
+      }
       updateAttendanceStats();
     }
 
     function markAllPresent(checked) {
       if (!checked) return;
-      const students = localData.students.filter(s => s.group_id === activeGroupId && s.status !== 'INACTIVE');
+      let students = localData.students.filter(s => s.group_id === activeGroupId && s.status !== 'INACTIVE');
       students.forEach(s => tempAttendanceState[s.student_id] = 'P');
+      students.sort((a, b) => a.full_name.localeCompare(b.full_name, 'es-MX'));
+      if (attendanceFilterQuery.trim()) {
+        const q = attendanceFilterQuery.toLowerCase();
+        students = students.filter(s => s.full_name.toLowerCase().includes(q));
+      }
       renderStudentAttendanceRows(students);
       updateAttendanceStats();
     }
@@ -15237,7 +15341,7 @@ window.addEventListener('beforeunload',function(e){
     <div class="bg-white rounded-3xl w-full max-w-6xl shadow-xl max-h-[94vh] flex flex-col">
       <div class="p-5 border-b border-[#d9e1da] flex items-start justify-between gap-3">
         <div>
-          <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G81 · Detección estructural de listas</p>
+          <p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G82 · Importación por hojas de Excel</p>
           <h3 class="serif text-2xl font-bold mt-1">Importar grupos y asignar alumnos</h3>
           <p class="text-xs text-[#66767a] mt-1">Detecta automáticamente la fila real de encabezados, ignora títulos como TRIMESTRE/MARCADOR y reconoce nombre completo o nombres/apellidos separados. Revisa antes de guardar.</p>
         </div>
@@ -15258,8 +15362,25 @@ window.addEventListener('beforeunload',function(e){
                     Seleccionar archivo
                     <input id="g77-import-file" type="file" accept=".xlsx,.xls,.csv,.tsv,text/csv,text/tab-separated-values" class="hidden" onchange="g77HandleImportFile(event)">
                   </label>
+                  <label class="rounded-xl border border-[#145b4b] bg-emerald-50 text-[#145b4b] px-4 py-2 text-xs font-bold cursor-pointer">📷 Subir foto de lista
+                    <input id="g85-import-image" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="g85ReadListPhoto(event)">
+                  </label>
                   <button type="button" class="rounded-xl border border-[#145b4b] text-[#145b4b] px-4 py-2 text-xs font-bold" onclick="g77OpenSourceExcel()">Abrir Excel de origen</button>
                 </div>
+              </div>
+              <div id="g85-photo-panel" class="hidden mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 space-y-2">
+                <p class="font-bold text-xs text-blue-900">Reconocimiento de fotografía · revisión obligatoria</p>
+                <p class="text-xs text-blue-800">El reconocimiento requiere conexión a internet para cargar el motor OCR. La foto se procesa en este navegador; no se envía a un servidor de la aplicación. Verifica cada nombre y número antes de importar.</p>
+                <img id="g85-photo-preview" alt="Fotografía seleccionada" class="max-h-48 object-contain rounded-lg border bg-white">
+                <p id="g85-photo-status" role="status" class="text-xs text-blue-900">Esperando fotografía.</p>
+                <textarea id="g85-photo-text" rows="8" class="w-full rounded-xl border border-blue-200 p-3 text-xs font-mono" placeholder="Núm. de lista y nombre, uno por línea. Puedes corregir los errores del OCR aquí."></textarea>
+                <button type="button" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-xs font-bold" onclick="g85AnalyzePhotoText()">Revisar alumnos detectados</button>
+              </div>
+              <div id="g82-sheet-picker" class="hidden mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                <label for="g82-sheet-select" class="block text-xs font-bold text-emerald-900 mb-1">Hoja del Excel que deseas importar</label>
+                <select id="g82-sheet-select" class="w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" onchange="g82LoadSheet()"></select>
+                <p id="g82-sheet-context" class="mt-2 text-xs text-emerald-900"></p>
+                <p class="mt-1 text-xs text-[#66767a]">Importa una hoja por vez; puedes cambiar de hoja y repetir sin eliminar los alumnos existentes.</p>
               </div>
               <textarea id="g77-import-paste" rows="7" class="w-full mt-3 rounded-xl border border-[#c7d3c8] p-3 text-xs font-mono" placeholder="También puedes copiar filas desde Excel y pegarlas aquí..."></textarea>
               <div class="flex flex-wrap gap-2 mt-3">
@@ -15274,7 +15395,7 @@ window.addEventListener('beforeunload',function(e){
               <div id="g77-mapping-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3"></div>
 
               <div id="g79-structural-note" class="mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">
-                G81 analiza el contenido de las columnas, no solo los encabezados. Puede detectar listas con estructura “Grupo → Apellidos y nombre → alumnos”.
+                G82 analiza el contenido de las columnas, no solo los encabezados. Puede detectar listas con estructura “Grupo → Apellidos y nombre → alumnos”.
               </div>
               <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-[#e5ebe6]">
                 <label class="text-[11px] font-bold text-[#66767a]">Escuela predeterminada
