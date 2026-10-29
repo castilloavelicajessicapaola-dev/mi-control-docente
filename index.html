@@ -4064,7 +4064,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         }
 
         const edit=g98RosterEdits.get(sourceIndex)||{};
-        const name=(edit.student??(student||[pat,mat].filter(Boolean).join(' ')).trim()).trim();
+        const name=String(edit.student??(student||[pat,mat].filter(Boolean).join(' '))).trim();
         if(g80IsNoiseRosterName(name) && !Number.isInteger(Number(g76Field(r,'number')))) continue;
 
         const school=g76Field(r,'school')||ds;
@@ -4077,7 +4077,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         if(ctx.group) group=ctx.group;
         if(defaultGrade) grade=Number(defaultGrade);
         if(defaultGroup) group=defaultGroup;
-        if(edit.group!==undefined) group=edit.group;
+        if(edit.group!==undefined && String(edit.group).trim()) group=edit.group;
+        if(!group && defaultGroup)group=defaultGroup;
 
         // Fallback to compound values such as 1-A.
         const compound=String(rg||'').trim().toUpperCase().match(/^([1-3])\s*[-º°]?\s*([A-Z])$/);
@@ -4521,14 +4522,16 @@ async function handleCreateSchool(e) {
     // Se mantienen las filas con número y se presentan para corrección humana.
     // G96: conserva cada renglón, reconoce numeración sin mutilar nombres y avisa huecos.
     // G97: lectura de renglones numerados con protección de nombres y auditoría de huecos.
+    // G99: OCR por renglón; números pegados, prefijos y caracteres de tabla.
+    // Nunca se crean nombres ni números ausentes: se señalan para revisión.
     function g88ParseRosterOCR(raw){
       const rows=[],rejected=[],seen=new Set();
       const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|APELLIDOS Y NOMBRE|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|GRADO|TURNO|PROMEDIO|TOTAL)\b/i;
       const source=String(raw||'').replace(/\r/g,'\n');
       for(const original of source.split('\n')){
         let line=original.trim();if(!line||noise.test(line))continue;
-        line=line.replace(/^[\s|¦\[\]{}:;._-]+/g,'').trim();
-        // OCR puede leer 11 como l1, |1 o !1. Solo normalizar en el campo numérico.
+        line=line.replace(/^[\s|¦\[\]{}:;._\-]+/g,'').trim();
+        // Aceptar 1]NOMBRE, 1 - NOMBRE, 1|NOMBRE, 1 NOMBRE.
         const m=line.match(/^(?:[Nn][Oo]\.?\s*)?([0-9Il|!]{1,3})\s*[\]\[).:;º°|!\-–—]*\s*(.+)$/);
         if(!m){rejected.push(original);continue;}
         const number=Number(m[1].replace(/[Il|!]/g,'1'));
@@ -4549,8 +4552,14 @@ async function handleCreateSchool(e) {
       if(!parsed.rows.length){showToast('No se detectaron alumnos numerados. Corrige el texto: 1 APELLIDO NOMBRE.');return;}
       g80CurrentSheetName='';
       // G93: conservar grado y grupo ingresados; nunca borrarlos al reanalizar OCR.
+      const oldEdits=new Map();
+      for(const [i,row] of g76RosterRows.entries()){
+        const n=Number(row?.['NÚM. LISTA']);
+        if(Number.isInteger(n)&&g98RosterEdits.has(i))oldEdits.set(n,{...g98RosterEdits.get(i)});
+      }
       g76RosterRows=parsed.rows.map(([number,name])=>({'NÚM. LISTA':number,'NOMBRE COMPLETO':name}));
       g76AfterRowsLoaded('Imagen/PDF revisado');
+      g76RosterRows.forEach((row,i)=>{const edit=oldEdits.get(Number(row['NÚM. LISTA']));if(edit)g98RosterEdits.set(i,edit);});
       // OCR tiene dos columnas conocidas: nunca solicitar mapeo heurístico.
       document.getElementById('g76-map-number').value='NÚM. LISTA';
       document.getElementById('g76-map-student').value='NOMBRE COMPLETO';
@@ -4560,6 +4569,7 @@ async function handleCreateSchool(e) {
       g76BuildRosterPreview();
       const status=document.getElementById('g86-document-status');
       if(status)status.textContent=`${parsed.rows.length} alumnos detectados. ${parsed.missing.length ? "Números ausentes: "+parsed.missing.join(", ")+". " : ""}${parsed.rejected.length} líneas requieren revisión. Verifica los números faltantes en la secuencia antes de importar. No se completan nombres automáticamente. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
+      if(parsed.missing.length)showToast('Atención: faltan números de lista: '+parsed.missing.join(', '));
       document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'start'});
     }
 
