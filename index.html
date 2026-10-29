@@ -4067,7 +4067,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         const name=String(edit.student??(student||[pat,mat].filter(Boolean).join(' '))).trim();
         if(g80IsNoiseRosterName(name) && !Number.isInteger(Number(g76Field(r,'number')))) continue;
 
-        const school=g76Field(r,'school')||ds;
+        const school=ds||g76Field(r,'school');
 
         let grade=g76ParseGrade(g76Field(r,'grade'),rg);
         let group=g76CleanGroup(rg);
@@ -4077,7 +4077,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         if(ctx.group) group=ctx.group;
         if(defaultGrade) grade=Number(defaultGrade);
         if(defaultGroup) group=defaultGroup;
-        if(edit.group!==undefined && String(edit.group).trim()) group=edit.group;
+        if(edit.group!==undefined && String(edit.group).trim() && !defaultGroup) group=edit.group;
         if(!group && defaultGroup)group=defaultGroup;
 
         // Fallback to compound values such as 1-A.
@@ -4087,8 +4087,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           group=compound[2];
         }
 
-        const subject=g76Field(r,'subject')||dsub;
-        const shift=ctx.shift || g76Field(r,'shift') || dsh;
+        const subject=dsub||g76Field(r,'subject');
+        const shift=dsh || ctx.shift || g76Field(r,'shift');
         const raw=g76Field(r,'number');
         const chosenNumber=edit.number!==undefined?edit.number:raw;
         const num=chosenNumber!==''&&chosenNumber!==null&&Number.isFinite(Number(chosenNumber))?Number(chosenNumber):null;
@@ -4096,17 +4096,13 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
 
         let state='OK',note='Listo';
 
-        if(!name){
-          state='ERROR'; note='Falta alumno';
-        }else if(!g80LooksLikeStudentName(name)){
-          state='REVISAR'; note='Nombre OCR dudoso: verifica antes de importar';
-        }else if(!school){
-          state='ERROR'; note='Indica la escuela';
-        }else if(!group){
-          state='ERROR'; note='Falta grupo';
-        }else if(!grade){
-          state='ERROR'; note='Falta grado';
-        }
+        if(!name){state='ERROR';note='Falta nombre del alumno';}
+        else if(!school){state='ERROR';note='Falta escuela';}
+        else if(![1,2,3].includes(Number(grade))){state='ERROR';note='Grado inválido (1, 2 o 3)';}
+        else if(!group){state='ERROR';note='Falta grupo';}
+        else if(!subject){state='ERROR';note='Falta asignatura';}
+        else if(!shift){state='ERROR';note='Falta turno';}
+        else if(!g80LooksLikeStudentName(name)){state='REVISAR';note='Verifica nombre OCR antes de importar';}
 
         const eg=localData.groups.find(g=>
           g76NormalizeHeader(localData.schools.find(s=>s.school_id===g.school_id)?.school_name||'')===g76NormalizeHeader(school)&&
@@ -4136,6 +4132,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       const missingNumbers=[];
       for(let n=1;n<=Math.min(expected,250);n++)if(!seenNumbers.has(n))missingNumbers.push(n);
       const repeatedNumbers=numbers.filter((n,i)=>numbers.indexOf(n)!==i);
+      for(const x of p){if(x.number!==null&&(!Number.isInteger(x.number)||x.number<1)){x.state='ERROR';x.note='Número de lista inválido';}}
       for(const x of p){
         if(repeatedNumbers.includes(x.number)){
           x.state='REVISAR';x.note='Número de lista repetido: verifica antes de importar';
@@ -4173,7 +4170,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         :`G102 · Numeración: ${p.length} registros; ${expected||'sin máximo'} como último número detectado. Verifica visualmente los nombres antes de importar.`;
       document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR'||x.state==='ERROR') || missingNumbers.length>0;
     }
-    // G103: asignar contexto escolar sin reanalizar ni sustituir nombres corregidos.
+    // G104: asignar contexto escolar sin reanalizar ni sustituir nombres corregidos.
     function g103ApplyGroupToAll(){
       const school=(document.getElementById('g76-default-school')?.value||'').trim();
       const grade=Number(document.getElementById('g87-default-grade')?.value||0);
@@ -4187,7 +4184,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         if(Object.prototype.hasOwnProperty.call(edit,'group'))delete edit.group;
       }
       g76BuildRosterPreview();
-      showToast('Datos del grupo aplicados a la vista previa. Revisa los nombres antes de importar.');
+      showToast(`Datos escolares aplicados a ${g76RosterPreview.length} filas. Revisa nombres y numeración antes de importar.`);
     }
     function g87EditRosterRow(index,field,value){
       if(!g76RosterRows[index]) return;
@@ -4205,6 +4202,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       const missing=[];for(let n=1;n<=Math.min(maxNum,250);n++)if(!numberSet.has(n))missing.push(n);
       if(missing.length)return showToast('Importación detenida: faltan números de lista '+missing.join(', '));
       if(numberSet.size!==nums.length)return showToast('Importación detenida: hay números de lista repetidos.');
+      if(g76RosterPreview.some(x=>x.state!=='OK'))return showToast('Importación detenida: corrige primero las filas marcadas ERROR o REVISAR.');
       const ready=g76RosterPreview.filter(x=>x.state==='OK');
       if(!ready.length)return showToast('No hay filas listas: revisa grado, grupo y nombres.');
       if(!confirm(`¿Importar ${ready.length} alumnos? Se conservarán los historiales existentes. Los nombres repetidos no se duplicarán.`))return;
