@@ -2863,7 +2863,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G88 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G89 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" placeholder="Pega aquí el enlace a tu archivo (opcional)"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -4014,7 +4014,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
     async function g76ReadRosterFile(e){const f=e.target.files?.[0];if(!f)return;g80CurrentFileName=f.name||'';const st=document.getElementById('g76-file-status');try{const ext=(f.name.split('.').pop()||'').toLowerCase();if(['csv','tsv'].includes(ext)){const t=await f.text(),d=ext==='tsv'?'\t':(t.includes('\t')?'\t':',');const m=t.split(/\r?\n/).filter(Boolean).map(l=>d==='\t'?l.split('\t'):l.split(','));g76RosterRows=g76RowsFromMatrix(m);g76AfterRowsLoaded(f.name);return;}if(typeof XLSX==='undefined'){if(st)st.textContent='No se cargó el lector Excel; usa CSV o verifica internet.';return showToast('Para .xlsx se necesita conexión al lector Excel');}g76Workbook=XLSX.read(await f.arrayBuffer(),{type:'array'});const sel=document.getElementById('g76-sheet-select');sel.innerHTML=g76Workbook.SheetNames.map(n=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');document.getElementById('g76-sheet-wrap').classList.remove('hidden');g76UseSelectedSheet();if(st)st.textContent=`${f.name} · ${g76Workbook.SheetNames.length} hoja(s)`;}catch(err){console.error(err);showToast('No se pudo leer el archivo');}}
     function g76UseSelectedSheet(){if(!g76Workbook)return;const n=document.getElementById('g76-sheet-select')?.value||g76Workbook.SheetNames[0],ws=g76Workbook.Sheets[n];g80CurrentSheetName=n;g76RosterRows=g76RowsFromMatrix(XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false}));g76AfterRowsLoaded(n);}
     function g76ParsePastedRoster(){const t=document.getElementById('g76-paste-data')?.value||'';if(!t.trim())return showToast('Pega datos desde Excel');g76RosterRows=g76RowsFromMatrix(t.split(/\r?\n/).filter(Boolean).map(r=>r.split('\t')));g76AfterRowsLoaded('Datos pegados');}
-    function g76AfterRowsLoaded(label){if(!g76RosterRows.length)return showToast('No se encontraron filas');const headers=Object.keys(g76RosterRows[0]||{}),grid=document.getElementById('g76-map-grid');grid.innerHTML=G81_FIELDS.map(([k,l,a])=>{const aliases=a.map(g76NormalizeHeader),det=headers.find(h=>aliases.includes(g76NormalizeHeader(h)))||'';return `<label class="text-xs font-bold">${escapeHTML(l)}<select id="g76-map-${k}" class="mt-1 w-full rounded-xl border p-2 text-xs" onchange="g76BuildRosterPreview()"><option value="">— No usar —</option>${headers.map(h=>`<option value="${escapeHTML(h)}" ${h===det?'selected':''}>${escapeHTML(h)}</option>`).join('')}</select></label>`;}).join('');document.getElementById('g76-row-count').textContent=`${g76RosterRows.length} fila(s)`;document.getElementById('g76-mapping-section').classList.remove('hidden');document.getElementById('g76-preview-section').classList.remove('hidden');g80AutoMapRoster();g76BuildRosterPreview();showToast(`${label}: ${g76RosterRows.length} filas`);}
+    function g76AfterRowsLoaded(label){if(!g76RosterRows.length)return showToast('No se encontraron filas');const mapGrid=document.getElementById('g76-map-grid');if(mapGrid)mapGrid.classList.remove('hidden');const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Relacionar columnas';const headers=Object.keys(g76RosterRows[0]||{}),grid=document.getElementById('g76-map-grid');grid.innerHTML=G81_FIELDS.map(([k,l,a])=>{const aliases=a.map(g76NormalizeHeader),det=headers.find(h=>aliases.includes(g76NormalizeHeader(h)))||'';return `<label class="text-xs font-bold">${escapeHTML(l)}<select id="g76-map-${k}" class="mt-1 w-full rounded-xl border p-2 text-xs" onchange="g76BuildRosterPreview()"><option value="">— No usar —</option>${headers.map(h=>`<option value="${escapeHTML(h)}" ${h===det?'selected':''}>${escapeHTML(h)}</option>`).join('')}</select></label>`;}).join('');document.getElementById('g76-row-count').textContent=`${g76RosterRows.length} fila(s)`;document.getElementById('g76-mapping-section').classList.remove('hidden');document.getElementById('g76-preview-section').classList.remove('hidden');g80AutoMapRoster();g76BuildRosterPreview();showToast(`${label}: ${g76RosterRows.length} filas`);}
     function g76Field(r,k){const c=document.getElementById(`g76-map-${k}`)?.value||'';return c?String(r?.[c]??'').trim():'';}
     function g76ParseGrade(v,g=''){const m=String(v||g||'').match(/(^|\D)([1-3])(?:\D|$)/);return m?Number(m[2]):null;}
     function g76CleanGroup(v){let s=String(v??'').trim();s=s.replace(/^([1-3])\s*[°ºo.]?\s*/i,'').trim();return s||String(v??'').trim();}
@@ -4048,7 +4048,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         const name=(student||[pat,mat].filter(Boolean).join(' ')).trim();
         if(g80IsNoiseRosterName(name)) continue;
 
-        const school=g76Field(r,'school')||ds||'Escuela Principal';
+        const school=g76Field(r,'school')||ds||(g80CurrentSheetName?'Escuela Principal':'');
 
         let grade=g76ParseGrade(g76Field(r,'grade'),rg);
         let group=g76CleanGroup(rg);
@@ -4078,6 +4078,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           state='ERROR'; note='Falta alumno';
         }else if(!g80LooksLikeStudentName(name)){
           state='IGNORADA'; note='Fila informativa';
+        }else if(!school){
+          state='ERROR'; note='Indica la escuela';
         }else if(!group){
           state='ERROR'; note='Falta grupo';
         }else if(!grade){
@@ -4421,7 +4423,7 @@ async function handleCreateSchool(e) {
         status.textContent='Lectura terminada. Corrige el texto y pulsa «Revisar alumnos detectados». Ningún alumno se ha guardado.';
       }catch(err){console.error('G86 documento',err);status.textContent='No se pudo leer automáticamente: '+(err.message||err)+'. Puedes escribir o pegar los nombres en el cuadro.';}
     }
-    // G88: OCR tolerante a separadores de listas impresas; siempre requiere revisión humana.
+    // G89: OCR tolerante a separadores de listas impresas; siempre requiere revisión humana.
     function g88ParseRosterOCR(raw){
       const rows=[], rejected=[];
       const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|GRADO|TURNO|PROMEDIO|TOTAL)\b/i;
@@ -4443,11 +4445,19 @@ async function handleCreateSchool(e) {
       const parsed=g88ParseRosterOCR(raw);
       if(!parsed.rows.length){showToast('No se detectaron alumnos numerados. Corrige el texto: 1 APELLIDO NOMBRE.');return;}
       g80CurrentSheetName='';
-      g76RosterRows=g76RowsFromMatrix([['NÚM. LISTA','NOMBRE COMPLETO'],...parsed.rows]);
+      for(const id of ['g87-default-grade','g87-default-group']){const el=document.getElementById(id);if(el)el.value='';}
+      g76RosterRows=parsed.rows.map(([number,name])=>({'NÚM. LISTA':number,'NOMBRE COMPLETO':name}));
       g76AfterRowsLoaded('Imagen/PDF revisado');
+      // OCR tiene dos columnas conocidas: nunca solicitar mapeo heurístico.
+      document.getElementById('g76-map-number').value='NÚM. LISTA';
+      document.getElementById('g76-map-student').value='NOMBRE COMPLETO';
+      ['group','grade','school','subject','shift','paternal','maternal'].forEach(k=>{const el=document.getElementById('g76-map-'+k);if(el)el.value='';});
+      const mapGrid=document.getElementById('g76-map-grid');if(mapGrid)mapGrid.classList.add('hidden');
+      const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Confirmar escuela, grado y grupo';
+      g76BuildRosterPreview();
       const status=document.getElementById('g86-document-status');
-      if(status)status.textContent=`${parsed.rows.length} alumnos detectados; ${parsed.rejected.length} líneas no reconocidas. Verifica los nombres, números, escuela, grado y grupo antes de importar.`;
-      document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+      if(status)status.textContent=`${parsed.rows.length} alumnos detectados; ${parsed.rejected.length} líneas no reconocidas. Completa escuela, grado y grupo debajo; corrige los nombres y números en la vista previa.`;
+      document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'start'});
     }
 
     // G85: foto -> OCR local en navegador -> texto revisable -> vista previa existente.
