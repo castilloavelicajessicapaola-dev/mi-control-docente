@@ -1,4 +1,4 @@
-<!doctype html>
+  <!doctype html>
 <html lang="es-MX">
 <head>
   <meta charset="UTF-8">
@@ -2863,7 +2863,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G86 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV o filas copiadas desde Excel. Primero revisas la vista previa.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G87 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" value="https://excel.cloud.microsoft/open/onedrive/?docId=8bdabe0c9f77bc49%21s4e4f911fbdaf432693ee4e88b02b0a26&driveId=8BDABE0C9F77BC49"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -2876,7 +2876,7 @@
             <textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
             <button type="button" class="rounded-xl bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="g86AnalyzeRosterDocument()">Revisar alumnos detectados</button>
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div id="g76-mapping-section" class="hidden space-y-3"><div class="flex items-center justify-between"><div><h4 class="font-bold">3. Relacionar columnas</h4><p class="text-xs text-[#66767a]">La detección es automática, pero puedes corregirla.</p></div><span id="g76-row-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">0 filas</span><div id="g80-import-detection-note" class="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">G81 analizará la hoja y detectará automáticamente alumno, número de lista, grado, grupo y turno.</div></div><div id="g76-map-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><label class="text-xs font-bold">Escuela predeterminada<input id="g76-default-school" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Secundaria #57"></label><label class="text-xs font-bold">Asignatura<input id="g76-default-subject" class="mt-1 w-full rounded-xl border p-2 text-sm" value="Tecnología"></label><label class="text-xs font-bold">Turno<select id="g76-default-shift" class="mt-1 w-full rounded-xl border p-2 text-sm"><option>Matutino</option><option>Vespertino</option><option>Mixto</option></select></label><label class="text-xs font-bold">Ciclo escolar<input id="g76-default-year" class="mt-1 w-full rounded-xl border p-2 text-sm" value="2026-2027"></label></div></div>
+        <div id="g76-mapping-section" class="hidden space-y-3"><div class="flex items-center justify-between"><div><h4 class="font-bold">3. Relacionar columnas</h4><p class="text-xs text-[#66767a]">La detección es automática, pero puedes corregirla.</p></div><span id="g76-row-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">0 filas</span><div id="g80-import-detection-note" class="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">G81 analizará la hoja y detectará automáticamente alumno, número de lista, grado, grupo y turno.</div></div><div id="g76-map-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><label class="text-xs font-bold">Escuela predeterminada<input id="g76-default-school" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Secundaria #57"></label><label class="text-xs font-bold">Asignatura<input id="g76-default-subject" class="mt-1 w-full rounded-xl border p-2 text-sm" value="Tecnología"></label><label class="text-xs font-bold">Turno<select id="g76-default-shift" class="mt-1 w-full rounded-xl border p-2 text-sm"><option>Matutino</option><option>Vespertino</option><option>Mixto</option></select></label><label class="text-xs font-bold">Grado predeterminado<input id="g87-default-grade" type="number" min="1" max="3" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Ej. 2" oninput="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Grupo predeterminado<input id="g87-default-group" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Ej. A" oninput="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Ciclo escolar<input id="g76-default-year" class="mt-1 w-full rounded-xl border p-2 text-sm" value="2026-2027"></label></div></div>
         <div id="g76-preview-section" class="hidden space-y-3"><div class="flex items-center justify-between"><h4 class="font-bold">4. Vista previa</h4><button type="button" class="rounded-xl border px-3 py-2 text-xs font-bold" onclick="g76BuildRosterPreview()">Actualizar</button></div><div id="g76-summary" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2"></div><div class="overflow-x-auto rounded-2xl border"><table class="w-full text-xs min-w-[900px]"><thead class="bg-slate-50"><tr><th class="p-2">Estado</th><th class="p-2">Escuela</th><th class="p-2">Grado</th><th class="p-2">Grupo</th><th class="p-2">Asignatura</th><th class="p-2">Turno</th><th class="p-2">#</th><th class="p-2 text-left">Alumno</th><th class="p-2 text-left">Observación</th></tr></thead><tbody id="g76-preview-body"></tbody></table></div></div>
       </div><div class="p-5 border-t flex justify-between gap-2"><button class="rounded-xl border px-4 py-2 text-sm font-bold" onclick="closeModal('modal-g76-roster-import')">Cancelar</button><button id="g76-import-btn" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold disabled:opacity-40" disabled onclick="g76ImportRoster()">Importar grupos y alumnos</button></div>
     </div>
@@ -4026,9 +4026,11 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       const dsh=document.getElementById('g76-default-shift')?.value||'Matutino';
       const dy=(document.getElementById('g76-default-year')?.value||localData.settings?.school_year||'2026-2027').trim();
       const ctx=g80ParseSheetContext(g80CurrentSheetName);
+      const defaultGrade=document.getElementById('g87-default-grade')?.value||'';
+      const defaultGroup=(document.getElementById('g87-default-group')?.value||'').trim().toUpperCase();
       const p=[];
 
-      for(const r of g76RosterRows){
+      for(const [sourceIndex,r] of g76RosterRows.entries()){
         let rg=g76Field(r,'group');
         let student=g76Field(r,'student');
         const pat=g76Field(r,'paternal');
@@ -4054,6 +4056,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         // Sheet name context has priority for this roster format, e.g. V25 1A.
         if(ctx.grade) grade=Number(ctx.grade);
         if(ctx.group) group=ctx.group;
+        if(defaultGrade) grade=Number(defaultGrade);
+        if(defaultGroup) group=defaultGroup;
 
         // Fallback to compound values such as 1-A.
         const compound=String(rg||'').trim().toUpperCase().match(/^([1-3])\s*[-º°]?\s*([A-Z])$/);
@@ -4090,14 +4094,14 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
 
         if(state==='OK' && eg && localData.students.some(s=>
           s.group_id===eg.group_id &&
-          ((num!==null&&Number(s.student_number)===num)||normalizeStudentName(s.full_name)===normalizeStudentName(name))
+          normalizeStudentName(s.full_name)===normalizeStudentName(name)
         )){
-          state='DUPLICADO'; note='Ya existe';
+          state='OK'; note='Alumno existente: se revisará su número de lista';
         }
 
         p.push({
           school,grade,group,subject,shift,year:dy,number:num,
-          fullName:name,paternal:pat,maternal:mat,state,note,key
+          fullName:name,paternal:pat,maternal:mat,state,note,key,sourceIndex
         });
       }
 
@@ -4120,14 +4124,59 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
           <td class="p-2">${escapeHTML(x.group||'—')}</td>
           <td class="p-2">${escapeHTML(x.subject)}</td>
           <td class="p-2">${escapeHTML(x.shift)}</td>
-          <td class="p-2">${x.number??'—'}</td>
-          <td class="p-2 font-semibold">${escapeHTML(x.fullName)}</td>
+          <td class="p-2"><input type="number" min="1" class="w-16 rounded-lg border px-1 py-1" value="${x.number??''}" onchange="g87EditRosterRow(${x.sourceIndex},'number',this.value)"></td>
+          <td class="p-2 font-semibold"><input class="w-64 rounded-lg border px-2 py-1" value="${escapeHTML(x.fullName)}" onchange="g87EditRosterRow(${x.sourceIndex},'student',this.value)"></td>
           <td class="p-2">${escapeHTML(x.note)}</td>
         </tr>`).join('');
 
       document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK');
     }
-    async function g76ImportRoster(){g76BuildRosterPreview();const ready=g76RosterPreview.filter(x=>x.state==='OK');if(!ready.length)return showToast('No hay filas listas');if(!confirm(`Importar ${ready.length} alumnos? Los duplicados se omitirán.`))return;const now=new Date().toISOString(),map=new Map();let sc=0,gc=0,stc=0;try{for(const x of ready){if(map.has(x.key))continue;let school=localData.schools.find(s=>g76NormalizeHeader(s.school_name)===g76NormalizeHeader(x.school));if(!school){school={school_id:generateId('sch'),school_name:x.school,created_at:now};await dbPut('schools',school);localData.schools.push(school);sc++;}let group=localData.groups.find(g=>g.school_id===school.school_id&&Number(g.grade)===x.grade&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&(g.status||'ACTIVE')!=='ARCHIVED');if(!group){group={group_id:generateId('grp'),school_id:school.school_id,school_year:x.year,grade:x.grade,group_name:x.group,subject:x.subject,shift:x.shift,status:'ACTIVE',created_at:now,updated_at:now};await dbPut('groups',group);localData.groups.push(group);gc++;}map.set(x.key,{school,group});}const reserved=new Map();for(const x of ready){const z=map.get(x.key);if(!z)continue;if(localData.students.some(s=>s.group_id===z.group.group_id&&((x.number!==null&&Number(s.student_number)===x.number)||normalizeStudentName(s.full_name)===normalizeStudentName(x.fullName))))continue;if(!reserved.has(z.group.group_id))reserved.set(z.group.group_id,new Set());const rs=reserved.get(z.group.group_id),num=x.number!==null?x.number:nextAvailableStudentNumber(z.group.group_id,rs);rs.add(num);const stu={student_id:generateId('stu'),group_id:z.group.group_id,school_id:z.school.school_id,student_number:num,first_name:x.fullName,paternal_surname:x.paternal,maternal_surname:x.maternal,full_name:x.fullName,status:'ACTIVE',created_at:now,updated_at:now};await dbPut('students',stu);localData.students.push(stu);stc++;}await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();closeModal('modal-g76-roster-import');showToast(`${stc} alumnos · ${gc} grupos · ${sc} escuelas`);}catch(err){console.error(err);showToast('Importación detenida; lo ya guardado se conserva');}}
+    function g87EditRosterRow(index,field,value){
+      const row=g76RosterRows[index];if(!row)return;
+      const key=document.getElementById('g76-map-'+field)?.value;
+      if(!key){showToast('Selecciona primero la columna de '+field);return;}
+      row[key]=field==='number'?(value.trim()===''?'':Number(value)):String(value||'').trim().toUpperCase();
+      g76BuildRosterPreview();
+    }
+    async function g76ImportRoster(){
+      g76BuildRosterPreview();
+      const ready=g76RosterPreview.filter(x=>x.state==='OK');
+      if(!ready.length)return showToast('No hay filas listas: revisa grado, grupo y nombres.');
+      if(!confirm(`¿Importar ${ready.length} alumnos? Se conservarán los historiales existentes. Los nombres repetidos no se duplicarán.`))return;
+      const now=new Date().toISOString(),map=new Map();let sc=0,gc=0,stc=0,updated=0,skipped=0;
+      try{
+        for(const x of ready){
+          if(map.has(x.key))continue;
+          let school=localData.schools.find(s=>g76NormalizeHeader(s.school_name)===g76NormalizeHeader(x.school));
+          if(!school){school={school_id:generateId('sch'),school_name:x.school,created_at:now};await dbPut('schools',school);localData.schools.push(school);sc++;}
+          let group=localData.groups.find(g=>g.school_id===school.school_id&&Number(g.grade)===x.grade&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&(g.status||'ACTIVE')!=='ARCHIVED');
+          if(!group){group={group_id:generateId('grp'),school_id:school.school_id,school_year:x.year,grade:x.grade,group_name:x.group,subject:x.subject,shift:x.shift,status:'ACTIVE',created_at:now,updated_at:now};await dbPut('groups',group);localData.groups.push(group);gc++;}
+          map.set(x.key,{school,group});
+        }
+        const updates=[],newStudents=[],used=new Map();
+        for(const x of ready){
+          const z=map.get(x.key);if(!z)continue;
+          const nameKey=normalizeStudentName(x.fullName);
+          const existing=localData.students.find(s=>s.group_id===z.group.group_id&&normalizeStudentName(s.full_name)===nameKey);
+          if(existing){
+            if(x.number!==null&&Number(existing.student_number)!==x.number){updates.push({student:existing,number:x.number});}
+            else skipped++;
+            continue;
+          }
+          if(newStudents.some(s=>s.group_id===z.group.group_id&&normalizeStudentName(s.full_name)===nameKey)){skipped++;continue;}
+          const num=x.number!==null?x.number:nextAvailableStudentNumber(z.group.group_id);
+          newStudents.push({student_id:generateId('stu'),group_id:z.group.group_id,school_id:z.school.school_id,student_number:num,first_name:x.fullName,paternal_surname:x.paternal,maternal_surname:x.maternal,full_name:x.fullName,status:'ACTIVE',created_at:now,updated_at:now});
+        }
+        if(updates.length){
+          if(confirm(`Se detectaron ${updates.length} alumnos existentes con número de lista diferente. ¿Actualizar SOLO sus números de lista? Sus asistencias y calificaciones se conservarán.`)){
+            for(const u of updates){const obj={...u.student,student_number:u.number,updated_at:now};await dbPut('students',obj);updated++;}
+          }else skipped+=updates.length;
+        }
+        for(const stu of newStudents){await dbPut('students',stu);stc++;}
+        await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();closeModal('modal-g76-roster-import');
+        showToast(`${stc} alumnos nuevos · ${updated} números actualizados · ${skipped} omitidos · ${gc} grupos`);
+      }catch(err){console.error(err);showToast('Importación detenida: revisa los datos; lo guardado se conserva.');}
+    }
 
 async function handleCreateSchool(e) {
       e.preventDefault();
@@ -4374,17 +4423,22 @@ async function handleCreateSchool(e) {
     }
     function g86AnalyzeRosterDocument(){
       const raw=document.getElementById('g86-document-text')?.value||'';
-      const rows=[];for(const line of raw.split(/\r?\n/)){
-        const match=line.trim().match(/^(\d{1,3})\s*[.\-):|\s]+\s*(.+)$/);
-        if(!match)continue;const name=match[2].replace(/\s+/g,' ').trim();
-        if(name.length<7||!/[A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(name))continue;
-        rows.push([match[1],name]);
+      const rows=[];
+      for(const line of raw.split(/\r?\n/)){
+        const clean=line.trim().replace(/[|¦]/g,' ').replace(/\s+/g,' ');
+        const match=clean.match(/^(\d{1,3})\s*[.\-):º°]*\s+(.+)$/);
+        if(!match)continue;
+        const name=match[2].replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]/g,' ').replace(/\s+/g,' ').trim();
+        if(name.length<7||name.split(' ').length<2)continue;
+        rows.push([Number(match[1]),name.toUpperCase()]);
       }
-      if(!rows.length){showToast('No se encontraron filas «número nombre». Corrige el texto antes de continuar.');return;}
+      if(!rows.length){showToast('No se encontraron filas numeradas. Corrige el texto (ej. 1 APELLIDO NOMBRE) y vuelve a revisar.');return;}
+      g80CurrentSheetName='';
       g76RosterRows=g76RowsFromMatrix([['NÚM. LISTA','NOMBRE COMPLETO'],...rows]);
       g76AfterRowsLoaded('Imagen/PDF revisado');
       const status=document.getElementById('g86-document-status');
-      if(status)status.textContent=`${rows.length} filas candidatas. Verifica grupo, escuela, turno y cada nombre en la vista previa.`;
+      if(status)status.textContent=`${rows.length} alumnos detectados. Completa grado y grupo predeterminados y corrige los datos en la vista previa.`;
+      document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'nearest'});
     }
 
     // G85: foto -> OCR local en navegador -> texto revisable -> vista previa existente.
