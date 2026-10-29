@@ -3461,7 +3461,7 @@
       return `${year}-${month}-${day}`;
     }
 
-    // G95 · Formato seguro de fechas locales. No convierte YYYY-MM-DD a UTC.
+    // G96 · Formato seguro de fechas locales. No convierte YYYY-MM-DD a UTC.
     function formatDateForDisplay(value) {
       if (value === null || value === undefined || value === '') return '—';
       if (value instanceof Date) {
@@ -4493,7 +4493,7 @@ async function handleCreateSchool(e) {
           for(let i=1;i<=pdfDoc.numPages;i++){
             status.textContent=`Leyendo PDF: página ${i} de ${pdfDoc.numPages}`;
             const page=await pdfDoc.getPage(i),content=await page.getTextContent();
-            const text=content.items.map(item=>item.str||'').join(' ').trim();
+            const lines=[];let previousY=null;for(const item of content.items){const y=Math.round(item.transform?.[5]||0);if(previousY!==null&&Math.abs(y-previousY)>3)lines.push('\n');lines.push((item.str||'')+' ');previousY=y;}const text=lines.join('').trim();
             if(text.length>=30){chunks.push(text);continue;}
             if(!window.Tesseract)throw new Error('Este PDF es escaneado y requiere OCR. Comprueba internet y recarga.');
             const viewport=page.getViewport({scale:2}),canvas=document.createElement('canvas');
@@ -4510,30 +4510,28 @@ async function handleCreateSchool(e) {
     // G91: OCR tolerante a separadores de listas impresas; siempre requiere revisión humana.
     // G94: lectura conservadora. No descartar alumnos por caracteres OCR dudosos.
     // Se mantienen las filas con número y se presentan para corrección humana.
+    // G96: conserva cada renglón, reconoce numeración sin mutilar nombres y avisa huecos.
     function g88ParseRosterOCR(raw){
       const rows=[],rejected=[],seen=new Set();
       const noise=/\b(LISTAS? DE ASISTENCIA|CICLO ESCOLAR|CONTROL DE ASISTENCIA|REGISTRO DE EVALUACION|ESCUELA SECUNDARIA|NOMBRE DEL ALUMNO|APELLIDOS Y NOMBRE|N[ÚU]MERO DE LISTA|DOCENTE|ASIGNATURA|GRADO|TURNO|PROMEDIO|TOTAL)\b/i;
       const source=String(raw||'').replace(/\r/g,'\n');
       for(const original of source.split('\n')){
         let line=original.trim();if(!line||noise.test(line))continue;
-        // Aceptar 1, 1), | 1 |, [1], 1- y separadores que introduce OCR.
-        line=line.replace(/^[\s|¦!Il\[\]{}:;._-]+/g,'').trim();
-        const m=line.match(/^(\d{1,3})\s*[\]\[).:;º°|!\-–—]*\s*(.+)$/);
+        // No retirar letras iniciales: antes se perdían A, I o L de apellidos.
+        line=line.replace(/^[\s|¦\[\]{}:;._-]+/g,'').trim();
+        const m=line.match(/^(?:[Nn][Oo]\.?\s*)?(\d{1,3})\s*[\]\[).:;º°|!\-–—]*\s*(.+)$/);
         if(!m){rejected.push(original);continue;}
         const number=Number(m[1]);
         if(number<1||number>250){rejected.push(original);continue;}
         const candidate=g93CleanName(m[2].replace(/^[\s\]\[|:;.,_\-]+/g,''));
-        if(!candidate||candidate.length<3||noise.test(candidate)){
-          rejected.push(original);continue;
-        }
-        if(seen.has(number)){
-          // Duplicados de OCR: conservar primera lectura y avisar, nunca reemplazar silenciosamente.
-          rejected.push('NÚMERO REPETIDO '+number+': '+original);continue;
-        }
+        if(!candidate||candidate.length<3||noise.test(candidate)){rejected.push(original);continue;}
+        if(seen.has(number)){rejected.push('NÚMERO REPETIDO '+number+': '+original);continue;}
         seen.add(number);rows.push([number,candidate]);
       }
       rows.sort((a,b)=>a[0]-b[0]);
-      return {rows,rejected};
+      const missing=[];
+      if(rows.length){for(let n=1;n<=rows[rows.length-1][0];n++)if(!seen.has(n))missing.push(n);}
+      return {rows,rejected,missing};
     }
     function g86AnalyzeRosterDocument(){
       const raw=document.getElementById('g86-document-text')?.value||'';
@@ -4551,7 +4549,7 @@ async function handleCreateSchool(e) {
       const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Confirmar escuela, grado y grupo';
       g76BuildRosterPreview();
       const status=document.getElementById('g86-document-status');
-      if(status)status.textContent=`${parsed.rows.length} alumnos detectados. ${parsed.rejected.length} líneas requieren revisión. Verifica los números faltantes en la secuencia antes de importar. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
+      if(status)status.textContent=`${parsed.rows.length} alumnos detectados. ${parsed.missing.length ? "Números ausentes: "+parsed.missing.join(", ")+". " : ""}${parsed.rejected.length} líneas requieren revisión. Verifica los números faltantes en la secuencia antes de importar. Si esperabas más alumnos, revisa el texto OCR arriba: puedes corregir o agregar los faltantes antes de pulsar «Revisar alumnos detectados» de nuevo. Los números inferidos deben comprobarse.`;
       document.getElementById('g76-mapping-section')?.scrollIntoView({behavior:'smooth',block:'start'});
     }
 
