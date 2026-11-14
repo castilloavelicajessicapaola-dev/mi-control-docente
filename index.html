@@ -2863,7 +2863,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G109 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G110 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" placeholder="Pega aquí el enlace a tu archivo (opcional)"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -2876,9 +2876,9 @@
             <textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
             <button type="button" class="rounded-xl bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="g86AnalyzeRosterDocument()">Revisar alumnos detectados</button>
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G106 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
-        <div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
-          <p class="font-bold text-teal-950">G109 · Importación verificada</p>
+        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G110 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
+        <button type="button" class="mb-3 rounded-xl border border-teal-700 px-3 py-2 text-xs font-bold" onclick="g110Preset1D()">Preparar Secundaria 25 · 1.º D · 26 alumnos</button><p id="g110-save-status" role="status" class="text-xs font-bold mb-3"></p><div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
+          <p class="font-bold text-teal-950">G110 · Importación verificada</p>
           <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
           <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
           <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
@@ -4138,7 +4138,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       // G102: comprobar la continuidad de la numeración; nunca completar alumnos ficticios.
       const numbers=p.map(x=>x.number).filter(n=>Number.isInteger(n)&&n>0);
       const seenNumbers=new Set(numbers);
-      const expected=numbers.length?Math.max(...numbers):0;
+      const expected=Math.max(g105ExpectedRosterCount(),numbers.length?Math.max(...numbers):0);
       const missingNumbers=[];
       for(let n=1;n<=Math.min(expected,250);n++)if(!seenNumbers.has(n))missingNumbers.push(n);
       const numberGroupCounts=new Map();
@@ -4244,85 +4244,102 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       g76BuildRosterPreview();
       showToast('Nombre marcado como revisado contra la lista original.');
     }
-    async function g76ImportRoster(){
-      g76BuildRosterPreview();
-      const expectedCount=g105ExpectedRosterCount();
-      if(expectedCount && g76RosterPreview.length!==expectedCount)return showToast(`Importación detenida: ${g76RosterPreview.length} detectados de ${expectedCount} esperados.`);
-      const nums=g76RosterPreview.map(x=>x.number).filter(n=>Number.isInteger(n)&&n>0);
-      const maxNum=nums.length?Math.max(...nums):0;
-      const numberSet=new Set(nums);
-      const missing=[];for(let n=1;n<=Math.min(maxNum,250);n++)if(!numberSet.has(n))missing.push(n);
-      if(missing.length)return showToast('Importación detenida: faltan números de lista '+missing.join(', '));
-      if(g76RosterPreview.some(x=>x.note?.includes('Número de lista repetido')))return showToast('Importación detenida: hay números de lista repetidos en un grupo.');
-      if(g76RosterPreview.some(x=>x.state!=='OK'))return showToast('Importación detenida: corrige primero las filas marcadas ERROR o REVISAR.');
-      const ready=g76RosterPreview.filter(x=>x.state==='OK');
-      if(!ready.length)return showToast('No hay filas listas: revisa grado, grupo y nombres.');
-      // G109: verificar colisiones con números ya ocupados antes de escribir.
-      const collisions=[];
-      for(const x of ready){
-        const school=localData.schools.find(s=>g76NormalizeHeader(s.school_name)===g76NormalizeHeader(x.school));
-        const group=school&&localData.groups.find(g=>g.school_id===school.school_id&&Number(g.grade)===Number(x.grade)&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&g76NormalizeHeader(g.shift||x.shift)===g76NormalizeHeader(x.shift)&&String(g.school_year||x.year)===String(x.year)&&(g.status||'ACTIVE')!=='ARCHIVED');
-        if(!group||!Number.isInteger(x.number)||x.number<1)continue;
-        const occupant=localData.students.find(st=>st.group_id===group.group_id&&Number(st.student_number)===x.number&&normalizeStudentName(st.full_name)!==normalizeStudentName(x.fullName));
-        if(occupant)collisions.push(`${x.number}: ${x.fullName} / ${occupant.full_name}`);
+
+    // G110: no schema migration; preserve IDs and all unrelated stores.
+    function g110Preset1D(){
+      for(const [id,value] of Object.entries({'g76-default-school':'Secundaria #25','g87-default-grade':'1','g87-default-group':'D','g76-default-shift':'Matutino','g105-expected-count':'26'}))document.getElementById(id).value=value;
+      if(g76RosterRows.length)g103ApplyGroupToAll();
+      g105UpdateExpectedCount();
+      showToast('1.º D: verifica los 26 nombres y los números 1 a 26.');
+    }
+    function g110PdfText(items){
+      const lines=[];
+      for(const item of items||[]){
+        if(typeof item.str!=='string'||!item.str.trim())continue;
+        const y=Number(item.transform?.[5]||0),x=Number(item.transform?.[4]||0);
+        let line=lines.find(l=>Math.abs(l.y-y)<=3);
+        if(!line){line={y,items:[]};lines.push(line);}
+        line.items.push({x,text:item.str});
       }
-      if(collisions.length){window.alert('Hay números de lista ocupados por otros alumnos. Corrige antes de importar:\n'+collisions.slice(0,12).join('\n'));return;}
-      if(ready.some(x=>!Number.isInteger(x.number)||x.number<1))return showToast('Cada alumno debe tener un número de lista entero y positivo.');
-      if(!confirm(`¿Importar ${ready.length} alumnos? Se conservarán los historiales existentes. Los nombres repetidos no se duplicarán.`))return;
-      const now=new Date().toISOString(),map=new Map();let sc=0,gc=0,stc=0,updated=0,skipped=0;
+      return lines.sort((a,b)=>b.y-a.y).map(l=>l.items.sort((a,b)=>a.x-b.x).map(i=>i.text).join(' ')).join('\n');
+    }
+    function g110PlanRoster(ready,data,now){
+      const schools=[],groups=[],students=[],map=new Map();let updated=0,existingCount=0;
+      for(const x of ready){
+        if(map.has(x.key))continue;
+        let school=[...data.schools,...schools].find(s=>g76NormalizeHeader(s.school_name)===g76NormalizeHeader(x.school));
+        if(!school){school={school_id:generateId('sch'),school_name:x.school,created_at:now};schools.push(school);}
+        let group=[...data.groups,...groups].find(g=>g.school_id===school.school_id&&Number(g.grade)===Number(x.grade)&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&g76NormalizeHeader(g.shift||x.shift)===g76NormalizeHeader(x.shift)&&String(g.school_year||x.year)===String(x.year)&&(g.status||'ACTIVE')!=='ARCHIVED');
+        if(!group){group={group_id:generateId('grp'),school_id:school.school_id,school_year:x.year,grade:x.grade,group_name:x.group,subject:x.subject,shift:x.shift,status:'ACTIVE',created_at:now,updated_at:now};groups.push(group);}
+        map.set(x.key,{school,group});
+      }
+      const names=new Set(),numbers=new Set();
+      for(const x of ready){
+        const z=map.get(x.key),name=normalizeStudentName(x.fullName),nk=z.group.group_id+'|'+name,pk=z.group.group_id+'|'+x.number;
+        if(names.has(nk)||numbers.has(pk))throw Error('Hay nombres o números duplicados en la lista.');
+        names.add(nk);numbers.add(pk);
+        const matches=data.students.filter(s=>s.group_id===z.group.group_id&&normalizeStudentName(s.full_name)===name);
+        if(matches.length>1)throw Error('Ya hay alumnos duplicados en el grupo: '+x.fullName+'. Revisa sus historiales antes de importar.');
+        const occupied=data.students.find(s=>s.group_id===z.group.group_id&&Number(s.student_number)===x.number&&normalizeStudentName(s.full_name)!==name);
+        if(occupied)throw Error('Número '+x.number+' ocupado por '+occupied.full_name+'. Corrige el registro existente antes de importar.');
+        if(matches.length){
+          existingCount++;
+          if(Number(matches[0].student_number)!==x.number)updated++;
+          students.push({...matches[0],student_number:x.number,updated_at:now});
+        }else students.push({student_id:generateId('stu'),group_id:z.group.group_id,school_id:z.school.school_id,student_number:x.number,first_name:x.fullName,paternal_surname:x.paternal,maternal_surname:x.maternal,full_name:x.fullName,status:'ACTIVE',created_at:now,updated_at:now});
+      }
+      return {schools,groups,students,updated,existingCount,map};
+    }
+    async function g110CommitRoster(ready){
+      const db=await openDatabase();
+      return new Promise((resolve,reject)=>{
+        const tx=db.transaction(['schools','groups','students'],'readwrite'),data={};let pending=3,plan,failure;
+        tx.onabort=()=>reject(failure||tx.error||new Error('Transacción cancelada; no se guardó ningún cambio.'));
+        tx.onerror=()=>{failure=failure||tx.error;};
+        tx.oncomplete=()=>resolve(plan);
+        for(const name of ['schools','groups','students']){
+          const req=tx.objectStore(name).getAll();
+          req.onsuccess=()=>{
+            data[name]=req.result||[];
+            if(--pending)return;
+            try{
+              plan=g110PlanRoster(ready,data,new Date().toISOString());
+              for(const name of ['schools','groups','students'])for(const record of plan[name])tx.objectStore(name).put(record);
+            }catch(error){failure=error;tx.abort();}
+          };
+        }
+      });
+    }
+    let g110ImportBusy=false;
+    async function g76ImportRoster(){
+      if(g110ImportBusy)return;
+      g76BuildRosterPreview();
+      const btn=document.getElementById('g76-import-btn'),status=document.getElementById('g110-save-status');
+      if(btn.disabled)return showToast('Corrige los errores, duplicados y números faltantes antes de importar.');
+      const ready=g76RosterPreview.map(x=>({...x}));
+      if(!ready.length)return;
+      if(!confirm('¿Guardar y verificar '+ready.length+' alumnos? Los alumnos existentes conservarán su ID, asistencia y calificaciones; sus números se actualizarán si corresponde.'))return;
+      g110ImportBusy=true;btn.disabled=true;
+      let committed=false;
       try{
-        for(const x of ready){
-          if(map.has(x.key))continue;
-          let school=localData.schools.find(s=>g76NormalizeHeader(s.school_name)===g76NormalizeHeader(x.school));
-          if(!school){school={school_id:generateId('sch'),school_name:x.school,created_at:now};await dbPut('schools',school);localData.schools.push(school);sc++;}
-          let group=localData.groups.find(g=>g.school_id===school.school_id&&Number(g.grade)===x.grade&&g76NormalizeHeader(g.group_name)===g76NormalizeHeader(x.group)&&g76NormalizeHeader(g.subject)===g76NormalizeHeader(x.subject)&&g76NormalizeHeader(g.shift||x.shift)===g76NormalizeHeader(x.shift)&&String(g.school_year||x.year)===String(x.year)&&(g.status||'ACTIVE')!=='ARCHIVED');
-          if(!group){group={group_id:generateId('grp'),school_id:school.school_id,school_year:x.year,grade:x.grade,group_name:x.group,subject:x.subject,shift:x.shift,status:'ACTIVE',created_at:now,updated_at:now};await dbPut('groups',group);localData.groups.push(group);gc++;}
-          map.set(x.key,{school,group});
+        status.textContent='Guardando lista completa…';
+        const plan=await g110CommitRoster(ready);committed=true;
+        const saved=await dbGetAll('students');
+        const differences=[];
+        for(const record of plan.students){
+          const matches=saved.filter(s=>s.group_id===record.group_id&&normalizeStudentName(s.full_name)===normalizeStudentName(record.full_name));
+          const numberMatches=saved.filter(s=>s.group_id===record.group_id&&Number(s.student_number)===Number(record.student_number));
+          if(matches.length!==1||numberMatches.length!==1||matches[0]?.student_id!==record.student_id||Number(matches[0]?.student_number)!==Number(record.student_number))differences.push(record.student_number+' '+record.full_name);
         }
-        const updates=[],newStudents=[],used=new Map();
-        for(const x of ready){
-          const z=map.get(x.key);if(!z)continue;
-          const nameKey=normalizeStudentName(x.fullName);
-          const existing=localData.students.find(s=>s.group_id===z.group.group_id&&normalizeStudentName(s.full_name)===nameKey);
-          if(existing){
-            if(x.number!==null&&Number(existing.student_number)!==x.number){updates.push({student:existing,number:x.number});}
-            else skipped++;
-            continue;
-          }
-          if(newStudents.some(s=>s.group_id===z.group.group_id&&normalizeStudentName(s.full_name)===nameKey)){skipped++;continue;}
-          const num=x.number;
-          newStudents.push({student_id:generateId('stu'),group_id:z.group.group_id,school_id:z.school.school_id,student_number:num,first_name:x.fullName,paternal_surname:x.paternal,maternal_surname:x.maternal,full_name:x.fullName,status:'ACTIVE',created_at:now,updated_at:now});
-        }
-        if(updates.length){
-          if(confirm(`Se detectaron ${updates.length} alumnos existentes con número de lista diferente. ¿Actualizar SOLO sus números de lista? Sus asistencias y calificaciones se conservarán.`)){
-            for(const u of updates){const obj={...u.student,student_number:u.number,updated_at:now};await dbPut('students',obj);updated++;}
-          }else skipped+=updates.length;
-        }
-        for(const stu of newStudents){await dbPut('students',stu);stc++;}
-        await refreshLocalCache();
-        // G109: leer nuevamente IndexedDB, no confiar solo en contadores de intentos.
-        const savedStudents=await dbGetAll('students');
-        const verification=[];
-        for(const x of ready){
-          const z=map.get(x.key);if(!z)continue;
-          const matching=savedStudents.filter(st=>st.group_id===z.group.group_id&&normalizeStudentName(st.full_name)===normalizeStudentName(x.fullName));
-          verification.push({x,z,matching});
-        }
-        const verified=verification.filter(v=>v.matching.length===1);
-        const notVerified=verification.filter(v=>v.matching.length!==1);
-        const differentNumbers=verified.filter(v=>Number(v.matching[0].student_number)!==v.x.number);
-        renderGroups();populateSchoolDropdowns();populateGroupDropdowns();
-        if(notVerified.length||differentNumbers.length){
-          const detail=[...notVerified.map(v=>`Sin registro único: ${v.x.fullName}`),...differentNumbers.map(v=>`Número diferente: ${v.x.fullName} (lista ${v.x.number}, guardado ${v.matching[0].student_number})`)];
-          window.alert(`G109 · Verificación posterior: ${verified.length}/${ready.length} alumnos localizados.\n${stc} nuevos · ${updated} números actualizados · ${skipped} omitidos.\n\nRevisa estas diferencias antes de registrar asistencia:\n${detail.slice(0,20).join('\n')}`);
-          showToast('Importación guardada con diferencias; revisa el resumen.');
-          return;
-        }
-        closeModal('modal-g76-roster-import');
-        const message=`G109 · Guardado verificado: ${verified.length}/${ready.length} alumnos localizados en IndexedDB; ${stc} nuevos, ${updated} números actualizados, ${skipped} omitidos y ${gc} grupos nuevos.`;
-        showToast(message);
-        window.alert(message+'\nLos alumnos se verificaron en su grupo.');
-      }catch(err){console.error(err);showToast('Importación interrumpida: algunos registros podrían haberse guardado. Actualiza el listado antes de reintentar.');}
+        await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();
+        if(differences.length)throw Error('La lectura posterior detectó diferencias: '+differences.join('; '));
+        const message='G110 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
+        status.textContent=message;showToast(message);window.alert(message);
+      }catch(error){
+        console.error('G110 importación',error);
+        status.textContent=(committed?'La lista se guardó, pero no se pudo completar la verificación. Revisa antes de reintentar. ':'No se guardó ningún cambio de esta importación. ')+(error.message||error);
+        window.alert(status.textContent);
+      }finally{g110ImportBusy=false;g76BuildRosterPreview();}
     }
 
 async function handleCreateSchool(e) {
@@ -4647,13 +4664,18 @@ async function handleCreateSchool(e) {
           for(let i=1;i<=pdfDoc.numPages;i++){
             status.textContent=`Leyendo PDF: página ${i} de ${pdfDoc.numPages}`;
             const page=await pdfDoc.getPage(i),content=await page.getTextContent();
-            const lines=[];let previousY=null;for(const item of content.items){const y=Math.round(item.transform?.[5]||0);if(previousY!==null&&Math.abs(y-previousY)>3)lines.push('\n');lines.push((item.str||'')+' ');previousY=y;}const text=lines.join('').trim();
-            if(text.length>=30){chunks.push(text);continue;}
-            if(!window.Tesseract)throw new Error('Este PDF es escaneado y requiere OCR. Comprueba internet y recarga.');
+            const text=g110PdfText(content.items);
+            const parsedText=g88ParseRosterOCR(text);
+            // A scanned roster may have a searchable header only. OCR the page too.
             const viewport=page.getViewport({scale:2}),canvas=document.createElement('canvas');
+            if(!window.Tesseract){
+              if(parsedText.rows.length){chunks.push(text);continue;}
+              throw new Error('Este PDF necesita OCR; comprueba internet y recarga.');
+            }
+            if(!window.Tesseract)throw new Error('Este PDF es escaneado y requiere OCR. Comprueba internet y recarga.');
             canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
             await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
-            const result=await g91RecognizeRoster(canvas,status);chunks.push(result.text||'');
+            const result=await g91RecognizeRoster(canvas,status);chunks.push(parsedText.rows.length>=g88ParseRosterOCR(result.text).rows.length?text:(result.text||text));
             canvas.width=canvas.height=0;
           }
           box.value=chunks.join('\n');
@@ -4689,12 +4711,12 @@ async function handleCreateSchool(e) {
         if(!Number.isInteger(number)||number<1||number>250){rejected.push(original);continue;}
         const candidate=g93CleanName(m[2].replace(/^[\s\]\[|:;.,_\-]+/g,''));
         if(!candidate||candidate.length<3||noise.test(candidate)){rejected.push(original);continue;}
-        if(seen.has(number)){rejected.push('NÚMERO REPETIDO '+number+': '+original);continue;}
+        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G110: conservar ambas filas para corregirlas.
         seen.add(number);rows.push([number,candidate]);
       }
       rows.sort((a,b)=>a[0]-b[0]);
       const missing=[];
-      if(rows.length)for(let n=1;n<=rows[rows.length-1][0];n++)if(!seen.has(n))missing.push(n);
+      for(let n=1;n<=Math.max(g105ExpectedRosterCount(),rows.length?rows[rows.length-1][0]:0);n++)if(!seen.has(n))missing.push(n);
       return {rows,rejected,missing};
     }
     function g106AddVerifiedStudent(){
@@ -4723,6 +4745,7 @@ async function handleCreateSchool(e) {
       if(g76RosterRows?.length)g76BuildRosterPreview();
     }
     function g86AnalyzeRosterDocument(){
+      g108CaptureActiveEdit();
       const raw=document.getElementById('g86-document-text')?.value||'';
       const parsed=g88ParseRosterOCR(raw);
       if(!parsed.rows.length){showToast('No se detectaron alumnos numerados. Corrige el texto: 1 APELLIDO NOMBRE.');return;}
