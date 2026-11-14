@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Control Docente G112 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G113 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2863,7 +2863,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G112 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G113 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" placeholder="Pega aquí el enlace a tu archivo (opcional)"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -2872,13 +2872,13 @@
           </label>
           <div id="g86-document-panel" class="hidden mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 space-y-2">
             <p id="g86-document-status" role="status" class="text-xs text-blue-900"></p>
-            <p class="text-[11px] text-blue-900">G112 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
-            <details id="g112-source-details" class="hidden"><summary class="text-xs font-bold cursor-pointer">Ver fotografía original para revisar nombres</summary><img id="g112-source-preview" alt="Fotografía seleccionada para importar alumnos" style="max-height:420px;max-width:100%;object-fit:contain;margin-top:8px"></details><textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
+            <p class="text-[11px] text-blue-900">G113 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
+            <details id="g112-source-details" class="hidden"><summary class="text-xs font-bold cursor-pointer">Ver fotografía original para revisar nombres</summary><img id="g112-source-preview" alt="Fotografía seleccionada para importar alumnos" style="max-height:420px;max-width:100%;object-fit:contain;margin-top:8px"></details><details id="g113-row-audit" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3"><summary class="font-bold text-xs cursor-pointer">Revisar renglones con su imagen</summary><p class="text-xs my-2">Confirma los números propuestos y corrige los nombres mirando cada renglón. Estas acciones solo preparan la lista; no guardan alumnos todavía.</p><div id="g113-row-audit-body" class="space-y-3 max-h-[480px] overflow-y-auto"></div></details><textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
             <button type="button" class="rounded-xl bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="g86AnalyzeRosterDocument()">Revisar alumnos detectados</button>
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G112 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
+        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G113 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
         <button type="button" class="mb-3 rounded-xl border border-teal-700 px-3 py-2 text-xs font-bold" onclick="g110Preset1D()">Preparar Secundaria 25 · 1.º D · 26 alumnos</button><p id="g110-save-status" role="status" class="text-xs font-bold mb-3"></p><div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
-          <p class="font-bold text-teal-950">G112 · Importación verificada</p>
+          <p class="font-bold text-teal-950">G113 · Importación verificada</p>
           <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
           <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
           <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
@@ -4036,9 +4036,9 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
     function g76OpenSourceWorkbook(){const u=(document.getElementById('g76-source-url')?.value||'').trim();if(!u)return showToast('Pega el enlace');window.open(u,'_blank','noopener');}
     async function g76SaveSourceUrl(){const u=(document.getElementById('g76-source-url')?.value||'').trim();localData.settings.student_import_source_url=u;try{await dbPut('settings',{key:'student_import_source_url',value:u});showToast('Enlace guardado');}catch(e){showToast('No se pudo guardar');}}
     function g76RowsFromMatrix(matrix){const rows=(matrix||[]).filter(r=>Array.isArray(r)&&r.some(v=>String(v??'').trim()));if(!rows.length)return[];let best=0,score=-1;for(let i=0;i<Math.min(12,rows.length);i++){const hs=rows[i].map(g76NormalizeHeader);const s=G81_FIELDS.reduce((a,[,,al])=>a+(hs.some(h=>al.map(g76NormalizeHeader).includes(h))?1:0),0);if(s>score){score=s;best=i;}}const headers=rows[best].map((v,i)=>String(v??'').trim()||`Columna ${i+1}`);return rows.slice(best+1).map(r=>{const o={};headers.forEach((hh,i)=>o[hh]=r[i]??'');return o;}).filter(o=>Object.values(o).some(v=>String(v??'').trim()));}
-    async function g76ReadRosterFile(e){g112InferredNumbers.clear();const f=e.target.files?.[0];if(!f)return;g80CurrentFileName=f.name||'';const st=document.getElementById('g76-file-status');try{const ext=(f.name.split('.').pop()||'').toLowerCase();if(['csv','tsv'].includes(ext)){const t=await f.text(),d=ext==='tsv'?'\t':(t.includes('\t')?'\t':',');const m=t.split(/\r?\n/).filter(Boolean).map(l=>d==='\t'?l.split('\t'):l.split(','));g76RosterRows=g76RowsFromMatrix(m);g76AfterRowsLoaded(f.name);return;}if(typeof XLSX==='undefined'){if(st)st.textContent='No se cargó el lector Excel; usa CSV o verifica internet.';return showToast('Para .xlsx se necesita conexión al lector Excel');}g76Workbook=XLSX.read(await f.arrayBuffer(),{type:'array'});const sel=document.getElementById('g76-sheet-select');sel.innerHTML=g76Workbook.SheetNames.map(n=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');document.getElementById('g76-sheet-wrap').classList.remove('hidden');g76UseSelectedSheet();if(st)st.textContent=`${f.name} · ${g76Workbook.SheetNames.length} hoja(s)`;}catch(err){console.error(err);showToast('No se pudo leer el archivo');}}
-    function g76UseSelectedSheet(){if(!g76Workbook)return;g112InferredNumbers.clear();const n=document.getElementById('g76-sheet-select')?.value||g76Workbook.SheetNames[0],ws=g76Workbook.Sheets[n];g80CurrentSheetName=n;g76RosterRows=g76RowsFromMatrix(XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false}));g76AfterRowsLoaded(n);}
-    function g76ParsePastedRoster(){g112InferredNumbers.clear();const t=document.getElementById('g76-paste-data')?.value||'';if(!t.trim())return showToast('Pega datos desde Excel');g76RosterRows=g76RowsFromMatrix(t.split(/\r?\n/).filter(Boolean).map(r=>r.split('\t')));g76AfterRowsLoaded('Datos pegados');}
+    async function g76ReadRosterFile(e){g113ResetOCR();const f=e.target.files?.[0];if(!f)return;g80CurrentFileName=f.name||'';const st=document.getElementById('g76-file-status');try{const ext=(f.name.split('.').pop()||'').toLowerCase();if(['csv','tsv'].includes(ext)){const t=await f.text(),d=ext==='tsv'?'\t':(t.includes('\t')?'\t':',');const m=t.split(/\r?\n/).filter(Boolean).map(l=>d==='\t'?l.split('\t'):l.split(','));g76RosterRows=g76RowsFromMatrix(m);g76AfterRowsLoaded(f.name);return;}if(typeof XLSX==='undefined'){if(st)st.textContent='No se cargó el lector Excel; usa CSV o verifica internet.';return showToast('Para .xlsx se necesita conexión al lector Excel');}g76Workbook=XLSX.read(await f.arrayBuffer(),{type:'array'});const sel=document.getElementById('g76-sheet-select');sel.innerHTML=g76Workbook.SheetNames.map(n=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');document.getElementById('g76-sheet-wrap').classList.remove('hidden');g76UseSelectedSheet();if(st)st.textContent=`${f.name} · ${g76Workbook.SheetNames.length} hoja(s)`;}catch(err){console.error(err);showToast('No se pudo leer el archivo');}}
+    function g76UseSelectedSheet(){if(!g76Workbook)return;g113ResetOCR();const n=document.getElementById('g76-sheet-select')?.value||g76Workbook.SheetNames[0],ws=g76Workbook.Sheets[n];g80CurrentSheetName=n;g76RosterRows=g76RowsFromMatrix(XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false}));g76AfterRowsLoaded(n);}
+    function g76ParsePastedRoster(){g113ResetOCR();const t=document.getElementById('g76-paste-data')?.value||'';if(!t.trim())return showToast('Pega datos desde Excel');g76RosterRows=g76RowsFromMatrix(t.split(/\r?\n/).filter(Boolean).map(r=>r.split('\t')));g76AfterRowsLoaded('Datos pegados');}
     function g76AfterRowsLoaded(label){g98RosterEdits.clear();if(!g76RosterRows.length)return showToast('No se encontraron filas');const mapGrid=document.getElementById('g76-map-grid');if(mapGrid)mapGrid.classList.remove('hidden');const heading=document.querySelector('#g76-mapping-section h4');if(heading)heading.textContent='3. Relacionar columnas';const headers=Object.keys(g76RosterRows[0]||{}),grid=document.getElementById('g76-map-grid');grid.innerHTML=G81_FIELDS.map(([k,l,a])=>{const aliases=a.map(g76NormalizeHeader),det=headers.find(h=>aliases.includes(g76NormalizeHeader(h)))||'';return `<label class="text-xs font-bold">${escapeHTML(l)}<select id="g76-map-${k}" class="mt-1 w-full rounded-xl border p-2 text-xs" onchange="g76BuildRosterPreview()"><option value="">— No usar —</option>${headers.map(h=>`<option value="${escapeHTML(h)}" ${h===det?'selected':''}>${escapeHTML(h)}</option>`).join('')}</select></label>`;}).join('');document.getElementById('g76-row-count').textContent=`${g76RosterRows.length} fila(s)`;document.getElementById('g76-mapping-section').classList.remove('hidden');document.getElementById('g76-preview-section').classList.remove('hidden');g80AutoMapRoster();g76BuildRosterPreview();showToast(`${label}: ${g76RosterRows.length} filas`);}
     function g76Field(r,k){const c=document.getElementById(`g76-map-${k}`)?.value||'';return c?String(r?.[c]??'').trim():'';}
     function g76ParseGrade(v,g=''){const m=String(v||g||'').match(/(^|\D)([1-3])(?:\D|$)/);return m?Number(m[2]):null;}
@@ -4114,8 +4114,8 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         else if(!g80LooksLikeStudentName(name)){state='REVISAR';note='Nombre OCR dudoso: corrígelo o confírmalo';}
         else if(edit.verified===true){note='Nombre confirmado manualmente';}
 
-        if(g112InferredNumbers.has(num)&&edit.verified!==true&&state!=='ERROR'){
-          state='REVISAR';note='Número propuesto por los renglones vecinos: verifica número y nombre en la foto y pulsa Revisado.';
+        if((g112InferredNumbers.has(num)||g113ReviewNumbers.has(num))&&edit.verified!==true&&state!=='ERROR'){
+          state='REVISAR';note=g113ReviewNumbers.get(num)||'Número propuesto: verifica número y nombre en la imagen y pulsa Revisado.';
         }
         const eg=localData.groups.find(g=>
           g76NormalizeHeader(localData.schools.find(s=>s.school_id===g.school_id)?.school_name||'')===g76NormalizeHeader(school)&&
@@ -4248,7 +4248,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       showToast('Nombre marcado como revisado contra la lista original.');
     }
 
-    // G112: no schema migration; preserve IDs and all unrelated stores.
+    // G113: no schema migration; preserve IDs and all unrelated stores.
     function g110Preset1D(){
       for(const [id,value] of Object.entries({'g76-default-school':'Secundaria #25','g87-default-grade':'1','g87-default-group':'D','g76-default-shift':'Matutino','g105-expected-count':'26'}))document.getElementById(id).value=value;
       if(g76RosterRows.length)g103ApplyGroupToAll();
@@ -4336,10 +4336,10 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         }
         await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();
         if(differences.length)throw Error('La lectura posterior detectó diferencias: '+differences.join('; '));
-        const message='G112 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
+        const message='G113 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
         status.textContent=message;showToast(message);window.alert(message);
       }catch(error){
-        console.error('G112 importación',error);
+        console.error('G113 importación',error);
         status.textContent=(committed?'La lista se guardó, pero no se pudo completar la verificación. Revisa antes de reintentar. ':'No se guardó ningún cambio de esta importación. ')+(error.message||error);
         window.alert(status.textContent);
       }finally{g110ImportBusy=false;g76BuildRosterPreview();}
@@ -4602,9 +4602,9 @@ async function handleCreateSchool(e) {
       return parsed.rows.length*12+parsed.rows.reduce((sum,r)=>sum+g93NameScore(r[1]),0)*.1;
     }
 
-    // G112: straighten photographed grids, erase horizontal rules, read isolated lines.
+    // G113: straighten photographed grids, erase horizontal rules, read isolated lines.
     // Numbers must be recognized from the image; row position never creates a number.
-    // G112: each table rule has its own angle; a single deskew angle cannot
+    // G113: each table rule has its own angle; a single deskew angle cannot
     // straighten a photographed page with perspective distortion.
     function g111PrepareTable(source){
       const small=document.createElement('canvas'),scale=Math.min(1,760/source.width);
@@ -4686,91 +4686,150 @@ async function handleCreateSchool(e) {
     }
 
     let g112InferredNumbers=new Set();
+
+    let g113RowEvidence=[],g113ReviewNumbers=new Map();
+    function g113CandidateName(name){
+      return g80LooksLikeStudentName(name)&&!/^(NO\.?\s+NOMBRE|NUMERO|NOMBRE|APELLIDOS|LISTAS?\b|ESCUELA\b)/i.test(name);
+    }
+    function g113StrongName(data){
+      const full=g93CleanName(data?.text||'');
+      const words=Array.isArray(data?.words)?data.words.filter(w=>g93CleanName(w.text)):[];
+      if(words.length<3)return {name:full,trimmed:false};
+      let end=words.length;
+      while(end>2&&g93CleanName(words[end-1].text).length<=2&&Number(words[end-1].confidence)<45)end--;
+      const proposed=g93CleanName(words.slice(0,end).map(w=>w.text).join(' '));
+      return end<words.length&&g113CandidateName(proposed)?{name:proposed,trimmed:true}:{name:full,trimmed:false};
+    }
+    function g113MergeReadings(results,observations,expected){
+      const variants=new Map(),inferred=new Set(),review=new Map();
+      const usable=n=>Number.isInteger(n)&&n>0&&n<=(expected||250);
+      const obs=observations.map(o=>({...o,number:usable(o.number)?o.number:null}));
+      // Geometry, two numeric anchors and a real recognized name are required.
+      // Edge proposals recover the first/last row too; all proposals need review.
+      for(let i=0;i<obs.length;i++){
+        const x=obs[i],p=obs[i-1],n=obs[i+1];let proposed=null;
+        if(!g113CandidateName(x.name))continue;
+        if(p?.number&&n?.number===p.number+2&&x.number!==p.number+1)proposed=p.number+1;
+        else if(n?.number===2&&obs[i+2]?.number===3&&x.number!==1&&(!p||!g113CandidateName(p.name)))proposed=1;
+        else if(expected&&p?.number===expected-1&&obs[i-2]?.number===expected-2&&x.number!==expected&&(!n||!g113CandidateName(n.name)))proposed=expected;
+        if(usable(proposed)){
+          x.detectedNumber=x.number;x.number=proposed;x.proposed=true;inferred.add(proposed);
+          review.set(proposed,'Número propuesto por la posición y los renglones vecinos. Confirma número y nombre contra la imagen.');
+        }
+      }
+      function add(number,name,confidence,tier,source,rowIndex){
+        if(!usable(number)||!g113CandidateName(name))return;
+        if(!variants.has(number))variants.set(number,[]);
+        variants.get(number).push({name:g93CleanName(name),confidence:Number(confidence)||0,tier,source,rowIndex});
+      }
+      for(const r of results){
+        if(r.rowIndex!==undefined&&obs[r.rowIndex]?.proposed)continue;
+        for(const [num,name] of g88ParseRosterOCR(r.text).rows)add(num,name,r.confidence,r.tier||10,r.source||'página',r.rowIndex);
+      }
+      for(const x of obs){
+        add(x.number,x.name,x.nameConfidence||x.confidence,100,'columna de nombre',x.rowIndex);
+        if(x.trimmed&&usable(x.number))review.set(x.number,'Se detectó texto corto de baja confianza al final del nombre. Revisa el nombre completo en la imagen.');
+      }
+      const rows=[];
+      for(const [num,options] of [...variants].sort((a,b)=>a[0]-b[0])){
+        // Independent cropped names outrank repeated whole-page hallucinations.
+        const rank=o=>o.tier*1000+Math.max(0,Math.min(100,o.confidence))*2+g93NameScore(o.name);
+        options.sort((a,b)=>rank(b)-rank(a));const chosen=options[0];
+        const columnOptions=options.filter(o=>o.source==='columna de nombre');
+        const physicalRows=new Set(columnOptions.map(o=>o.rowIndex));
+        if(physicalRows.size>1&&new Set(columnOptions.map(o=>normalizeStudentName(o.name))).size>1)review.set(num,'Dos renglones distintos producen el mismo número. Corrige los números en la revisión por imagen.');
+        if(options.some(o=>normalizeStudentName(o.name)!==normalizeStudentName(chosen.name)))review.set(num,review.get(num)||'Las lecturas producen nombres distintos. Compara con la imagen y confirma el nombre correcto.');
+        rows.push([num,chosen.name]);
+      }
+      const seen=new Set(rows.map(r=>r[0])),missing=[];
+      for(let n=1;n<=Math.max(expected,rows.length?rows.at(-1)[0]:0);n++)if(!seen.has(n))missing.push(n);
+      return {rows,text:rows.map(r=>r.join(' ')).join('\n'),missing,variants,inferred,review,evidence:obs.filter(o=>g113CandidateName(o.name))};
+    }
+    function g113ResetOCR(){
+      g112InferredNumbers.clear();g113ReviewNumbers.clear();g113RowEvidence=[];
+      const panel=document.getElementById('g113-row-audit');if(panel)panel.classList.add('hidden');
+    }
+    function g113RenderEvidence(){
+      const panel=document.getElementById('g113-row-audit'),body=document.getElementById('g113-row-audit-body');if(!panel||!body)return;
+      panel.classList.toggle('hidden',!g113RowEvidence.length);
+      body.innerHTML=g113RowEvidence.map((x,i)=>
+        '<div class="rounded-xl border bg-white p-3 space-y-2">'+
+        '<p class="font-bold text-xs">'+(x.number?'Número '+x.number:'Número no reconocido')+(x.proposed?' · PROPUESTO: verificar':'')+'</p>'+
+        (x.image?'<img alt="Renglón extraído del documento seleccionado" src="'+x.image+'" class="w-full border rounded-lg">':'')+
+        '<div class="flex flex-wrap gap-2"><input id="g113-number-'+i+'" aria-label="Número del renglón '+(i+1)+'" type="number" min="1" max="250" value="'+(x.number||'')+'" class="w-20 rounded border p-2">'+
+        '<input id="g113-name-'+i+'" aria-label="Nombre del renglón '+(i+1)+'" value="'+escapeHTML(x.name)+'" class="flex-1 min-w-[180px] rounded border p-2">'+
+        '<button type="button" class="rounded border px-3 py-2 font-bold" onclick="g113UseEvidence('+i+')">Confirmar esta fila</button></div></div>'
+      ).join('');
+    }
+    function g113UseEvidence(index){
+      const x=g113RowEvidence[index];if(!x)return;
+      const number=Number(document.getElementById('g113-number-'+index)?.value),name=g93CleanName(document.getElementById('g113-name-'+index)?.value);
+      if(!Number.isInteger(number)||number<1||number>250||!g113CandidateName(name))return showToast('Revisa el número y el nombre completo contra la imagen.');
+      const box=document.getElementById('g86-document-text');
+      // Keep all other lines, including unparsed text, and replace this number only.
+      const lines=box.value.split(/\r?\n/),matches=[];
+      lines.forEach((line,i)=>{if(g88ParseRosterOCR(line).rows.some(r=>r[0]===number))matches.push(i);});
+      if(matches.length>1)return showToast('El número está repetido en el texto. Corrige primero sus renglones.');
+      const prior=matches.length?g88ParseRosterOCR(lines[matches[0]]).rows[0]:null;
+      if(prior&&normalizeStudentName(prior[1])!==normalizeStudentName(name)&&!confirm('¿Sustituir el nombre del número '+number+' en la vista previa? Esto no modifica alumnos ya guardados.'))return;
+      g108CaptureActiveEdit();
+      for(const [i,row] of g76RosterRows.entries())if(Number(row['NÚM. LISTA'])===number)g98RosterEdits.delete(i);
+      if(matches.length)lines[matches[0]]=number+' '+name;else lines.push(number+' '+name);
+      box.value=lines.join('\n');
+      g86AnalyzeRosterDocument();
+      const row=g76RosterPreview.find(r=>r.number===number);
+      if(row){g98RosterEdits.set(row.sourceIndex,{...(g98RosterEdits.get(row.sourceIndex)||{}),student:name,verified:true});g76BuildRosterPreview();}
+      x.number=number;x.name=name;x.proposed=false;g113RenderEvidence();
+      showToast('Fila confirmada en la vista previa. Aún no se ha guardado en la base de datos.');
+    }
     async function g91RecognizeRoster(source,status){
-      if(!window.Tesseract)throw new Error('OCR no disponible. Conéctate a internet y recarga la página.');
+      if(!window.Tesseract)throw new Error('OCR no disponible. Conéctate a internet y recarga.');
       const canvas=source instanceof HTMLCanvasElement?source:await g91PrepareImage(source);
-      let worker;
+      let worker,table,slices=[];
       try{
-        worker=await Tesseract.createWorker('spa',1,{logger:m=>{
-          if(status&&m.status==='recognizing text')status.textContent='Reconociendo lista: '+Math.round((m.progress||0)*100)+'%';
-        }});
-        const results=[],rowObservations=[];
-        const table=g111PrepareTable(canvas);
-        const slices=g105RosterSlices(table.canvas);
-        try{
-          for(let si=0;si<slices.length;si++){
-            for(const psm of (si===0?[6,4,11]:[6,11])){
-              await worker.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'});
-              if(status)status.textContent=`Leyendo ${si===0?'página completa':'zona '+si} · modo ${psm}…`;
-              const r=await worker.recognize(slices[si]);
-              results.push({text:r.data?.text||'',confidence:r.data?.confidence||0,psm});
-            }
-          }
-          // PSM 7 avoids table segmentation dropping half the students.
-          if(table.bands.length<=100){
-            await worker.setParameters({tessedit_pageseg_mode:7,preserve_interword_spaces:'1'});
-            for(let index=0;index<table.bands.length;index++){
-              const row=table.rowCanvases[index];
-              if(status)status.textContent='Leyendo renglón '+(index+1)+' de '+table.bands.length+'. No cierres la ventana.';
-              try{
-                const part=table.rowParts[index];let splitName='',splitNumber=null;
-                if(part.numberCanvas&&part.nameCanvas){
-                  await worker.setParameters({tessedit_pageseg_mode:7,tessedit_char_whitelist:'0123456789'});
-                  const nr=await worker.recognize(part.numberCanvas);
-                  await worker.setParameters({tessedit_pageseg_mode:7,tessedit_char_whitelist:''});
-                  const names=await worker.recognize(part.nameCanvas);
-                  const digits=(nr.data?.text||'').trim().replace(/\s/g,'');
-                  const name=g93CleanName(names.data?.text||'');
-                  splitName=name;
-                  if(/^\d{1,3}$/.test(digits)&&Number(digits)>0&&Number(digits)<=250)splitNumber=Number(digits);
-                  if(/^\d{1,3}$/.test(digits)&&name)results.push({text:digits+' '+name,confidence:Math.min(nr.data?.confidence||0,names.data?.confidence||0),psm:7});
-                }
-                // Keep a full-row pass as independent evidence, including unsplit grids.
-                const r=await worker.recognize(row);results.push({text:r.data?.text||'',confidence:r.data?.confidence||0,psm:7});
-                const parsed=g88ParseRosterOCR(r.data?.text||'').rows;
-                rowObservations.push({number:splitNumber||parsed[0]?.[0]||null,name:splitName||parsed[0]?.[1]||'',confidence:r.data?.confidence||0});
-              }
-              finally{row.width=row.height=0;}
-            }
-          }
-        }finally{slices.slice(1).forEach(c=>{c.width=c.height=0;});table.rowCanvases.forEach(c=>{c.width=c.height=0;});table.rowParts.forEach(p=>[p.canvas,p.nameCanvas,p.numberCanvas].filter(Boolean).forEach(c=>{c.width=c.height=0;}));}
-        results.sort((a,b)=>g91OCRQuality(b.text)-g91OCRQuality(a.text)||(b.confidence-a.confidence));
-        // Comparar las tres segmentaciones por número de lista. No inventar filas.
-        const variants=new Map();
-        for(const result of results){
-          for(const [num,name] of g88ParseRosterOCR(result.text).rows){
-            if(g105ExpectedRosterCount()&&num>g105ExpectedRosterCount())continue; // Outside the explicitly expected list range.
-            if(!variants.has(num))variants.set(num,[]);
-            variants.get(num).push({name,confidence:result.confidence,psm:result.psm});
-          }
+        worker=await Tesseract.createWorker('spa',1,{logger:m=>{if(status&&m.status==='recognizing text')status.textContent='Reconociendo texto: '+Math.round((m.progress||0)*100)+'%';}});
+        const results=[],observations=[];table=g111PrepareTable(canvas);slices=g105RosterSlices(canvas);
+        for(let si=0;si<slices.length;si++)for(const mode of (si===0?[6,4,11]:[6,11])){
+          await worker.setParameters({tessedit_pageseg_mode:mode,preserve_interword_spaces:'1',tessedit_char_whitelist:''});
+          const r=await worker.recognize(slices[si]);results.push({text:r.data?.text||'',confidence:r.data?.confidence||0,tier:10,source:'página'});
         }
-        // A missing printed number may be proposed ONLY between two consecutive
-        // neighbors, with an independently recognized name. It must be confirmed.
-        for(let i=1;i<rowObservations.length-1;i++){
-          const p=rowObservations[i-1],x=rowObservations[i],n=rowObservations[i+1];
-          if(!x.number&&g80LooksLikeStudentName(x.name)&&p.number&&n.number===p.number+2){
-            const proposed=p.number+1;
-            if(!variants.has(proposed)&&(!g105ExpectedRosterCount()||proposed<=g105ExpectedRosterCount())){
-              variants.set(proposed,[{name:x.name,confidence:x.confidence,psm:'propuesto'}]);
-              g112InferredNumbers.add(proposed);
-            }
+        if(table.rowParts.length<=100)for(let index=0;index<table.rowParts.length;index++){
+          const p=table.rowParts[index];let name='',number=null,nameConfidence=0,trimmed=false;
+          if(status)status.textContent='Leyendo renglón '+(index+1)+' de '+table.rowParts.length+'.';
+          if(p.nameCanvas&&p.numberCanvas){
+            await worker.setParameters({tessedit_pageseg_mode:7,tessedit_char_whitelist:'0123456789'});
+            const nr=await worker.recognize(p.numberCanvas),digits=String(nr.data?.text||'').trim().replace(/\s/g,'');
+            if(/^\d{1,3}$/.test(digits)&&Number(digits)>0&&Number(digits)<=250)number=Number(digits);
+            await worker.setParameters({tessedit_pageseg_mode:7,tessedit_char_whitelist:''});
+            const names=await worker.recognize(p.nameCanvas),strong=g113StrongName(names.data);
+            name=strong.name;trimmed=strong.trimmed;nameConfidence=names.data?.confidence||0;
           }
+          await worker.setParameters({tessedit_pageseg_mode:7,tessedit_char_whitelist:''});
+          const r=await worker.recognize(p.cleanRow),parsed=g88ParseRosterOCR(r.data?.text||'').rows;
+          const expected=g105ExpectedRosterCount();
+          if((!number||(expected&&number>expected))&&parsed[0])number=parsed[0][0];
+          if(!g113CandidateName(name)&&parsed[0])name=parsed[0][1];
+          // If a number is lost, preserve the independently recognized name.
+          if(!g113CandidateName(name)){
+            const unnumbered=g93CleanName(r.data?.text||'');if(g113CandidateName(unnumbered))name=unnumbered;
+          }
+          const thumb=document.createElement('canvas');thumb.width=Math.min(1280,p.cleanRow.width);thumb.height=Math.max(40,Math.round(p.cleanRow.height*thumb.width/p.cleanRow.width));
+          thumb.getContext('2d').drawImage(p.cleanRow,0,0,thumb.width,thumb.height);
+          const image=thumb.toDataURL('image/jpeg',.88);thumb.width=thumb.height=0;
+          observations.push({number,name,nameConfidence,trimmed,confidence:r.data?.confidence||0,rowIndex:index,image});
+          results.push({text:r.data?.text||'',confidence:r.data?.confidence||0,tier:30,source:'renglón',rowIndex:index});
         }
-        const merged=[...variants].sort((a,b)=>a[0]-b[0]).map(([num,options])=>{
-          // Preferir nombres coincidentes entre lecturas; desempatar por calidad y confianza.
-          const ranked=options.map(o=>{
-            const key=g93CleanName(o.name);
-            const votes=options.filter(v=>g93CleanName(v.name)===key).length;
-            return {...o,rank:votes*100+g93NameScore(o.name)+o.confidence*.04};
-          }).sort((a,b)=>b.rank-a.rank);
-          return `${num} ${ranked[0].name}`;
-        });
-        const best=merged.length?merged.join('\n'):results[0].text;
-        const numbers=[...variants.keys()].sort((a,b)=>a-b);
-        const missing=[];
-        for(let n=1;n<=Math.max(g105ExpectedRosterCount(),numbers.length?numbers[numbers.length-1]:0);n++)if(!variants.has(n))missing.push(n);
-        return {text:best,confidence:results[0].confidence,psm:'G112 tabla y renglones',missing,variants};
-      }finally{await worker?.terminate();if(!(source instanceof HTMLCanvasElement)){canvas.width=canvas.height=0;}}
+        const merged=g113MergeReadings(results,observations,g105ExpectedRosterCount());
+        for(const n of merged.inferred)g112InferredNumbers.add(n);
+        for(const [n,reason] of merged.review)g113ReviewNumbers.set(n,reason);
+        g113RowEvidence.push(...merged.evidence);
+        return {...merged,confidence:results[0]?.confidence||0,psm:'G113 columnas y revisión visual'};
+      }finally{
+        await worker?.terminate();
+        slices.slice(1).forEach(c=>{c.width=c.height=0;});
+        table?.rowParts.forEach(p=>[p.canvas,p.cleanRow,p.nameCanvas,p.numberCanvas].filter(Boolean).forEach(c=>{c.width=c.height=0;}));
+        if(!(source instanceof HTMLCanvasElement))canvas.width=canvas.height=0;
+      }
     }
     let g112DocumentBusy=false;
     async function g86ReadRosterDocument(event){
@@ -4787,14 +4846,18 @@ async function handleCreateSchool(e) {
     async function g112ReadRosterDocument(event){
       const file=event.target.files?.[0];if(!file)return;
       const panel=document.getElementById('g86-document-panel'),status=document.getElementById('g86-document-status'),box=document.getElementById('g86-document-text');
-      panel.classList.remove('hidden');box.value='';g112InferredNumbers.clear();
+      panel.classList.remove('hidden');box.value='';g113ResetOCR();
       const pdf=file.type==='application/pdf'||/\.pdf$/i.test(file.name);
       if(!pdf&&!/^image\/(jpeg|png|webp)$/.test(file.type)){status.textContent='Solo JPG, PNG, WEBP o PDF.';return;}
       if(file.size>20*1024*1024){status.textContent='Archivo mayor de 20 MB. Reduce su tamaño.';return;}
       try{
         if(!pdf){
           if(!window.Tesseract)throw new Error('OCR no disponible: comprueba internet y recarga la página.');
-          status.textContent='Leyendo imagen…';
+          if(window.g112SourceURL)URL.revokeObjectURL(window.g112SourceURL);
+          window.g112SourceURL=URL.createObjectURL(file);
+          document.getElementById('g112-source-preview').src=window.g112SourceURL;
+          document.getElementById('g112-source-details').classList.remove('hidden');
+          status.textContent='Leyendo imagen.';
           const result=await g91RecognizeRoster(file,status);
           box.value=result.text||'';
         }else{
@@ -4824,6 +4887,7 @@ async function handleCreateSchool(e) {
         }
         // Only a successful new document replaces the previous import draft.
         const audit=g88ParseRosterOCR(box.value);
+        g113RenderEvidence();
         if(audit.rows.length){
           g98RosterEdits.clear();g76RosterRows=[];g76RosterPreview=[];
           g86AnalyzeRosterDocument();
@@ -4859,7 +4923,7 @@ async function handleCreateSchool(e) {
         if(!Number.isInteger(number)||number<1||number>250){rejected.push(original);continue;}
         const candidate=g93CleanName(m[2].replace(/^[\s\]\[|:;.,_\-]+/g,''));
         if(!candidate||candidate.length<3||noise.test(candidate)){rejected.push(original);continue;}
-        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G112: conservar ambas filas para corregirlas.
+        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G113: conservar ambas filas para corregirlas.
         seen.add(number);rows.push([number,candidate]);
       }
       rows.sort((a,b)=>a[0]-b[0]);
