@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Control Docente G113 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G114 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2863,7 +2863,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G113 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G114 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" placeholder="Pega aquí el enlace a tu archivo (opcional)"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -2872,19 +2872,19 @@
           </label>
           <div id="g86-document-panel" class="hidden mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 space-y-2">
             <p id="g86-document-status" role="status" class="text-xs text-blue-900"></p>
-            <p class="text-[11px] text-blue-900">G113 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
-            <details id="g112-source-details" class="hidden"><summary class="text-xs font-bold cursor-pointer">Ver fotografía original para revisar nombres</summary><img id="g112-source-preview" alt="Fotografía seleccionada para importar alumnos" style="max-height:420px;max-width:100%;object-fit:contain;margin-top:8px"></details><details id="g113-row-audit" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3"><summary class="font-bold text-xs cursor-pointer">Revisar renglones con su imagen</summary><p class="text-xs my-2">Confirma los números propuestos y corrige los nombres mirando cada renglón. Estas acciones solo preparan la lista; no guardan alumnos todavía.</p><div id="g113-row-audit-body" class="space-y-3 max-h-[480px] overflow-y-auto"></div></details><textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
+            <p class="text-[11px] text-blue-900">G114 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
+            <details id="g112-source-details" class="hidden"><summary class="text-xs font-bold cursor-pointer">Ver fotografía original para revisar nombres</summary><img id="g112-source-preview" alt="Fotografía seleccionada para importar alumnos" style="max-height:420px;max-width:100%;object-fit:contain;margin-top:8px"></details><details id="g113-row-audit" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3"><summary class="font-bold text-xs cursor-pointer">Revisar renglones con su imagen</summary><p class="text-xs my-2">Confirma los números propuestos y corrige los nombres mirando cada renglón. Estas acciones solo preparan la lista; no guardan alumnos todavía.</p><label class="block text-xs my-2"><input id="g114-only-pending" type="checkbox" checked onchange="g113RenderEvidence()"> Mostrar solo filas pendientes</label><p id="g114-review-status" class="text-xs my-2" role="status"></p><div id="g113-row-audit-body" class="space-y-3 max-h-[480px] overflow-y-auto"></div></details><textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
             <button type="button" class="rounded-xl bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="g86AnalyzeRosterDocument()">Revisar alumnos detectados</button>
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G113 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
+        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G114 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
         <button type="button" class="mb-3 rounded-xl border border-teal-700 px-3 py-2 text-xs font-bold" onclick="g110Preset1D()">Preparar Secundaria 25 · 1.º D · 26 alumnos</button><p id="g110-save-status" role="status" class="text-xs font-bold mb-3"></p><div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
-          <p class="font-bold text-teal-950">G113 · Importación verificada</p>
+          <p class="font-bold text-teal-950">G114 · Importación verificada</p>
           <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
           <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
           <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
         </div>
         <div id="g76-mapping-section" class="hidden space-y-3"><div class="flex items-center justify-between"><div><h4 class="font-bold">3. Relacionar columnas</h4><p class="text-xs text-[#66767a]">La detección es automática, pero puedes corregirla.</p></div><span id="g76-row-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">0 filas</span><div id="g80-import-detection-note" class="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-[11px] text-blue-900">Revisa escuela, grado, grupo, número y nombre. Los datos del OCR pueden contener errores.</div></div><div id="g76-map-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><label class="text-xs font-bold">Escuela predeterminada<input id="g76-default-school" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Secundaria #57" onchange="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Asignatura<input id="g76-default-subject" class="mt-1 w-full rounded-xl border p-2 text-sm" value="Tecnología" onchange="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Turno<select id="g76-default-shift" class="mt-1 w-full rounded-xl border p-2 text-sm" onchange="g76BuildRosterPreview()"><option>Matutino</option><option>Vespertino</option><option>Mixto</option></select></label><label class="text-xs font-bold">Grado predeterminado<input id="g87-default-grade" type="number" min="1" max="3" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Ej. 2" oninput="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Grupo predeterminado<input id="g87-default-group" class="mt-1 w-full rounded-xl border p-2 text-sm" placeholder="Ej. A" oninput="g76BuildRosterPreview()"></label><label class="text-xs font-bold">Ciclo escolar<input id="g76-default-year" class="mt-1 w-full rounded-xl border p-2 text-sm" value="2026-2027" onchange="g76BuildRosterPreview()"></label></div></div>
-        <div id="g76-preview-section" class="hidden space-y-3"><div class="flex flex-wrap gap-2 items-center rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><button type="button" class="rounded-lg bg-amber-800 text-white px-3 py-2 font-bold" onclick="g107FocusIssues()">Corregir registros con errores</button><span id="g107-issue-summary" role="status">Revisa los datos antes de importar.</span></div><div class="flex items-center justify-between"><h4 class="font-bold">4. Vista previa</h4><button type="button" class="rounded-xl border px-3 py-2 text-xs font-bold" onclick="g76BuildRosterPreview()">Actualizar</button></div><div class="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3"><button type="button" class="rounded-xl bg-[#145b4b] px-3 py-2 text-xs font-bold text-white" onclick="g103ApplyGroupToAll()">Aplicar datos del grupo a todos los alumnos</button><span class="text-xs text-emerald-950">Utiliza los campos predeterminados de arriba. Conserva los nombres y números corregidos.</span></div><div id="g76-summary" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2"></div><div class="overflow-x-auto rounded-2xl border"><table class="w-full text-xs min-w-[900px]"><thead class="bg-slate-50"><tr><th class="p-2">Estado</th><th class="p-2">Escuela</th><th class="p-2">Grado</th><th class="p-2">Grupo</th><th class="p-2">Asignatura</th><th class="p-2">Turno</th><th class="p-2">#</th><th class="p-2 text-left">Alumno</th><th class="p-2 text-left">Observación</th></tr></thead><tbody id="g76-preview-body"></tbody></table></div></div>
+        <div id="g76-preview-section" class="hidden space-y-3"><div class="flex flex-wrap gap-2 items-center rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><button type="button" class="rounded-lg bg-amber-800 text-white px-3 py-2 font-bold" onclick="g107FocusIssues()">Corregir registros con errores</button><button type="button" class="rounded-lg bg-[#145b4b] text-white px-3 py-2 font-bold" onclick="g114NextReview()">Revisar siguiente con imagen</button><span id="g107-issue-summary" role="status">Revisa los datos antes de importar.</span></div><div class="flex items-center justify-between"><h4 class="font-bold">4. Vista previa</h4><button type="button" class="rounded-xl border px-3 py-2 text-xs font-bold" onclick="g76BuildRosterPreview()">Actualizar</button></div><div class="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3"><button type="button" class="rounded-xl bg-[#145b4b] px-3 py-2 text-xs font-bold text-white" onclick="g103ApplyGroupToAll()">Aplicar datos del grupo a todos los alumnos</button><span class="text-xs text-emerald-950">Utiliza los campos predeterminados de arriba. Conserva los nombres y números corregidos.</span></div><div id="g76-summary" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2"></div><div class="overflow-x-auto rounded-2xl border"><table class="w-full text-xs min-w-[900px]"><thead class="bg-slate-50"><tr><th class="p-2">Estado</th><th class="p-2">Escuela</th><th class="p-2">Grado</th><th class="p-2">Grupo</th><th class="p-2">Asignatura</th><th class="p-2">Turno</th><th class="p-2">#</th><th class="p-2 text-left">Alumno</th><th class="p-2 text-left">Observación</th></tr></thead><tbody id="g76-preview-body"></tbody></table></div></div>
       </div><div class="p-5 border-t flex justify-between gap-2"><button class="rounded-xl border px-4 py-2 text-sm font-bold" onclick="closeModal('modal-g76-roster-import')">Cancelar</button><button id="g76-import-btn" class="rounded-xl bg-[#145b4b] text-white px-4 py-2 text-sm font-bold disabled:opacity-40" disabled onclick="g76ImportRoster()">Importar grupos y alumnos</button></div>
     </div>
   </div>
@@ -4192,6 +4192,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         ?`G102 · Revisión obligatoria: hay ${p.length} registros detectados y la numeración llega hasta ${expected}. Faltan los números ${missingNumbers.join(', ')}. Corrige el texto OCR y vuelve a revisar. No se crearán alumnos inexistentes.`
         :`G102 · Numeración: ${p.length} registros; ${expected||'sin máximo'} como último número detectado. Verifica visualmente los nombres antes de importar.`;
       document.getElementById('g76-import-btn').disabled=!p.some(x=>x.state==='OK') || p.some(x=>x.state==='REVISAR'||x.state==='ERROR') || missingNumbers.length>0 || mismatch || g112DocumentBusy;
+      if(g113RowEvidence.length)g113RenderEvidence();
     }
     // G104: asignar contexto escolar sin reanalizar ni sustituir nombres corregidos.
     function g103ApplyGroupToAll(){
@@ -4248,7 +4249,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       showToast('Nombre marcado como revisado contra la lista original.');
     }
 
-    // G113: no schema migration; preserve IDs and all unrelated stores.
+    // G114: no schema migration; preserve IDs and all unrelated stores.
     function g110Preset1D(){
       for(const [id,value] of Object.entries({'g76-default-school':'Secundaria #25','g87-default-grade':'1','g87-default-group':'D','g76-default-shift':'Matutino','g105-expected-count':'26'}))document.getElementById(id).value=value;
       if(g76RosterRows.length)g103ApplyGroupToAll();
@@ -4336,10 +4337,10 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         }
         await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();
         if(differences.length)throw Error('La lectura posterior detectó diferencias: '+differences.join('; '));
-        const message='G113 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
+        const message='G114 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
         status.textContent=message;showToast(message);window.alert(message);
       }catch(error){
-        console.error('G113 importación',error);
+        console.error('G114 importación',error);
         status.textContent=(committed?'La lista se guardó, pero no se pudo completar la verificación. Revisa antes de reintentar. ':'No se guardó ningún cambio de esta importación. ')+(error.message||error);
         window.alert(status.textContent);
       }finally{g110ImportBusy=false;g76BuildRosterPreview();}
@@ -4602,10 +4603,60 @@ async function handleCreateSchool(e) {
       return parsed.rows.length*12+parsed.rows.reduce((sum,r)=>sum+g93NameScore(r[1]),0)*.1;
     }
 
-    // G113: straighten photographed grids, erase horizontal rules, read isolated lines.
+    // G114: straighten photographed grids, erase horizontal rules, read isolated lines.
     // Numbers must be recognized from the image; row position never creates a number.
-    // G113: each table rule has its own angle; a single deskew angle cannot
+    // G114: each table rule has its own angle; a single deskew angle cannot
     // straighten a photographed page with perspective distortion.
+
+    // G114: recognize the ink occupied by a name, not the blank table columns.
+    // If separated ink is excluded, human review is mandatory.
+    function g114CropNameInk(source){
+      const w=source.width,h=source.height,ctx=source.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,w,h).data;
+      const rows=[];for(let y=0;y<h;y++){
+        let count=0;for(let x=0;x<w;x++){const i=(y*w+x)*4;if(.299*data[i]+.587*data[i+1]+.114*data[i+2]<175)count++;}
+        if(count>=Math.max(4,w*.007)&&count<w*.55)rows.push({y,count});
+      }
+      if(!rows.length)return {canvas:source,ambiguous:false};
+      const bands=[];for(const row of rows){if(!bands.length||row.y-bands.at(-1).at(-1).y>4)bands.push([]);bands.at(-1).push(row);}
+      bands.sort((a,b)=>b.reduce((n,r)=>n+r.count,0)-a.reduce((n,r)=>n+r.count,0));
+      const band=bands[0],top=band[0].y,bottom=band.at(-1).y,textHeight=bottom-top+1;
+      if(textHeight<8)return {canvas:source,ambiguous:false};
+      const columns=[];
+      for(let x=0;x<w;x++){
+        let count=0;for(let y=top;y<=bottom;y++){const i=(y*w+x)*4;if(.299*data[i]+.587*data[i+1]+.114*data[i+2]<175)count++;}
+        if(count>=Math.max(2,textHeight*.045))columns.push(x);
+      }
+      if(!columns.length)return {canvas:source,ambiguous:false};
+      const groups=[];for(const x of columns){if(!groups.length||x-groups.at(-1).at(-1)>Math.max(24,textHeight*1.8))groups.push([]);groups.at(-1).push(x);}
+      let left=columns[0],right=columns.at(-1),ambiguous=false;
+      if(groups.length===2){
+        const a=groups[0],b=groups[1];
+        if(a.at(-1)-a[0]>textHeight*4&&b.at(-1)-b[0]<textHeight*2.2){right=a.at(-1);ambiguous=true;}
+      }
+      const pad=Math.max(8,Math.round(textHeight*.25)),x0=Math.max(0,left-pad),y0=Math.max(0,top-pad);
+      const x1=Math.min(w,right+pad+1),y1=Math.min(h,bottom+pad+1),c=document.createElement('canvas');
+      c.width=x1-x0+20;c.height=y1-y0+20;
+      const out=c.getContext('2d');out.fillStyle='white';out.fillRect(0,0,c.width,c.height);out.drawImage(source,x0,y0,x1-x0,y1-y0,10,10,x1-x0,y1-y0);
+      return {canvas:c,ambiguous,bounds:{left:x0,right:x1,top:y0,bottom:y1}};
+    }
+    function g114EvidenceRow(x){
+      const index=g76RosterRows.findIndex(r=>Number(r['NÚM. LISTA'])===x.number);
+      return g76RosterPreview.find(r=>r.sourceIndex===index)||g76RosterPreview.find(r=>r.number===x.number);
+    }
+    function g114DraftEvidence(index,field,value){
+      const x=g113RowEvidence[index];if(x)x[field===0?'draftNumber':'draftName']=value;
+    }
+    function g114NextReview(){
+      g113RenderEvidence();
+      const panel=document.getElementById('g113-row-audit');
+      if(!panel||panel.classList.contains('hidden'))return g107FocusIssues();
+      panel.open=true;
+      const row=panel.querySelector('[data-g114-pending="yes"]');
+      if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.querySelector('input[type="text"]')?.focus({preventScroll:true});}
+      else showToast('No hay nombres pendientes. Revisa el resumen antes de importar.');
+    }
+    function g114ConfirmAndNext(index){g113UseEvidence(index);g114NextReview();}
+
     function g111PrepareTable(source){
       const small=document.createElement('canvas'),scale=Math.min(1,760/source.width);
       small.width=Math.round(source.width*scale);small.height=Math.round(source.height*scale);
@@ -4674,13 +4725,16 @@ async function handleCreateSchool(e) {
             nc.putImageData(ni,0,0);
           }
         }
+        const nameCrop=nameCanvas?g114CropNameInk(nameCanvas):null;
+        const originalNameCanvas=nameCanvas;
+        if(nameCrop)nameCanvas=nameCrop.canvas;
         let cleanRow=crop;
         if(numberCanvas&&nameCanvas){
-          cleanRow=document.createElement('canvas');cleanRow.width=numberCanvas.width+nameCanvas.width+40;cleanRow.height=crop.height;
+          cleanRow=document.createElement('canvas');cleanRow.width=numberCanvas.width+nameCanvas.width+40;cleanRow.height=Math.max(crop.height,numberCanvas.height,nameCanvas.height);
           const clean=cleanRow.getContext('2d');clean.fillStyle='white';clean.fillRect(0,0,cleanRow.width,cleanRow.height);
           clean.drawImage(numberCanvas,0,0);clean.drawImage(nameCanvas,numberCanvas.width+40,0);
         }
-        rows.push({canvas:crop,cleanRow,numberCanvas,nameCanvas,top:a.y,bottom:b.y});
+        rows.push({canvas:crop,cleanRow,numberCanvas,nameCanvas,originalNameCanvas,cropAmbiguous:nameCrop?.ambiguous||false,top:a.y,bottom:b.y});
       }
       return {canvas:source,bands:rows.map(r=>({top:r.top,bottom:r.bottom})),rowCanvases:rows.map(r=>r.cleanRow),rowParts:rows,lines,slope:0,rules:lines.length};
     }
@@ -4728,6 +4782,7 @@ async function handleCreateSchool(e) {
       }
       for(const x of obs){
         add(x.number,x.name,x.nameConfidence||x.confidence,100,'columna de nombre',x.rowIndex);
+        if(x.cropAmbiguous&&usable(x.number))review.set(x.number,'Hay marcas separadas a la derecha del nombre. Compara el renglón completo antes de confirmar.');
         if(x.trimmed&&usable(x.number))review.set(x.number,'Se detectó texto corto de baja confianza al final del nombre. Revisa el nombre completo en la imagen.');
       }
       const rows=[];
@@ -4752,14 +4807,20 @@ async function handleCreateSchool(e) {
     function g113RenderEvidence(){
       const panel=document.getElementById('g113-row-audit'),body=document.getElementById('g113-row-audit-body');if(!panel||!body)return;
       panel.classList.toggle('hidden',!g113RowEvidence.length);
-      body.innerHTML=g113RowEvidence.map((x,i)=>
-        '<div class="rounded-xl border bg-white p-3 space-y-2">'+
-        '<p class="font-bold text-xs">'+(x.number?'Número '+x.number:'Número no reconocido')+(x.proposed?' · PROPUESTO: verificar':'')+'</p>'+
-        (x.image?'<img alt="Renglón extraído del documento seleccionado" src="'+x.image+'" class="w-full border rounded-lg">':'')+
-        '<div class="flex flex-wrap gap-2"><input id="g113-number-'+i+'" aria-label="Número del renglón '+(i+1)+'" type="number" min="1" max="250" value="'+(x.number||'')+'" class="w-20 rounded border p-2">'+
-        '<input id="g113-name-'+i+'" aria-label="Nombre del renglón '+(i+1)+'" value="'+escapeHTML(x.name)+'" class="flex-1 min-w-[180px] rounded border p-2">'+
-        '<button type="button" class="rounded border px-3 py-2 font-bold" onclick="g113UseEvidence('+i+')">Confirmar esta fila</button></div></div>'
-      ).join('');
+      const onlyPending=document.getElementById('g114-only-pending')?.checked!==false;
+      const pending=g76RosterPreview.filter(r=>r.state==='REVISAR').length;
+      const label=document.getElementById('g114-review-status');if(label)label.textContent=pending+' nombres pendientes de confirmar. Las confirmaciones preparan la lista; no guardan alumnos.';
+      body.innerHTML=g113RowEvidence.map((x,i)=>{
+        const row=g114EvidenceRow(x),isPending=!row||row.state!=='OK';
+        if(onlyPending&&!isPending)return '';
+        const number=x.draftNumber??row?.number??x.number??'',name=x.draftName??row?.fullName??x.name;
+        return '<div data-g114-pending="'+(isPending?'yes':'no')+'" class="rounded-xl border bg-white p-3 space-y-2">'+
+          '<p class="font-bold text-xs">'+(number?'Número '+number:'Número no reconocido')+(x.proposed?' · PROPUESTO: verificar':'')+'</p>'+
+          (x.image?'<img alt="Renglón completo del documento: comprueba el nombre antes de confirmar" src="'+x.image+'" class="w-full border rounded-lg">':'')+
+          '<div class="flex flex-wrap gap-2"><input id="g113-number-'+i+'" aria-label="Número del renglón '+(i+1)+'" type="number" min="1" max="250" value="'+escapeHTML(String(number))+'" oninput="g114DraftEvidence('+i+',0,this.value)" class="w-20 rounded border p-2">'+
+          '<input id="g113-name-'+i+'" aria-label="Nombre del renglón '+(i+1)+'" type="text" value="'+escapeHTML(name)+'" oninput="g114DraftEvidence('+i+',1,this.value)" class="flex-1 min-w-[180px] rounded border p-2">'+
+          '<button type="button" class="rounded border px-3 py-2 font-bold" onclick="g114ConfirmAndNext('+i+')">Confirmar y continuar</button></div></div>';
+      }).join('')||'<p class="text-xs p-3">No hay filas pendientes en esta vista. Puedes mostrar todas para comparar la lista completa.</p>';
     }
     function g113UseEvidence(index){
       const x=g113RowEvidence[index];if(!x)return;
@@ -4779,7 +4840,7 @@ async function handleCreateSchool(e) {
       g86AnalyzeRosterDocument();
       const row=g76RosterPreview.find(r=>r.number===number);
       if(row){g98RosterEdits.set(row.sourceIndex,{...(g98RosterEdits.get(row.sourceIndex)||{}),student:name,verified:true});g76BuildRosterPreview();}
-      x.number=number;x.name=name;x.proposed=false;g113RenderEvidence();
+      x.number=number;x.name=name;x.proposed=false;delete x.draftName;delete x.draftNumber;g113RenderEvidence();
       showToast('Fila confirmada en la vista previa. Aún no se ha guardado en la base de datos.');
     }
     async function g91RecognizeRoster(source,status){
@@ -4813,21 +4874,21 @@ async function handleCreateSchool(e) {
           if(!g113CandidateName(name)){
             const unnumbered=g93CleanName(r.data?.text||'');if(g113CandidateName(unnumbered))name=unnumbered;
           }
-          const thumb=document.createElement('canvas');thumb.width=Math.min(1280,p.cleanRow.width);thumb.height=Math.max(40,Math.round(p.cleanRow.height*thumb.width/p.cleanRow.width));
-          thumb.getContext('2d').drawImage(p.cleanRow,0,0,thumb.width,thumb.height);
+          const thumb=document.createElement('canvas');thumb.width=Math.min(1280,p.canvas.width);thumb.height=Math.max(40,Math.round(p.canvas.height*thumb.width/p.canvas.width));
+          thumb.getContext('2d').drawImage(p.canvas,0,0,thumb.width,thumb.height);
           const image=thumb.toDataURL('image/jpeg',.88);thumb.width=thumb.height=0;
-          observations.push({number,name,nameConfidence,trimmed,confidence:r.data?.confidence||0,rowIndex:index,image});
+          observations.push({number,name,nameConfidence,trimmed,cropAmbiguous:p.cropAmbiguous,confidence:r.data?.confidence||0,rowIndex:index,image});
           results.push({text:r.data?.text||'',confidence:r.data?.confidence||0,tier:30,source:'renglón',rowIndex:index});
         }
         const merged=g113MergeReadings(results,observations,g105ExpectedRosterCount());
         for(const n of merged.inferred)g112InferredNumbers.add(n);
         for(const [n,reason] of merged.review)g113ReviewNumbers.set(n,reason);
         g113RowEvidence.push(...merged.evidence);
-        return {...merged,confidence:results[0]?.confidence||0,psm:'G113 columnas y revisión visual'};
+        return {...merged,confidence:results[0]?.confidence||0,psm:'G114 columnas y revisión visual'};
       }finally{
         await worker?.terminate();
         slices.slice(1).forEach(c=>{c.width=c.height=0;});
-        table?.rowParts.forEach(p=>[p.canvas,p.cleanRow,p.nameCanvas,p.numberCanvas].filter(Boolean).forEach(c=>{c.width=c.height=0;}));
+        table?.rowParts.forEach(p=>[p.canvas,p.cleanRow,p.nameCanvas,p.numberCanvas,p.originalNameCanvas].filter(Boolean).forEach(c=>{c.width=c.height=0;}));
         if(!(source instanceof HTMLCanvasElement))canvas.width=canvas.height=0;
       }
     }
@@ -4923,7 +4984,7 @@ async function handleCreateSchool(e) {
         if(!Number.isInteger(number)||number<1||number>250){rejected.push(original);continue;}
         const candidate=g93CleanName(m[2].replace(/^[\s\]\[|:;.,_\-]+/g,''));
         if(!candidate||candidate.length<3||noise.test(candidate)){rejected.push(original);continue;}
-        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G113: conservar ambas filas para corregirlas.
+        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G114: conservar ambas filas para corregirlas.
         seen.add(number);rows.push([number,candidate]);
       }
       rows.sort((a,b)=>a[0]-b[0]);
