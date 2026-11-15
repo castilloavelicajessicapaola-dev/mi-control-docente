@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Control Docente G114 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G115 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2863,7 +2863,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G114 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G115 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" placeholder="Pega aquí el enlace a tu archivo (opcional)"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -2872,13 +2872,13 @@
           </label>
           <div id="g86-document-panel" class="hidden mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 space-y-2">
             <p id="g86-document-status" role="status" class="text-xs text-blue-900"></p>
-            <p class="text-[11px] text-blue-900">G114 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
+            <p class="text-[11px] text-blue-900">G115 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
             <details id="g112-source-details" class="hidden"><summary class="text-xs font-bold cursor-pointer">Ver fotografía original para revisar nombres</summary><img id="g112-source-preview" alt="Fotografía seleccionada para importar alumnos" style="max-height:420px;max-width:100%;object-fit:contain;margin-top:8px"></details><details id="g113-row-audit" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3"><summary class="font-bold text-xs cursor-pointer">Revisar renglones con su imagen</summary><p class="text-xs my-2">Confirma los números propuestos y corrige los nombres mirando cada renglón. Estas acciones solo preparan la lista; no guardan alumnos todavía.</p><label class="block text-xs my-2"><input id="g114-only-pending" type="checkbox" checked onchange="g113RenderEvidence()"> Mostrar solo filas pendientes</label><p id="g114-review-status" class="text-xs my-2" role="status"></p><div id="g113-row-audit-body" class="space-y-3 max-h-[480px] overflow-y-auto"></div></details><textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
             <button type="button" class="rounded-xl bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="g86AnalyzeRosterDocument()">Revisar alumnos detectados</button>
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G114 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
+        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G115 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
         <button type="button" class="mb-3 rounded-xl border border-teal-700 px-3 py-2 text-xs font-bold" onclick="g110Preset1D()">Preparar Secundaria 25 · 1.º D · 26 alumnos</button><p id="g110-save-status" role="status" class="text-xs font-bold mb-3"></p><div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
-          <p class="font-bold text-teal-950">G114 · Importación verificada</p>
+          <p class="font-bold text-teal-950">G115 · Importación verificada</p>
           <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
           <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
           <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
@@ -4249,7 +4249,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       showToast('Nombre marcado como revisado contra la lista original.');
     }
 
-    // G114: no schema migration; preserve IDs and all unrelated stores.
+    // G115: no schema migration; preserve IDs and all unrelated stores.
     function g110Preset1D(){
       for(const [id,value] of Object.entries({'g76-default-school':'Secundaria #25','g87-default-grade':'1','g87-default-group':'D','g76-default-shift':'Matutino','g105-expected-count':'26'}))document.getElementById(id).value=value;
       if(g76RosterRows.length)g103ApplyGroupToAll();
@@ -4337,10 +4337,10 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         }
         await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();
         if(differences.length)throw Error('La lectura posterior detectó diferencias: '+differences.join('; '));
-        const message='G114 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
+        const message='G115 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
         status.textContent=message;showToast(message);window.alert(message);
       }catch(error){
-        console.error('G114 importación',error);
+        console.error('G115 importación',error);
         status.textContent=(committed?'La lista se guardó, pero no se pudo completar la verificación. Revisa antes de reintentar. ':'No se guardó ningún cambio de esta importación. ')+(error.message||error);
         window.alert(status.textContent);
       }finally{g110ImportBusy=false;g76BuildRosterPreview();}
@@ -4603,12 +4603,12 @@ async function handleCreateSchool(e) {
       return parsed.rows.length*12+parsed.rows.reduce((sum,r)=>sum+g93NameScore(r[1]),0)*.1;
     }
 
-    // G114: straighten photographed grids, erase horizontal rules, read isolated lines.
+    // G115: straighten photographed grids, erase horizontal rules, read isolated lines.
     // Numbers must be recognized from the image; row position never creates a number.
-    // G114: each table rule has its own angle; a single deskew angle cannot
+    // G115: each table rule has its own angle; a single deskew angle cannot
     // straighten a photographed page with perspective distortion.
 
-    // G114: recognize the ink occupied by a name, not the blank table columns.
+    // G115: recognize the ink occupied by a name, not the blank table columns.
     // If separated ink is excluded, human review is mandatory.
     function g114CropNameInk(source){
       const w=source.width,h=source.height,ctx=source.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,w,h).data;
@@ -4884,7 +4884,7 @@ async function handleCreateSchool(e) {
         for(const n of merged.inferred)g112InferredNumbers.add(n);
         for(const [n,reason] of merged.review)g113ReviewNumbers.set(n,reason);
         g113RowEvidence.push(...merged.evidence);
-        return {...merged,confidence:results[0]?.confidence||0,psm:'G114 columnas y revisión visual'};
+        return {...merged,confidence:results[0]?.confidence||0,psm:'G115 columnas y revisión visual'};
       }finally{
         await worker?.terminate();
         slices.slice(1).forEach(c=>{c.width=c.height=0;});
@@ -4984,7 +4984,7 @@ async function handleCreateSchool(e) {
         if(!Number.isInteger(number)||number<1||number>250){rejected.push(original);continue;}
         const candidate=g93CleanName(m[2].replace(/^[\s\]\[|:;.,_\-]+/g,''));
         if(!candidate||candidate.length<3||noise.test(candidate)){rejected.push(original);continue;}
-        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G114: conservar ambas filas para corregirlas.
+        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G115: conservar ambas filas para corregirlas.
         seen.add(number);rows.push([number,candidate]);
       }
       rows.sort((a,b)=>a[0]-b[0]);
@@ -7453,6 +7453,7 @@ function renderStudentManageList() {
 
     // G3.2: Borrador de calificaciones. No escribe en IndexedDB en cada tecla.
     let tempGradebookState = new Map();
+    const g115GradeErrors=new Map();
     let gradebookDirty = false;
     let gradebookRenderContext = { groupId: null, trimester: null };
     let lastQuickPasteRows = [];
@@ -7500,13 +7501,12 @@ function renderStudentManageList() {
       const draft = getDraftOrStoredResult(activity, studentId);
 
       if (field === 'grade') {
-        if (rawValue === '' || rawValue === null || rawValue === undefined) {
+        if (rawValue === '' || rawValue === null || rawValue === undefined || String(rawValue).trim()==='') {
           draft.grade = null;
         } else {
           const n = Number(rawValue);
-          if (!Number.isFinite(n) || n < 0 || n > Number(activity.max_grade || 10)) {
-            showToast(`Calificación inválida. Use 0 a ${activity.max_grade || 10}.`);
-            renderGradebook();
+          if (!Number.isFinite(n) || n < 0 || n > g115MaxGrade(activity)) {
+            g115RememberGradeError(activityId,studentId,rawValue,'Usa una calificación de 0 a '+g115MaxGrade(activity)+'.');
             return;
           }
           draft.grade = n;
@@ -7516,17 +7516,68 @@ function renderStudentManageList() {
       } else if (field === 'observation') {
         draft.observation = rawValue || '';
       }
+      if(field==='grade')g115GradeErrors.delete(key);
       tempGradebookState.set(key, draft);
       setGradebookDirty(true);
       refreshDraftAveragesOnly();
     }
 
-    function refreshDraftAveragesOnly() {
-      // Re-render uses only memory and is safe; no IndexedDB writes.
-      renderGradebook(true);
+
+    function g115MaxGrade(activity){const n=Number(activity?.max_grade??10);return Number.isFinite(n)&&n>=0?n:10;}
+    function g115RememberGradeError(activityId,studentId,raw,message){
+      const key=gradeResultKey(activityId,studentId),previous=g115GradeErrors.get(key);
+      g115GradeErrors.set(key,{activityId,studentId,raw:String(raw??''),message});
+      setGradebookDirty(true);g115RefreshGradeVisuals();
+      if(!previous)showToast(message);
+    }
+    function g115FocusInvalidGrade(){
+      const error=g115GradeErrors.values().next().value;if(!error)return;
+      const input=[...document.querySelectorAll('#gradebook-tbody [data-grade-input]')].find(el=>el.dataset.activityId===error.activityId&&el.dataset.studentId===error.studentId);
+      if(input){input.focus();input.reportValidity();}
+      showToast('Corrige la calificación inválida antes de guardar.');
+    }
+    function g115RefreshGradeVisuals(){
+      // Never replace the edited input, row or table during input/change/blur.
+      const groupId=document.getElementById('gradebook-group-select')?.value||activeGroupId;
+      const trimester=document.getElementById('gradebook-trimester-select')?.value||'T1';
+      const labels={AT:'A tiempo',TA:'Tardía',JU:'Justificada',SE:'Sin entregar','':'Sin estado'};
+      const colors={AT:'text-emerald-700',TA:'text-amber-700',JU:'text-blue-700',SE:'text-red-700','':'text-slate-500'};
+      const base='min-w-[42px] px-2.5 py-1.5 rounded-lg text-[11px] font-bold border-2 transition focus:outline-none focus:ring-2 focus:ring-offset-1 ';
+      for(const row of document.querySelectorAll('#gradebook-tbody tr[data-student-id]')){
+        const studentId=row.dataset.studentId,cells=[...row.querySelectorAll('td[data-activity-id]')];
+        for(const cell of cells){
+          const activity=(localData.activities||[]).find(a=>a.activity_id===cell.dataset.activityId);if(!activity)continue;
+          const draft=getDraftOrStoredResult(activity,studentId),status=draft.delivery_status??'';
+          const input=cell.querySelector('[data-grade-input]'),error=g115GradeErrors.get(gradeResultKey(activity.activity_id,studentId));
+          if(input){input.setCustomValidity(error?.message||'');input.setAttribute('aria-invalid',error?'true':'false');input.style.borderColor=error?'#dc2626':'';}
+          const warning=cell.querySelector('[data-grade-error]');
+          if(warning){warning.textContent=error?.message||'';warning.classList.toggle('hidden',!error);}
+          for(const button of cell.querySelectorAll('button[data-delivery-status]')){
+            const selected=button.dataset.deliveryStatus===status;
+            button.setAttribute('aria-pressed',selected?'true':'false');
+            button.className=base+(selected?button.dataset.classOn:button.dataset.classOff);
+            button.textContent=(selected?'✓ ':'')+(button.dataset.deliveryStatus||'—');
+          }
+          const label=cell.querySelector('[data-delivery-label]');
+          if(label){label.textContent=labels[status]||'Sin estado';label.className='text-[10px] font-semibold '+(colors[status]||colors['']);}
+        }
+        let average='—';
+        if(cells.length===1){
+          const a=localData.activities.find(a=>a.activity_id===cells[0].dataset.activityId),draft=a&&getDraftOrStoredResult(a,studentId);
+          if(draft?.grade!==null&&draft?.grade!==undefined&&draft?.grade!==''&&Number.isFinite(Number(draft.grade)))average=((Number(draft.grade)/(Number(a.max_grade??10)||10))*10).toFixed(1);
+        }
+        if(average==='—'){
+          const ev=getStudentTrimesterEvaluation(studentId,groupId,trimester,true);
+          if(ev?.average!==null&&ev?.average!==undefined&&Number.isFinite(Number(ev.average)))average=Number(ev.average).toFixed(1);
+        }
+        const cell=row.querySelector('[data-draft-average]');if(cell)cell.textContent=average;
+      }
     }
 
+    function refreshDraftAveragesOnly(){g115RefreshGradeVisuals();}
+
     async function saveGradebookChanges() {
+      if(g115GradeErrors.size){g115FocusInvalidGrade();return false;}
       if (!gradebookDirty || tempGradebookState.size === 0) return;
 
       const btn=document.getElementById('gradebook-save-btn');
@@ -7559,7 +7610,7 @@ function renderStudentManageList() {
 
           const delivery=(draft.delivery_status===null || draft.delivery_status===undefined || draft.delivery_status==='') ? null : draft.delivery_status;
           const grade=(draft.grade===null || draft.grade===undefined || draft.grade==='') ? null : Number(draft.grade);
-          if(grade!==null && (!Number.isFinite(grade) || grade<0 || grade>Number(activity.max_grade||10))){
+          if(grade!==null && (!Number.isFinite(grade) || grade<0 || grade>g115MaxGrade(activity))){
             const e=new Error(`Calificación fuera de rango para ${student.full_name}`);
             e.name='ValidationError';
             throw e;
@@ -7634,7 +7685,7 @@ function renderStudentManageList() {
           throw e;
         }
 
-        tempGradebookState.clear();
+        tempGradebookState.clear();g115GradeErrors.clear();
         setGradebookDirty(false);
         if(typeof g58RefreshDirtyState==='function') g58RefreshDirtyState();
 
@@ -7670,6 +7721,7 @@ function renderStudentManageList() {
         if (save) {
           const desired = element.value;
           saveGradebookChanges().then(() => {
+            if(gradebookDirty){element.value=previous||element.value;return;}
             if (kind === 'group') activeGroupId = desired;
             renderGradebook();
           });
@@ -9323,13 +9375,14 @@ function renderStudentManageList() {
       if(typeof g58RefreshDirtyState==='function') g58RefreshDirtyState();
     }
 
-    function g59SetGrade(activityId, studentId, raw){
+    function g59SetGrade(activityId, studentId, raw, input){
+      if(input?.validity.badInput){g115RememberGradeError(activityId,studentId,raw,'Escribe un número válido.');return;}
       updateTempGradeResult(activityId,studentId,'grade',raw);
       if(typeof g58RefreshDirtyState==='function') g58RefreshDirtyState();
     }
 
     function g59CommitGradeVisual(){
-      g57RerenderMatrix();
+      refreshDraftAveragesOnly();
       if(typeof g58RefreshDirtyState==='function') g58RefreshDirtyState();
     }
 
@@ -9412,30 +9465,30 @@ function renderStudentManageList() {
       tbody.innerHTML=students.map((s,idx)=>{
         const cols=activities.map(a=>{
           const draft=getDraftOrStoredResult(a,s.student_id);
-          const grade=(draft.grade!==null && draft.grade!==undefined && draft.grade!=='') ? draft.grade : '';
+          const grade=g115GradeErrors.get(gradeResultKey(a.activity_id,s.student_id))?.raw??((draft.grade!==null && draft.grade!==undefined && draft.grade!=='') ? draft.grade : '');
           const status=draft.delivery_status??'';
           const max=a.max_grade??10;
 
-          return `<td class="py-3 px-2 text-center align-middle">
+          return `<td data-activity-id="${escapeHTML(a.activity_id)}" class="py-3 px-2 text-center align-middle">
             <div class="flex flex-col items-center gap-2">
               <div class="flex items-center gap-1">
-                <input type="number" inputmode="decimal" step="0.1" min="0" max="${max}" value="${grade}" placeholder="—"
+                <input data-grade-input data-activity-id="${escapeHTML(a.activity_id)}" data-student-id="${escapeHTML(s.student_id)}" type="number" inputmode="decimal" step="0.1" min="0" max="${max}" value="${escapeHTML(String(grade))}" placeholder="—"
                   aria-label="Calificación de ${escapeHTML(s.full_name||'alumno')} en ${escapeHTML(a.activity_code||'actividad')}"
                   class="w-20 h-10 text-center border-2 border-[#c7d3c8] rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-300"
                   onfocus="this.select()"
-                  oninput="g59SetGrade('${a.activity_id}','${s.student_id}',this.value)" onchange="g59CommitGradeVisual()" onblur="g59CommitGradeVisual()">
+                  oninput="g59SetGrade('${a.activity_id}','${s.student_id}',this.value,this)" onchange="g59CommitGradeVisual()" onblur="g59CommitGradeVisual()">
                 <span class="text-[10px] text-[#66767a]">/ ${escapeHTML(String(max))}</span>
               </div>
-              <div class="flex flex-wrap justify-center gap-1.5" role="group" aria-label="Estado de entrega">
+              <span data-grade-error role="alert" class="hidden text-xs text-red-700"></span><div class="flex flex-wrap justify-center gap-1.5" role="group" aria-label="Estado de entrega">
                 ${['AT','TA','JU','SE',''].map(v=>`
                   <button type="button"
                     class="min-w-[42px] px-2.5 py-1.5 rounded-lg text-[11px] font-bold border-2 transition focus:outline-none focus:ring-2 focus:ring-offset-1 ${buttonClass(status,v)}"
-                    aria-pressed="${status===v?'true':'false'}"
+                    aria-pressed="${status===v?'true':'false'}" data-delivery-status="${v}" data-class-on="${escapeHTML(buttonClass(v,v))}" data-class-off="${escapeHTML(buttonClass('__none__',v))}"
                     title="${labelMap[v]}"
                     onclick="g59SetStatus('${a.activity_id}','${s.student_id}','${v}')">${status===v?'✓ ':''}${v||'—'}</button>
                 `).join('')}
               </div>
-              <div class="text-[10px] font-semibold ${status==='AT'?'text-emerald-700':status==='TA'?'text-amber-700':status==='JU'?'text-blue-700':status==='SE'?'text-red-700':'text-slate-500'}">
+              <div data-delivery-label class="text-[10px] font-semibold ${status==='AT'?'text-emerald-700':status==='TA'?'text-amber-700':status==='JU'?'text-blue-700':status==='SE'?'text-red-700':'text-slate-500'}">
                 ${escapeHTML(labelMap[status]||'Sin estado')}
               </div>
             </div>
@@ -9459,11 +9512,11 @@ function renderStudentManageList() {
           }
         }catch(e){}
 
-        return `<tr class="border-b hover:bg-slate-50">
+        return `<tr data-student-id="${escapeHTML(s.student_id)}" class="border-b hover:bg-slate-50">
           <td class="py-3 px-2 text-xs text-gray-400 font-bold sticky left-0 bg-white z-[5]">${escapeHTML(String(s.student_number||idx+1))}</td>
           <td class="py-3 px-2 font-bold text-sm text-[#172226] sticky left-10 bg-white z-[5] min-w-[250px]">${escapeHTML(s.full_name||'Alumno')}</td>
           ${cols}
-          <td class="py-3 px-2 text-center font-bold text-emerald-700 text-sm">${avg}</td>
+          <td data-draft-average class="py-3 px-2 text-center font-bold text-emerald-700 text-sm">${avg}</td>
         </tr>`;
       }).join('');
 
@@ -9478,6 +9531,7 @@ function renderStudentManageList() {
         const a=allActivities.find(x=>x.activity_id===focusId);
         scope.textContent=a ? `Mostrando solo ${a.activity_code||'actividad'} para captura rápida` : 'Mostrando todas las actividades';
       }
+      g115RefreshGradeVisuals();
     }
 
     function g56SelectActivityForCapture(activityId){
