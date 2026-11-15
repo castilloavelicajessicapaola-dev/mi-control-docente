@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Control Docente G116 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G117 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -177,6 +177,8 @@
   .g74-theme-card.is-selected { outline:3px solid var(--brand); outline-offset:2px; }
 </style>
 
+<style id="g117-participation-styles">.g117-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}.g117-kpis>div{padding:16px;border:1px solid #d9e1da;background:var(--brand-soft,#e4f0e5);border-radius:14px}.g117-kpis small{display:block;line-height:1.4;color:#58696e}.g117-kpis strong{display:block;font-size:29px;margin-top:8px;color:var(--brand,#145b4b)}.g116-shell input[type=text],.g116-shell input[type=search],.g117-modal-box input[type=text]{background:white;border:1px solid #b6c7bc;border-radius:10px;padding:9px 12px;min-height:40px;font:inherit;color:#172226;max-width:100%}.g116-actions label{max-width:100%;min-width:0}.g117-totals-table td:not(:first-child){text-align:center}.g117-totals-table th:not(:first-child){text-align:center}.g117-voided{opacity:.65}.g117-voided strong{text-decoration:line-through}.g116-history li>div{min-width:0}.g116-history li p{font-size:11px;margin-top:5px;overflow-wrap:anywhere}.g116-history button{align-self:center;flex-shrink:0}.g116-team>.g116-btn{margin-bottom:12px;font-size:11px}#modal-g117-team-participation{position:fixed;inset:0;z-index:150;background:#14221bbb;align-items:center;justify-content:center;padding:16px}.g117-modal-box{background:white;color:#172226;border-radius:22px;padding:24px;width:min(680px,100%);max-height:90vh;overflow:auto;box-shadow:0 24px 80px #0004}.g117-modal-box h3{font-size:23px;margin:0}.g117-member-list{display:grid;gap:12px;margin:16px 0;padding:12px;border:1px solid #d9e1da;border-radius:12px;max-height:300px;overflow:auto}.g117-member-list label{display:flex;gap:9px;align-items:center;font-size:13px}.g117-note-label{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:650}.g117-modal-box button:focus-visible,.g117-modal-box input:focus-visible{outline:3px solid #69c4b0;outline-offset:3px}#g117-team-error{margin-top:12px;padding:8px}#g117-team-error:empty{display:none}@media(max-width:680px){.g117-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.g117-modal-box{padding:18px}.g117-totals-table{min-width:600px}}
+</style>
 <style id="g116-classroom-styles">
 .g116-shell{color:#172226;max-width:1280px;margin:auto;font-size:14px}.g116-shell *{box-sizing:border-box}.g116-heading{display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}.g116-heading h2{font-size:32px;margin:4px 0}.g116-shell h3{font-size:23px;margin:3px 0 12px}.g116-shell h4{font-weight:750;font-size:16px;margin:0 0 12px}.g116-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand,#145b4b);font-weight:800}.g116-card{background:white;border:1px solid #d9e1da;border-radius:22px;padding:22px;margin:0 0 18px}.g116-context,.g116-actions{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.g116-context{justify-content:space-between}.g116-actions{margin:12px 0}.g116-shell label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:650}.g116-shell select,.g116-shell input[type=date],.g116-shell input[type=number]{background:white;border:1px solid #b6c7bc;border-radius:10px;padding:9px 12px;min-height:40px;font:inherit;max-width:100%;color:#172226}.g116-shell input[type=number]{max-width:100px}.g116-inline,.g116-person{flex-direction:row!important;align-items:center;gap:8px!important}.g116-btn{border-radius:11px;border:1px solid var(--brand,#145b4b);background:var(--brand,#145b4b);color:white;font-size:12px;font-weight:750;padding:10px 14px;cursor:pointer;min-height:40px}.g116-btn.secondary{background:white;color:var(--brand,#145b4b)}.g116-shell button:disabled,.g116-shell select:disabled{opacity:.45;cursor:default}.g116-shell button:focus-visible,.g116-shell select:focus-visible,.g116-shell input:focus-visible{outline:3px solid #69c4b0;outline-offset:3px}.g116-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.g116-picked{font-size:28px;font-weight:800;color:var(--brand,#145b4b);border-radius:15px;padding:24px 16px;background:var(--brand-soft,#e4f0e5);min-height:140px;display:flex;align-items:center;justify-content:center;text-align:center;overflow-wrap:anywhere}.g116-clock{font-variant-numeric:tabular-nums;font-size:64px;font-weight:800;line-height:1.2;color:var(--brand,#145b4b);text-align:center;padding:10px}.g116-clock.g116-finished{color:#a12c2c}.g116-notice{background:var(--brand-soft,#e4f0e5);padding:12px 16px;border-radius:12px;font-size:12px;margin-bottom:16px}.g116-error{color:#a12c2c!important;background:#fff0ef!important}.g116-muted{font-size:12px;line-height:1.6;color:#58696e;margin:6px 0 12px}.g116-badge{display:inline-block;margin-left:10px;padding:4px 8px;border-radius:9px;background:var(--brand-soft,#e4f0e5);font-size:11px}.g116-roster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px;max-height:280px;overflow:auto}.g116-shell details>summary{font-weight:750;cursor:pointer}.g116-teams{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.g116-team{border:1px solid #d9e1da;background:#f7faf7;border-radius:15px;padding:16px}.g116-team ul{list-style:none;padding:0;margin:0}.g116-team li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid #e0e9e3;font-size:12px;overflow-wrap:anywhere}.g116-team small{display:block;font-size:10px;color:#58696e;margin-top:4px}.g116-team select{max-width:100px;font-size:11px;padding:5px}.g116-table-wrap{overflow-x:auto}.g116-table{border-collapse:collapse;width:100%;text-align:left}.g116-table td,.g116-table th{padding:12px 10px;border-bottom:1px solid #e4ebe6}.g116-table th{font-size:12px;font-weight:650}.g116-statuses{display:flex;gap:7px;flex-wrap:wrap;min-width:380px}.g116-chip{border:1px solid #c7d3c8;border-radius:9px;background:#f2f5f2;padding:7px 9px;font-size:11px;min-height:36px;cursor:pointer}.g116-chip.g116-green{background:#e2f5e8;color:#155c36}.g116-chip.g116-amber{background:#fff5d6;color:#785719}.g116-chip.g116-red{background:#ffebea;color:#8b2927}.g116-chip[aria-pressed=true]{outline:2px solid currentColor;outline-offset:1px;font-weight:800}.g116-history{list-style:none;padding:0;max-height:310px;overflow:auto}.g116-history li{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid #e4ebe6;padding:10px 0}.g116-history small{font-size:11px;color:#58696e}.g116-projector .g116-no-project{display:none!important}.g116-projector .g116-picked{font-size:38px;min-height:180px}.g116-projector .g116-clock{font-size:84px}.g116-projector .g116-team li{font-size:16px}.g116-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 @media(max-width:800px){.g116-grid{grid-template-columns:1fr}.g116-roster,.g116-teams{grid-template-columns:repeat(2,minmax(0,1fr))}.g116-card{padding:16px}.g116-context label:first-child{width:100%}.g116-picked{font-size:24px}}
@@ -306,7 +308,7 @@
         <!-- VIEW 1: HOY -->
         <section id="interactive-classroom-view" class="view">
   <div id="g116-shell" class="g116-shell">
-    <div class="g116-heading"><div><p class="g116-eyebrow">G116 · Herramientas de clase</p><h2 class="serif">Aula interactiva</h2><p>Organiza la sesión, distribuye la participación y registra cómo cierra el aprendizaje.</p></div><button id="g116-projection" class="g116-btn secondary" type="button" aria-pressed="false" onclick="g116ToggleProjector()">Modo proyección</button></div>
+    <div class="g116-heading"><div><p class="g116-eyebrow">G117 · Herramientas de clase</p><h2 class="serif">Aula interactiva</h2><p>Organiza la sesión, distribuye la participación y registra cómo cierra el aprendizaje.</p></div><button id="g116-projection" class="g116-btn secondary" type="button" aria-pressed="false" onclick="g116ToggleProjector()">Modo proyección</button></div>
     <div class="g116-card g116-context">
       <label>Grupo<select id="g116-group" data-g116-write onchange="g116ContextChanged()"><option value="">Selecciona un grupo</option></select></label>
       <label>Fecha de la sesión<input id="g116-date" data-g116-write type="date" onchange="g116ContextChanged()"></label>
@@ -331,7 +333,16 @@
     </div>
     <article class="g116-card"><div class="g116-heading"><div><p class="g116-eyebrow">Trabajo colaborativo</p><h3 class="serif">Equipos y roles</h3><p class="g116-muted">Distribución aleatoria con tamaños equilibrados. Puedes mover integrantes entre equipos.</p></div><div class="g116-actions g116-no-project"><label>Organizar por<select id="g116-team-mode"><option value="size">Alumnos por equipo</option><option value="count">Número de equipos</option></select></label><label>Cantidad<input id="g116-team-amount" type="number" min="1" max="100" value="4"></label><button data-g116-write type="button" class="g116-btn" onclick="g116GenerateTeams()">Generar y guardar</button></div></div><div id="g116-teams" class="g116-teams"></div></article>
     <article class="g116-card g116-no-project"><p class="g116-eyebrow">Cierre formativo</p><h3 class="serif">Semáforo de comprensión</h3><p class="g116-muted">Registra la respuesta del alumno al finalizar la sesión. Es una evidencia de seguimiento y no una calificación automática.</p><p id="g116-exit-summary" class="g116-notice"></p><div class="g116-table-wrap"><table class="g116-table"><thead><tr><th>Alumno</th><th>Respuesta del cierre</th></tr></thead><tbody id="g116-exit-rows"></tbody></table></div></article>
-    <article class="g116-card g116-no-project"><p class="g116-eyebrow">Historial de la fecha</p><h3 class="serif">Participaciones</h3><p id="g116-history-summary" class="g116-muted"></p><ul id="g116-history" class="g116-history"></ul><p class="g116-muted">Se muestran los 30 turnos más recientes. La exportación CSV resume todos los turnos guardados para esta fecha.</p></article>
+    <article id="g117-participation-panel" class="g116-card g116-no-project">
+  <div class="g116-heading"><div><p class="g116-eyebrow">G117 · Participación individual y en equipo</p><h3 class="serif">Participaciones guardadas</h3><p id="g117-save-caption" class="g116-muted" role="status"></p></div><div class="g116-actions"><button type="button" class="g116-btn secondary" onclick="g117ExportTotals()">Descargar resumen CSV</button><button type="button" class="g116-btn secondary" onclick="g117ExportHistory()">Descargar historial CSV</button></div></div>
+  <div class="g117-kpis"><div><small>Individuales</small><strong id="g117-total-individual">0</strong></div><div><small>En equipo, por integrante</small><strong id="g117-total-team">0</strong></div><div><small>Total de participaciones</small><strong id="g117-total-all">0</strong></div><div><small>Intervenciones de equipos</small><strong id="g117-total-interventions">0</strong></div></div>
+  <div class="g116-actions"><label>Alumno<select id="g117-manual-student"></select></label><label>Motivo o actividad (opcional)<input type="text" id="g117-manual-note" maxlength="240" placeholder="Respuesta, exposición, apoyo al equipo…"></label><button type="button" data-g116-write class="g116-btn" onclick="g117RegisterIndividual()">+ Participación individual</button></div>
+  <p class="g116-muted">Puedes registrar una participación sin utilizar el selector. En los equipos, pulsa «Registrar participación» y confirma los integrantes. Cada registro suma una participación; no asigna calificaciones.</p>
+  <div class="g116-actions"><label>Resumen<select id="g117-scope" onchange="g117RenderParticipation()"><option value="day">Fecha seleccionada</option><option value="all">Todas las fechas del grupo</option></select></label><label>Buscar alumno<input type="search" id="g117-search" placeholder="Nombre o número" oninput="g117RenderParticipation()"></label></div>
+  <div class="g116-table-wrap"><table class="g116-table g117-totals-table"><thead><tr><th>Alumno</th><th>Individual</th><th>En equipo</th><th>Total</th><th>Turnos pasados</th></tr></thead><tbody id="g117-totals"></tbody></table></div>
+</article>
+
+<article class="g116-card g116-no-project"><p class="g116-eyebrow">Historial de la fecha</p><h3 class="serif">Participaciones</h3><p id="g116-history-summary" class="g116-muted"></p><ul id="g116-history" class="g116-history"></ul><p class="g116-muted">Se muestran los 30 turnos más recientes. La exportación CSV resume todos los turnos guardados para esta fecha.</p></article>
     <p class="g116-muted">En modo proyección se ocultan participantes, respuestas de comprensión e historial individual. Los equipos, las participaciones y los cierres quedan asociados al grupo; las participaciones y respuestas también a su fecha. Se incluyen en el respaldo general de la aplicación.</p>
   </div>
 </section>
@@ -2903,7 +2914,7 @@
   <!-- G81: IMPORTAR GRUPOS Y ALUMNOS -->
   <div id="modal-g76-roster-import" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-5xl w-full shadow-xl max-h-[94vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G116 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
+      <div class="p-5 border-b flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.15em] font-bold text-[#145b4b]">G117 · Importación académica</p><h3 class="serif text-2xl font-bold">Importar grupos y alumnos</h3><p class="text-xs text-[#66767a] mt-1">Excel, CSV/TSV, fotografías o PDF. Revisa y corrige los alumnos antes de importar.</p></div><button type="button" class="rounded-xl border px-3 py-2 font-bold" onclick="closeModal('modal-g76-roster-import')">✕</button></div>
       <div class="p-5 overflow-y-auto space-y-5">
         <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4"><label class="text-xs font-bold text-blue-900">Archivo origen OneDrive / Excel</label><div class="flex flex-col md:flex-row gap-2 mt-2"><input id="g76-source-url" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-xs" placeholder="Pega aquí el enlace a tu archivo (opcional)"><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76OpenSourceWorkbook()">Abrir archivo</button><button type="button" class="rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold" onclick="g76SaveSourceUrl()">Guardar enlace</button></div><p class="text-[10px] text-blue-800 mt-2">Ese enlace puede requerir tu sesión de Microsoft. Para importar, descarga el Excel o copia las filas y pégalas aquí.</p></div>
         <div class="grid lg:grid-cols-2 gap-4"><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">1. Seleccionar archivo</h4><input id="g76-roster-file" type="file" accept=".xlsx,.xls,.csv,.tsv" class="mt-3 block w-full text-xs" onchange="g76ReadRosterFile(event)"><p id="g76-file-status" class="text-[11px] text-[#66767a] mt-2">Excel .xlsx/.xls, CSV y TSV.</p>
@@ -2912,13 +2923,13 @@
           </label>
           <div id="g86-document-panel" class="hidden mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 space-y-2">
             <p id="g86-document-status" role="status" class="text-xs text-blue-900"></p>
-            <p class="text-[11px] text-blue-900">G116 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
+            <p class="text-[11px] text-blue-900">G117 endereza la tabla y lee cada renglón por separado. Revisa y corrige los nombres. Las imágenes y PDF escaneados requieren OCR y conexión para cargar sus bibliotecas. No se importará nada sin tu confirmación.</p>
             <details id="g112-source-details" class="hidden"><summary class="text-xs font-bold cursor-pointer">Ver fotografía original para revisar nombres</summary><img id="g112-source-preview" alt="Fotografía seleccionada para importar alumnos" style="max-height:420px;max-width:100%;object-fit:contain;margin-top:8px"></details><details id="g113-row-audit" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-3"><summary class="font-bold text-xs cursor-pointer">Revisar renglones con su imagen</summary><p class="text-xs my-2">Confirma los números propuestos y corrige los nombres mirando cada renglón. Estas acciones solo preparan la lista; no guardan alumnos todavía.</p><label class="block text-xs my-2"><input id="g114-only-pending" type="checkbox" checked onchange="g113RenderEvidence()"> Mostrar solo filas pendientes</label><p id="g114-review-status" class="text-xs my-2" role="status"></p><div id="g113-row-audit-body" class="space-y-3 max-h-[480px] overflow-y-auto"></div></details><textarea id="g86-document-text" rows="8" class="w-full rounded-xl border p-2 text-xs font-mono" placeholder="1 NOMBRE APELLIDOS&#10;2 NOMBRE APELLIDOS"></textarea>
             <button type="button" class="rounded-xl bg-[#145b4b] text-white px-3 py-2 text-xs font-bold" onclick="g86AnalyzeRosterDocument()">Revisar alumnos detectados</button>
           </div><div id="g76-sheet-wrap" class="hidden mt-3"><label class="text-xs font-bold">Hoja</label><select id="g76-sheet-select" class="w-full mt-1 rounded-xl border px-3 py-2 text-sm" onchange="g76UseSelectedSheet()"></select></div></div><div class="rounded-2xl border p-4"><h4 class="font-bold text-sm">2. O pegar desde Excel</h4><textarea id="g76-paste-data" rows="5" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Copia filas y columnas desde Excel..."></textarea><button type="button" class="mt-2 rounded-xl border border-[#145b4b] text-[#145b4b] px-3 py-2 text-xs font-bold" onclick="g76ParsePastedRoster()">Analizar datos pegados</button></div></div>
-        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G116 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
+        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs"><label class="font-bold" for="g105-expected-count">G117 · Cantidad esperada de alumnos (opcional)</label><input id="g105-expected-count" type="number" min="1" max="250" placeholder="Ej. 26" class="ml-2 w-24 rounded-lg border p-2" onchange="g105UpdateExpectedCount()"><p id="g105-count-warning" class="mt-1 text-amber-900">Indica cuántos alumnos debe contener la lista para detectar lecturas incompletas.</p></div>
         <button type="button" class="mb-3 rounded-xl border border-teal-700 px-3 py-2 text-xs font-bold" onclick="g110Preset1D()">Preparar Secundaria 25 · 1.º D · 26 alumnos</button><p id="g110-save-status" role="status" class="text-xs font-bold mb-3"></p><div id="g106-repair-tools" class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
-          <p class="font-bold text-teal-950">G116 · Importación verificada</p>
+          <p class="font-bold text-teal-950">G117 · Importación verificada</p>
           <p>Si el OCR omitió un renglón, agrega únicamente el nombre que puedas verificar en la lista original. Se conserva el texto detectado.</p>
           <div class="flex flex-wrap gap-2 items-center"><input id="g106-missing-number" type="number" min="1" max="250" placeholder="Número" aria-label="Número faltante" class="w-24 rounded-lg border p-2"><input id="g106-missing-name" type="text" placeholder="Nombre completo verificado" aria-label="Nombre completo del alumno faltante" class="flex-1 min-w-[220px] rounded-lg border p-2"><button type="button" class="rounded-lg bg-[#145b4b] text-white font-bold px-3 py-2" onclick="g106AddVerifiedStudent()">Agregar alumno verificado</button></div>
           <p id="g106-repair-status" class="font-semibold text-teal-950" role="status">Los nombres no se completan automáticamente.</p>
@@ -4290,7 +4301,7 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
       showToast('Nombre marcado como revisado contra la lista original.');
     }
 
-    // G116: no schema migration; preserve IDs and all unrelated stores.
+    // G117: no schema migration; preserve IDs and all unrelated stores.
     function g110Preset1D(){
       for(const [id,value] of Object.entries({'g76-default-school':'Secundaria #25','g87-default-grade':'1','g87-default-group':'D','g76-default-shift':'Matutino','g105-expected-count':'26'}))document.getElementById(id).value=value;
       if(g76RosterRows.length)g103ApplyGroupToAll();
@@ -4378,10 +4389,10 @@ function g76NormalizeHeader(v){return String(v??'').trim().toLocaleLowerCase('es
         }
         await refreshLocalCache();renderGroups();populateSchoolDropdowns();populateGroupDropdowns();
         if(differences.length)throw Error('La lectura posterior detectó diferencias: '+differences.join('; '));
-        const message='G116 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
+        const message='G117 · Guardado verificado en IndexedDB: '+ready.length+'/'+ready.length+' alumnos, '+(ready.length-plan.existingCount)+' nuevos y '+plan.updated+' números actualizados. Sin duplicados en los registros importados.';
         status.textContent=message;showToast(message);window.alert(message);
       }catch(error){
-        console.error('G116 importación',error);
+        console.error('G117 importación',error);
         status.textContent=(committed?'La lista se guardó, pero no se pudo completar la verificación. Revisa antes de reintentar. ':'No se guardó ningún cambio de esta importación. ')+(error.message||error);
         window.alert(status.textContent);
       }finally{g110ImportBusy=false;g76BuildRosterPreview();}
@@ -4644,12 +4655,12 @@ async function handleCreateSchool(e) {
       return parsed.rows.length*12+parsed.rows.reduce((sum,r)=>sum+g93NameScore(r[1]),0)*.1;
     }
 
-    // G116: straighten photographed grids, erase horizontal rules, read isolated lines.
+    // G117: straighten photographed grids, erase horizontal rules, read isolated lines.
     // Numbers must be recognized from the image; row position never creates a number.
-    // G116: each table rule has its own angle; a single deskew angle cannot
+    // G117: each table rule has its own angle; a single deskew angle cannot
     // straighten a photographed page with perspective distortion.
 
-    // G116: recognize the ink occupied by a name, not the blank table columns.
+    // G117: recognize the ink occupied by a name, not the blank table columns.
     // If separated ink is excluded, human review is mandatory.
     function g114CropNameInk(source){
       const w=source.width,h=source.height,ctx=source.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,w,h).data;
@@ -4925,7 +4936,7 @@ async function handleCreateSchool(e) {
         for(const n of merged.inferred)g112InferredNumbers.add(n);
         for(const [n,reason] of merged.review)g113ReviewNumbers.set(n,reason);
         g113RowEvidence.push(...merged.evidence);
-        return {...merged,confidence:results[0]?.confidence||0,psm:'G116 columnas y revisión visual'};
+        return {...merged,confidence:results[0]?.confidence||0,psm:'G117 columnas y revisión visual'};
       }finally{
         await worker?.terminate();
         slices.slice(1).forEach(c=>{c.width=c.height=0;});
@@ -5025,7 +5036,7 @@ async function handleCreateSchool(e) {
         if(!Number.isInteger(number)||number<1||number>250){rejected.push(original);continue;}
         const candidate=g93CleanName(m[2].replace(/^[\s\]\[|:;.,_\-]+/g,''));
         if(!candidate||candidate.length<3||noise.test(candidate)){rejected.push(original);continue;}
-        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G116: conservar ambas filas para corregirlas.
+        if(seen.has(number))rejected.push('NÚMERO REPETIDO '+number+': '+original); // G117: conservar ambas filas para corregirlas.
         seen.add(number);rows.push([number,candidate]);
       }
       rows.sort((a,b)=>a[0]-b[0]);
@@ -16308,8 +16319,19 @@ window.addEventListener('beforeunload',function(e){
       </div>
     </div>
   </div>
+<div id="modal-g117-team-participation" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="g117-team-title">
+  <div class="g117-modal-box">
+    <div class="g116-heading"><h3 id="g117-team-title" class="serif">Participación del equipo</h3><button type="button" class="g116-btn secondary" aria-label="Cerrar registro de equipo" onclick="closeModal('modal-g117-team-participation')">Cerrar</button></div>
+    <p id="g117-team-context" class="g116-notice"></p><p id="g117-team-help" class="g116-muted"></p>
+    <div id="g117-team-members" class="g117-member-list"></div>
+    <label class="g117-note-label">Motivo o actividad (opcional)<input type="text" id="g117-team-note" maxlength="240" placeholder="Exposición, solución colaborativa, demostración…"></label>
+    <p id="g117-team-error" class="g116-error" role="alert"></p>
+    <div class="g116-actions"><button type="button" class="g116-btn secondary" onclick="closeModal('modal-g117-team-participation')">Cancelar</button><button id="g117-confirm-team" type="button" class="g116-btn" onclick="g117ConfirmTeam()">Guardar participación del equipo</button></div>
+  </div>
+</div>
+
 <script id="g116-classroom-module">
-/* G116 · Aula interactiva. New settings records only; academic stores are read-only. */
+/* G117 · Aula interactiva. New settings records only; academic stores are read-only. */
 let g116PreferredGroup='',g116Busy=false,g116Timer=null,g116Ticker=null,g116TimerFinishing=false;
 let g116WriteTail=Promise.resolve();
 const g116Roles=['Coordinación','Relatoría','Materiales','Tiempo'];
@@ -16359,7 +16381,7 @@ async function g116Action(operation){
   if(g116Busy)return;
   g116Busy=true;document.querySelectorAll('#interactive-classroom-view [data-g116-write]').forEach(e=>e.disabled=true);
   try{await operation();g116RenderOutputs();g116Notice('Guardado local verificado.');}
-  catch(e){console.error('G116',e);g116Notice(e.message||'No se pudo guardar la operación.',true);}
+  catch(e){console.error('G117',e);g116Notice(e.message||'No se pudo guardar la operación.',true);}
   finally{g116Busy=false;document.querySelectorAll('#interactive-classroom-view [data-g116-write]').forEach(e=>e.disabled=false);g116RenderPicker();}
 }
 async function g116OpenForGroup(groupId){g116PreferredGroup=groupId;showView('interactive-classroom');}
@@ -16378,11 +16400,11 @@ async function g116Open(){
 function g116RenderRoster(){
   const roster=g116Roster();
   g116El('roster').innerHTML=roster.map(s=>'<label class="g116-person"><input type="checkbox" checked value="'+escapeHTML(s.student_id)+'" onchange="g116UpdatePool()"> '+escapeHTML('#'+(s.student_number||'—')+' '+s.full_name)+'</label>').join('')||'<p>No hay alumnos activos en este grupo.</p>';
-  g116UpdatePool();
+  g116UpdatePool();g117PopulateStudents();
 }
 function g116ContextChanged(){if(!g116El('date').value)g116El('date').value=getLocalDateISO();g116RenderRoster();g116RenderOutputs();g116Notice('Información del grupo y la fecha seleccionados.');}
 function g116ToggleParticipants(checked){document.querySelectorAll('#g116-roster input').forEach(e=>e.checked=checked);g116UpdatePool();}
-function g116RenderOutputs(){g116RenderTeams();g116RenderPicker();g116RenderExit();g116RenderHistory();g116TimerTick();}
+function g116RenderOutputs(){g116RenderTeams();g116RenderPicker();g116RenderExit();g116RenderHistory();g117RenderParticipation();g116TimerTick();}
 async function g116GenerateTeams(){
   const {groupId}=g116Context(),ids=g116Pool(),mode=g116El('team-mode').value,amount=Number(g116El('team-amount').value);
   if(!groupId)return g116Notice('Selecciona un grupo.',true);
@@ -16393,7 +16415,7 @@ async function g116GenerateTeams(){
 function g116RenderTeams(){
   const {groupId}=g116Context(),saved=g116State(groupId).teams,body=g116El('teams');
   if(!saved){body.innerHTML='<p class="g116-muted">Genera equipos a partir de los participantes seleccionados. Los tamaños se equilibran por cantidad de integrantes.</p>';return;}
-  body.innerHTML=saved.items.map(team=>'<article class="g116-team"><h4>'+escapeHTML(team.name)+' <small>('+team.members.length+')</small></h4><ul>'+team.members.map((id,i)=>'<li><span>'+escapeHTML(g116StudentLabel(id,groupId))+'<small>'+g116Roles[i%g116Roles.length]+'</small></span><label class="g116-no-project"><span class="g116-sr">Mover '+escapeHTML(g116StudentLabel(id,groupId))+'</span><select data-g116-write data-student-id="'+escapeHTML(id)+'" onchange="g116MoveMember(this.dataset.studentId,this.value)">'+saved.items.map(t=>'<option value="'+escapeHTML(t.id)+'" '+(t.id===team.id?'selected':'')+'>'+escapeHTML(t.name)+'</option>').join('')+'</select></label></li>').join('')+'</ul></article>').join('');
+  body.innerHTML=saved.items.map(team=>'<article class="g116-team"><h4>'+escapeHTML(team.name)+' <small>('+team.members.length+')</small></h4><button type="button" data-g116-write data-team-id="'+escapeHTML(team.id)+'" class="g116-btn secondary g116-no-project" onclick="g117OpenTeamParticipation(this.dataset.teamId)">Registrar participación</button><ul>'+team.members.map((id,i)=>'<li><span>'+escapeHTML(g116StudentLabel(id,groupId))+'<small>'+g116Roles[i%g116Roles.length]+'</small></span><label class="g116-no-project"><span class="g116-sr">Mover '+escapeHTML(g116StudentLabel(id,groupId))+'</span><select data-g116-write data-student-id="'+escapeHTML(id)+'" onchange="g116MoveMember(this.dataset.studentId,this.value)">'+saved.items.map(t=>'<option value="'+escapeHTML(t.id)+'" '+(t.id===team.id?'selected':'')+'>'+escapeHTML(t.name)+'</option>').join('')+'</select></label></li>').join('')+'</ul></article>').join('');
   const available=new Set(g116Roster(groupId).map(s=>s.student_id));
   if(saved.participantIds.some(id=>!available.has(id)))body.insertAdjacentHTML('afterbegin','<p class="g116-error">La lista de alumnos cambió. Revisa los integrantes guardados antes de utilizar los equipos.</p>');
 }
@@ -16410,7 +16432,7 @@ async function g116Draw(){
     const state=old?.version===1?old:g116EmptyState(),session=g116Session(state,date),available=pool.filter(id=>!session.drawn.includes(id));
     if(!available.length)throw Error('Ronda completada. Inicia otra ronda para volver a seleccionar.');
     const id=available[Math.floor(Math.random()*available.length)];session.drawn.push(id);
-    const event={id:generateId('turn'),studentId:id,at:new Date().toISOString(),round:session.round,status:'selected'};
+    const event={id:generateId('turn'),studentId:id,at:new Date().toISOString(),round:session.round,status:'selected',source:'picker'};
     session.current=event.id;session.history.push(event);return state;
   }));
 }
@@ -16419,7 +16441,7 @@ async function g116MarkTurn(status){
   const {groupId,date}=g116Context(),current=g116State(groupId).sessions?.[date]?.current;
   return g116Action(()=>g116AtomicSetting(g116StateKey(groupId),state=>{
     const session=state?.sessions?.[date],turn=session?.history.find(e=>e.id===current);
-    if(!turn||turn.status!=='selected')throw Error('Selecciona un alumno o revisa el turno actual.');
+    if(!turn||turn.voidedAt||turn.status!=='selected')throw Error('Selecciona un alumno o revisa el turno actual.');
     turn.status=status;turn.reviewedAt=new Date().toISOString();return state;
   }));
 }
@@ -16429,7 +16451,7 @@ async function g116NewRound(){
   return g116Action(()=>g116AtomicSetting(g116StateKey(groupId),old=>{const state=old?.version===1?old:g116EmptyState(),session=g116Session(state,date);session.round++;session.drawn=[];session.current=null;return state;}));
 }
 function g116RenderPicker(){
-  const {groupId,date}=g116Context(),session=g116State(groupId).sessions?.[date],current=session?.history.find(e=>e.id===session.current),pool=g116Pool(),remaining=pool.filter(id=>!session?.drawn.includes(id));
+  const {groupId,date}=g116Context(),session=g116State(groupId).sessions?.[date],current=session?.history.find(e=>e.id===session.current&&!e.voidedAt),pool=g116Pool(),remaining=pool.filter(id=>!session?.drawn.includes(id));
   g116El('picked').textContent=current?g116StudentLabel(current.studentId,groupId):'¿Quién participa?';
   g116El('round-info').textContent='Ronda '+(session?.round||1)+' · '+remaining.length+' de '+pool.length+' participantes por seleccionar';
   g116El('turn-state').textContent=current?({selected:'Turno pendiente de registrar',participated:'Participación registrada',passed:'Turno pasado, sin penalización'}[current.status]||''):'';
@@ -16447,23 +16469,9 @@ function g116RenderExit(){
   g116El('exit-summary').textContent='Lo logré: '+counts.green+' · Practicar: '+counts.amber+' · Ayuda: '+counts.red+' · Sin registro: '+(roster.length-counts.green-counts.amber-counts.red);
   g116El('exit-rows').innerHTML=roster.map(s=>'<tr><th scope="row">'+escapeHTML(g116StudentLabel(s.student_id,groupId))+'</th><td><div class="g116-statuses">'+['green','amber','red',''].map(v=>'<button data-g116-write data-student-id="'+escapeHTML(s.student_id)+'" data-understanding="'+v+'" type="button" class="g116-chip '+(v?'g116-'+v:'')+'" aria-pressed="'+((values[s.student_id]||'')===v)+'" onclick="g116SetUnderstanding(this.dataset.studentId,this.dataset.understanding)">'+labels[v]+'</button>').join('')+'</div></td></tr>').join('')||'<tr><td>Selecciona un grupo con alumnos activos.</td></tr>';
 }
-function g116RenderHistory(){
-  const {groupId,date}=g116Context(),session=g116State(groupId).sessions?.[date],history=session?.history||[],labels={selected:'Seleccionado',participated:'Participó',passed:'Pasó turno'};
-  g116El('history-summary').textContent=history.filter(x=>x.status==='participated').length+' participaciones registradas · '+history.filter(x=>x.status==='passed').length+' turnos pasados';
-  g116El('history').innerHTML=history.slice(-30).reverse().map(x=>'<li><span>'+escapeHTML(g116StudentLabel(x.studentId,groupId))+'</span><small>Ronda '+x.round+' · '+labels[x.status]+' · '+new Date(x.at).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})+'</small></li>').join('')||'<li>No hay turnos registrados para esta fecha.</li>';
-}
+function g116RenderHistory(){g117RenderHistory();}
 function g116CsvCell(value){let s=String(value??'');if(/^[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
-function g116SessionCSV(groupId,date){
-  const state=g116State(groupId),session=state.sessions?.[date]||{},labels={green:'Lo logré',amber:'Necesito practicar',red:'Necesito ayuda'};
-  const historicalIds=new Set([...(session.history||[]).map(x=>x.studentId),...Object.keys(session.understanding||{})]);
-  const roster=[...g116Roster(groupId)];
-  for(const id of historicalIds)if(!roster.some(s=>s.student_id===id))roster.push(localData.students.find(s=>s.student_id===id)||{student_id:id,student_number:'',full_name:'Alumno no disponible: '+id});
-  const rows=[['Fecha','Escuela','Grupo','Número','Alumno','Selecciones','Participó','Pasó turno','Comprensión']];
-  const group=localData.groups.find(g=>g.group_id===groupId),groupName=group?group.grade+' '+group.group_name:groupId;
-  const school=localData.schools.find(s=>s.school_id===group?.school_id)?.school_name||'';
-  for(const s of roster){const events=(session.history||[]).filter(x=>x.studentId===s.student_id);rows.push([date,school,groupName,s.student_number,s.full_name,events.length,events.filter(x=>x.status==='participated').length,events.filter(x=>x.status==='passed').length,labels[session.understanding?.[s.student_id]]||'Sin registro']);}
-  return '\uFEFF'+rows.map(row=>row.map(g116CsvCell).join(',')).join('\r\n');
-}
+function g116SessionCSV(groupId,date){return g117CSV(groupId,[date]);}
 function g116ExportSession(){const {groupId,date}=g116Context();if(!groupId)return g116Notice('Selecciona un grupo.',true);const url=URL.createObjectURL(new Blob([g116SessionCSV(groupId,date)],{type:'text/csv;charset=utf-8;'})),a=document.createElement('a');a.href=url;a.download='Aula_'+date+'_'+groupId+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function g116ToggleProjector(){g116El('shell').classList.toggle('g116-projector');g116El('projection').setAttribute('aria-pressed',g116El('shell').classList.contains('g116-projector'));}
 function g116RefreshNames(){g116RenderOutputs();}
@@ -16527,6 +16535,151 @@ function g116TimerTick(now=Date.now()){
 }
 window.addEventListener('load',()=>{g116HydrateTimer().catch(()=>{});});
 
+
+/* G117 · Participation records, team snapshots and reversible corrections. */
+let g117TeamDraft=null,g117TeamSaving=false;
+function g117SessionReady(state,date){const session=g116Session(state,date);session.teamEvents=session.teamEvents||[];return session;}
+function g117EventSource(event){return event.source||'picker';}
+function g117Dates(state,scope,date){return scope==='all'?Object.keys(state.sessions||{}).sort():[date];}
+function g117Stats(state,dates){
+  const students=new Map();let teamInterventions=0;
+  for(const date of dates){const session=state.sessions?.[date];if(!session)continue;
+    teamInterventions+=(session.teamEvents||[]).filter(e=>!e.voidedAt).length;
+    for(const event of session.history||[]){
+      if(event.voidedAt)continue;
+      if(!students.has(event.studentId))students.set(event.studentId,{individual:0,team:0,total:0,draws:0,passed:0});
+      const row=students.get(event.studentId),source=g117EventSource(event);
+      if(source==='picker')row.draws++;
+      if(event.status==='passed')row.passed++;
+      if(event.status==='participated'){if(source==='team')row.team++;else row.individual++;row.total++;}
+    }
+  }
+  return {students,teamInterventions};
+}
+function g117ReportRoster(groupId,dates){
+  const state=g116State(groupId),roster=[...g116Roster(groupId)],ids=new Set();
+  for(const date of dates){const session=state.sessions?.[date];for(const event of session?.history||[])ids.add(event.studentId);for(const id of Object.keys(session?.understanding||{}))ids.add(id);}
+  for(const id of ids)if(!roster.some(s=>s.student_id===id))roster.push(localData.students.find(s=>s.student_id===id)||{student_id:id,student_number:'',full_name:'Alumno no disponible: '+id});
+  return roster.sort((a,b)=>(Number(a.student_number)||999)-(Number(b.student_number)||999)||String(a.full_name).localeCompare(String(b.full_name),'es-MX'));
+}
+function g117PopulateStudents(){
+  const select=document.getElementById('g117-manual-student');if(!select)return;const previous=select.value;
+  select.innerHTML=g116Roster().map(s=>'<option value="'+escapeHTML(s.student_id)+'">'+escapeHTML('#'+s.student_number+' '+s.full_name)+'</option>').join('')||'<option value="">Sin alumnos activos</option>';
+  if([...select.options].some(o=>o.value===previous))select.value=previous;
+}
+function g117RenderParticipation(){
+  const body=document.getElementById('g117-totals');if(!body)return;
+  const {groupId,date}=g116Context(),scope=document.getElementById('g117-scope')?.value||'day',state=g116State(groupId),dates=g117Dates(state,scope,date),stats=g117Stats(state,dates),query=(document.getElementById('g117-search')?.value||'').trim().toLocaleLowerCase('es');
+  const roster=g117ReportRoster(groupId,dates),filtered=roster.filter(s=>!query||(s.full_name+' '+s.student_number).toLocaleLowerCase('es').includes(query));
+  let individual=0,team=0;for(const row of stats.students.values()){individual+=row.individual;team+=row.team;}
+  document.getElementById('g117-total-individual').textContent=individual;
+  document.getElementById('g117-total-team').textContent=team;
+  document.getElementById('g117-total-all').textContent=individual+team;
+  document.getElementById('g117-total-interventions').textContent=stats.teamInterventions;
+  document.getElementById('g117-save-caption').textContent=scope==='all'?'Resumen de todas las fechas guardadas en este grupo.':'Resumen guardado para el '+formatDateForDisplay(date)+'.';
+  body.innerHTML=filtered.map(s=>{const row=stats.students.get(s.student_id)||{individual:0,team:0,total:0,draws:0,passed:0};return '<tr><th scope="row">'+escapeHTML('#'+(s.student_number||'—')+' '+s.full_name)+'</th><td>'+row.individual+'</td><td>'+row.team+'</td><td><strong>'+row.total+'</strong></td><td>'+row.passed+'</td></tr>';}).join('')||'<tr><td colspan="5">Sin alumnos que coincidan con la búsqueda.</td></tr>';
+}
+async function g117RegisterIndividual(){
+  const {groupId,date}=g116Context(),studentId=document.getElementById('g117-manual-student').value,note=document.getElementById('g117-manual-note').value.trim().slice(0,240),id=generateId('manual-turn');
+  if(!groupId||!studentId)return g116Notice('Selecciona un grupo y un alumno.',true);
+  let saved=false;
+  await g116Action(async()=>{
+    const students=await dbGetAll('students');if(!students.some(s=>s.student_id===studentId&&s.group_id===groupId&&(!s.status||s.status==='ACTIVE')))throw Error('El alumno ya no está activo en este grupo. Actualiza el aula.');
+    await g116AtomicSetting(g116StateKey(groupId),old=>{const state=old?.version===1?old:g116EmptyState(),session=g117SessionReady(state,date);session.history.push({id,studentId,at:new Date().toISOString(),status:'participated',source:'manual',note});return state;});saved=true;
+  });
+  if(saved)document.getElementById('g117-manual-note').value='';
+}
+function g117OpenTeamParticipation(teamId){
+  const {groupId,date}=g116Context(),distribution=g116State(groupId).teams,team=distribution?.items.find(t=>t.id===teamId);if(!team)return g116Notice('Genera los equipos primero.',true);
+  const roster=g116Roster(groupId),members=team.members.filter(id=>roster.some(s=>s.student_id===id));if(!members.length)return g116Notice('Este equipo no tiene integrantes activos.',true);
+  const pool=new Set(g116Pool());
+  g117TeamDraft={id:generateId('team-turn'),groupId,date,teamId,teamName:team.name,distributionAt:distribution.updatedAt,memberIds:[...members]};
+  const group=localData.groups.find(g=>g.group_id===groupId),school=localData.schools.find(s=>s.school_id===group?.school_id);
+  document.getElementById('g117-team-title').textContent=team.name+' · Registrar participación';
+  document.getElementById('g117-team-context').textContent=(school?.school_name||'')+' · '+(group?.grade||'')+' '+(group?.group_name||'')+' · '+formatDateForDisplay(date);
+  document.getElementById('g117-team-note').value='';
+  document.getElementById('g117-team-error').textContent='';
+  document.getElementById('g117-team-members').innerHTML=members.map(id=>'<label class="g116-person"><input type="checkbox" onchange="g117UpdateTeamCount()" value="'+escapeHTML(id)+'" '+(pool.has(id)?'checked':'')+'> '+escapeHTML(g116StudentLabel(id,groupId))+'</label>').join('');
+  document.getElementById('g117-team-help').textContent='Se sumará una participación a cada integrante marcado. Los alumnos excluidos de la sesión aparecen sin marcar. Revisa la lista antes de confirmar.';
+  openModal('modal-g117-team-participation');
+  g117UpdateTeamCount();document.querySelector('#g117-team-members input')?.focus();
+}
+function g117UpdateTeamCount(){const count=document.querySelectorAll('#g117-team-members input:checked').length,button=document.getElementById('g117-confirm-team');button.textContent='Guardar para '+count+' integrante'+(count===1?'':'s');button.disabled=g117TeamSaving||count===0;}
+async function g117WriteTeamParticipation(draft,ids,note){
+  const selected=[...new Set(ids)];if(!selected.length)throw Error('Marca al menos un integrante.');
+  if(selected.some(id=>!draft.memberIds.includes(id)))throw Error('Hay un alumno que no pertenece a la lista revisada del equipo.');
+  const students=await dbGetAll('students');
+  if(selected.some(id=>!students.some(s=>s.student_id===id&&s.group_id===draft.groupId&&(!s.status||s.status==='ACTIVE'))))throw Error('La lista del grupo cambió. Vuelve a revisar los integrantes.');
+  return g116AtomicSetting(g116StateKey(draft.groupId),old=>{
+    const state=old?.version===1?old:g116EmptyState(),session=g117SessionReady(state,draft.date);
+    if(session.teamEvents.some(e=>e.id===draft.id))return state; // Retry of the same reviewed action, not a second contribution.
+    const distribution=state.teams,team=distribution?.items.find(t=>t.id===draft.teamId);
+    if(!team||distribution.updatedAt!==draft.distributionAt)throw Error('La distribución del equipo cambió. Cierra y vuelve a abrir su registro.');
+    const at=new Date().toISOString(),text=String(note||'').trim().slice(0,240);
+    session.teamEvents.push({id:draft.id,teamId:draft.teamId,teamName:draft.teamName,memberIds:selected,at,note:text});
+    for(const studentId of selected)session.history.push({id:draft.id+'::'+studentId,teamEventId:draft.id,teamId:draft.teamId,teamName:draft.teamName,studentId,at,status:'participated',source:'team',note:text});
+    return state;
+  });
+}
+async function g117ConfirmTeam(){
+  if(g117TeamSaving||g116Busy||!g117TeamDraft)return;
+  const draft=structuredClone(g117TeamDraft),ids=[...document.querySelectorAll('#g117-team-members input:checked')].map(e=>e.value),note=document.getElementById('g117-team-note').value;
+  if(!ids.length){document.getElementById('g117-team-error').textContent='Marca al menos un integrante.';return;}
+  let saved=false;g117TeamSaving=true;
+  document.querySelectorAll('#modal-g117-team-participation button,#modal-g117-team-participation input').forEach(b=>b.disabled=true);
+  try{
+    await g116Action(async()=>{try{await g117WriteTeamParticipation(draft,ids,note);saved=true;}catch(e){document.getElementById('g117-team-error').textContent=e.message;throw e;}});
+    if(saved){closeModal('modal-g117-team-participation');g117TeamDraft=null;g116Notice(ids.length+' participaciones del equipo guardadas y verificadas.');}
+  }finally{g117TeamSaving=false;document.querySelectorAll('#modal-g117-team-participation button,#modal-g117-team-participation input').forEach(b=>b.disabled=false);g117UpdateTeamCount();}
+}
+async function g117SetVoided(kind,id,voided){
+  const {groupId,date}=g116Context();if(!['team','individual'].includes(kind))return;
+  if(voided&&!confirm(kind==='team'?'¿Anular esta intervención y las participaciones de sus integrantes? Podrás restaurarla.':'¿Anular esta participación? Podrás restaurarla.'))return;
+  return g116Action(()=>g116AtomicSetting(g116StateKey(groupId),old=>{
+    if(!old?.sessions?.[date])throw Error('No se encontró la sesión.');
+    const session=g117SessionReady(old,date),at=new Date().toISOString();
+    if(kind==='team'){
+      const team=session.teamEvents.find(e=>e.id===id);if(!team)throw Error('No se encontró la intervención del equipo.');
+      if(voided)team.voidedAt=at;else delete team.voidedAt;
+      for(const event of session.history.filter(e=>e.teamEventId===id)){if(voided)event.voidedAt=at;else delete event.voidedAt;}
+    }else{
+      const event=session.history.find(e=>e.id===id&&g117EventSource(e)!=='team');if(!event)throw Error('No se encontró el registro individual.');
+      if(!voided&&g117EventSource(event)==='picker'&&session.history.some(e=>e.id!==id&&!e.voidedAt&&g117EventSource(e)==='picker'&&e.round===event.round&&e.studentId===event.studentId))throw Error('Ya hay otro turno activo del mismo alumno en esa ronda.');
+      if(voided){event.voidedAt=at;if(session.current===event.id)session.current=null;}else{delete event.voidedAt;if(!session.current&&event.status==='selected')session.current=event.id;}
+      session.drawn=[...new Set(session.history.filter(e=>!e.voidedAt&&g117EventSource(e)==='picker'&&e.round===session.round).map(e=>e.studentId))];
+    }
+    return old;
+  }));
+}
+function g117RenderHistory(){
+  const {groupId,date}=g116Context(),session=g116State(groupId).sessions?.[date],events=[...(session?.history||[]).filter(e=>g117EventSource(e)!=='team').map(e=>({...e,kind:'individual'})),...(session?.teamEvents||[]).map(e=>({...e,kind:'team'}))].sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  const stats=g117Stats(g116State(groupId),[date]);let total=0;for(const x of stats.students.values())total+=x.total;
+  g116El('history-summary').textContent=total+' participaciones vigentes · '+stats.teamInterventions+' intervenciones de equipos · '+events.filter(e=>e.voidedAt).length+' registros anulados';
+  const labels={selected:'Seleccionado: todavía no suma participación',participated:'Participó',passed:'Pasó turno: no suma participación'};
+  g116El('history').innerHTML=events.slice(0,30).map(e=>'<li class="'+(e.voidedAt?'g117-voided':'')+'"><div><strong>'+escapeHTML(e.kind==='team'?e.teamName+' · '+e.memberIds.length+' integrantes':g116StudentLabel(e.studentId,groupId))+'</strong><small>'+escapeHTML(e.voidedAt?'Anulado':(e.kind==='team'?'Participación en equipo':labels[e.status]||e.status))+' · '+new Date(e.at).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})+(e.kind!=='team'&&g117EventSource(e)==='manual'?' · Registro directo':'')+'</small>'+(e.note?'<p>'+escapeHTML(e.note)+'</p>':'')+'</div><button data-g116-write data-kind="'+e.kind+'" data-event-id="'+escapeHTML(e.id)+'" data-voided="'+(!e.voidedAt)+'" type="button" class="g116-btn secondary" onclick="g117SetVoided(this.dataset.kind,this.dataset.eventId,this.dataset.voided===\'true\')">'+(e.voidedAt?'Restaurar':'Anular')+'</button></li>').join('')||'<li>No hay turnos o participaciones registrados para esta fecha.</li>';
+}
+function g117CSV(groupId,dates){
+  const state=g116State(groupId),stats=g117Stats(state,dates),group=localData.groups.find(g=>g.group_id===groupId),school=localData.schools.find(s=>s.school_id===group?.school_id),labels={green:'Lo logré',amber:'Necesito practicar',red:'Necesito ayuda'};
+  const rows=[['Desde','Hasta','Escuela','Grupo','Número','Alumno','Selecciones vigentes','Participación individual','Participación en equipo','Total participaciones','Turnos pasados','Comprensión de la fecha']];
+  for(const s of g117ReportRoster(groupId,dates)){
+    const x=stats.students.get(s.student_id)||{draws:0,individual:0,team:0,total:0,passed:0};
+    rows.push([dates[0]||'',dates.at(-1)||'',school?.school_name||'',group?group.grade+' '+group.group_name:groupId,s.student_number,s.full_name,x.draws,x.individual,x.team,x.total,x.passed,dates.length===1?(labels[state.sessions?.[dates[0]]?.understanding?.[s.student_id]]||'Sin registro'):'Consultar cada fecha']);
+  }
+  return '\uFEFF'+rows.map(row=>row.map(g116CsvCell).join(',')).join('\r\n');
+}
+function g117ExportTotals(){
+  const {groupId,date}=g116Context();if(!groupId)return g116Notice('Selecciona un grupo.',true);
+  const dates=g117Dates(g116State(groupId),document.getElementById('g117-scope').value,date),url=URL.createObjectURL(new Blob([g117CSV(groupId,dates)],{type:'text/csv;charset=utf-8;'})),a=document.createElement('a');a.href=url;a.download='Participaciones_'+groupId+'_'+date+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function g117HistoryCSV(groupId,dates){
+  const state=g116State(groupId),group=localData.groups.find(g=>g.group_id===groupId),school=localData.schools.find(s=>s.school_id===group?.school_id),labels={picker:'Selector',manual:'Individual directa',team:'Equipo'},status={selected:'Seleccionado',participated:'Participó',passed:'Pasó turno'};
+  const rows=[['Fecha','Hora','Escuela','Grupo','Número','Alumno','Origen','Equipo','Estado','Anulado','Fecha de anulación','Nota','ID del registro']];
+  for(const date of dates)for(const event of state.sessions?.[date]?.history||[]){const student=localData.students.find(s=>s.student_id===event.studentId);rows.push([date,event.at,school?.school_name||'',group?group.grade+' '+group.group_name:groupId,student?.student_number||'',student?.full_name||event.studentId,labels[g117EventSource(event)]||'Selector',event.teamName||'',status[event.status]||event.status,event.voidedAt?'Sí':'No',event.voidedAt||'',event.note||'',event.id]);}
+  return '\uFEFF'+rows.map(row=>row.map(g116CsvCell).join(',')).join('\r\n');
+}
+function g117ExportHistory(){
+  const {groupId,date}=g116Context();if(!groupId)return g116Notice('Selecciona un grupo.',true);const dates=g117Dates(g116State(groupId),document.getElementById('g117-scope').value,date),url=URL.createObjectURL(new Blob([g117HistoryCSV(groupId,dates)],{type:'text/csv;charset=utf-8;'})),a=document.createElement('a');a.href=url;a.download='Historial_participaciones_'+groupId+'_'+date+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 </script>
 </body>
 </html>
