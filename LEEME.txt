@@ -1,0 +1,25 @@
+Mi Control Docente G275
+
+Abrir y publicar
+- Extrae el ZIP. index.html abre la app y permite probar la captura local.
+- Para instalar y usar las conexiones de Google, publica juntos los archivos del paquete en la carpeta que sirve el enlace de GitHub Pages. Conserva los nombres de los archivos y usa HTTPS.
+- En Android, abre el enlace publicado en Chrome y usa Instalar o la opción para agregar la aplicación a la pantalla de inicio.
+
+Activar Classroom en el proyecto de Google Cloud
+1. Selecciona el proyecto que contiene el cliente OAuth web que ya usa Mi Control Docente.
+2. Habilita Google Classroom API: https://console.cloud.google.com/apis/library/classroom.googleapis.com
+3. En Google Auth Platform, revisa Acceso a datos y agrega los permisos de solo lectura de cursos, lista de alumnos, actividades y calificaciones:
+   https://www.googleapis.com/auth/classroom.courses.readonly
+   https://www.googleapis.com/auth/classroom.rosters.readonly
+   https://www.googleapis.com/auth/classroom.coursework.students.readonly
+4. Si el proyecto está En pruebas, autoriza la cuenta docente en Público → Usuarios de prueba. Si Google Workspace restringe el acceso, pide a tu administrador que revise la aplicación. Confirma que el origen HTTPS publicado esté registrado en el cliente OAuth.
+
+Uso
+- En el cuaderno, elige grupo, trimestre y actividad local. Abre Classroom y calificación masiva.
+- Para Classroom: conecta tu cuenta docente, elige clase y tarea, y revisa las notas publicadas. Corrige las asignaciones necesarias. La vista previa muestra la escala de origen y la escala del cuaderno.
+- Para calificación masiva: selecciona alumnos y captura una nota. Puedes seleccionar todos o solo quienes aún no tienen nota. Revisa los cambios antes de aplicarlos.
+- Aplica al borrador y pulsa Guardar cambios en el cuaderno. La importación es manual, por tarea, desde Classroom hacia Mi Control Docente.
+
+Validación pendiente en producción
+- Confirma que el enlace de GitHub Pages sirva G275 y prueba la instalación en un Android físico.
+- Con dos cuentas docentes autorizadas y perfiles separados, usa grupos ficticios para comprobar Drive y Classroom antes de usar datos reales.
