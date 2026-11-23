@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G319 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G321 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -101,6 +101,7 @@
     }
     
     @media screen { #report-group-tbody .report-student-no-match { display: none; } }
+    #report-group-tbody [data-report-delivery]:not([hidden]) { display: block; color: #526267; }
 
     @media print {
       .desktop-nav, .mobile-bottom, header, .fixed, button, select, input, .no-print { display:none !important; }
@@ -2384,7 +2385,8 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
                       <div>
                         <label class="block text-xs font-bold text-[#66767a]" for="report-group-activity-condition">Condición de la actividad</label>
                         <select id="report-group-activity-condition" class="mt-1 w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm disabled:opacity-50" aria-controls="report-group-tbody" onchange="applyGroupReportStudentSearch()" disabled>
-                          <option value="data-missing-grade">Sin calificación</option>
+                          <option value="all">Todos los alumnos</option>
+                          <option value="data-missing-grade" selected>Sin calificación</option>
                           <option value="data-missing-delivery">Sin entregar</option>
                           <option value="data-unrecorded-delivery">Sin registro de entrega</option>
                         </select>
@@ -14016,12 +14018,16 @@ function renderSchedule() {
         const matchesStudent = (!selectedStatus || row.dataset.reportStatus === selectedStatus)
           && matchesGroupReportStudent(name, listNumber, terms);
         const cell = row.cells[activityColumn];
+        const visibleDelivery = row.querySelector('[data-report-delivery]:not([hidden])');
+        const selectedDelivery = cell?.querySelector('[data-report-delivery]');
+        if (visibleDelivery && visibleDelivery !== selectedDelivery) visibleDelivery.hidden = true;
+        if (selectedDelivery) selectedDelivery.hidden = false;
         if (cell && matchesStudent) {
           for (const option of conditions) {
-            if (cell.hasAttribute(option.value)) counts.set(option.value, counts.get(option.value) + 1);
+            if (option.value === 'all' || cell.hasAttribute(option.value)) counts.set(option.value, counts.get(option.value) + 1);
           }
         }
-        const matches = matchesStudent && (activityColumn < 0 || cell?.hasAttribute(condition.value));
+        const matches = matchesStudent && (activityColumn < 0 || condition.value === 'all' || cell?.hasAttribute(condition.value));
         row.classList.toggle('report-student-no-match', !matches);
         if (filtered && matches) matchingIds.add(row.querySelector('button[data-report-student]').dataset.reportStudent);
       }
@@ -14055,7 +14061,7 @@ function renderSchedule() {
       applyGroupReportStudentSearch();
       if (document.getElementById('report-group-print-matches').disabled) return;
       const table = document.getElementById('report-group-tbody').closest('table').cloneNode(true);
-      table.querySelectorAll('.report-student-no-match, .no-print').forEach(node => node.remove());
+      table.querySelectorAll('.report-student-no-match, .no-print, [data-report-delivery][hidden]').forEach(node => node.remove());
       const count = table.tBodies[0].rows.length;
       const context = document.getElementById('report-context-line').textContent;
       const date = document.getElementById('report-generated-date').textContent;
@@ -14086,12 +14092,26 @@ function renderSchedule() {
           tr { break-inside: avoid; }
           th, td { border: 1px solid #b8c8c2; padding: 4px; overflow-wrap: anywhere; text-align: center; }
           th { background: #edf5f0; }
+          [data-report-delivery]:not([hidden]) { display: block; color: #526267; }
           th:nth-child(2), td:nth-child(2) { min-width: 28mm; text-align: left; }
         </style></head><body>
         <h1>Concentrado de calificaciones · Coincidencias</h1>
         <p>${escapeHTML(context)} · ${escapeHTML(countLabel)}<br>${escapeHTML(date)}${activityLabel ? '<br>' + escapeHTML(activityLabel) : ''}</p>
         ${table.outerHTML}</body></html>`;
       document.body.appendChild(frame);
+    }
+
+    function groupReportDeliveryLabel(status) {
+      return status ? deliveryStatusLabel(status) : 'Sin registro de entrega';
+    }
+
+    function renderGroupReportActivityCell(result) {
+      const hasGrade = result && result.grade !== null && result.grade !== undefined && result.grade !== '';
+      const status = String(result?.delivery_status ?? '').trim();
+      const ungraded = hasGrade ? '' : ' data-missing-grade';
+      const delivery = status === 'SE' ? ' data-missing-delivery' : (!status ? ' data-unrecorded-delivery' : '');
+      const grade = hasGrade ? Number(result.grade).toFixed(1) : '—';
+      return `<td class="p-2 text-center"${ungraded}${delivery}>${grade}<small data-report-delivery hidden>${escapeHTML(groupReportDeliveryLabel(status))}</small></td>`;
     }
 
     function renderGroupReportTable(groupId,period) {
@@ -14105,7 +14125,7 @@ function renderSchedule() {
       } else {
         thead.innerHTML=`<tr class="border-b bg-slate-100"><th class="p-2">#</th><th class="p-2">Alumno</th>${acts.map(a=>`<th class="p-2 text-center">${escapeHTML(a.activity_code||a.activity_name)}</th>`).join('')}<th class="p-2 text-center">Promedio</th><th class="p-2">Estatus</th></tr>`;
         const cfg=getEvaluationConfig(groupId);
-        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); const hasGrade = r && r.grade!==null && r.grade!==undefined && r.grade!==''; return `<td class="p-2 text-center"${hasGrade ? '' : ' data-missing-grade'}${r?.delivery_status === 'SE' ? ' data-missing-delivery' : ''}${String(r?.delivery_status ?? '').trim() ? '' : ' data-unrecorded-delivery'}>${hasGrade ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b" data-report-status="${status}"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
+        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>renderGroupReportActivityCell(localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id))).join(''); return `<tr class="border-b" data-report-status="${status}"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
       }
       const search = document.getElementById('report-group-student-search');
       const scope = JSON.stringify([resolveReportCycleYear(), groupId]);
@@ -17888,14 +17908,34 @@ function g119DownloadAcademicCSV(filename, rows, matchingIds = null) {
   const sid = document.getElementById('report-student-select')?.value;
   const student = localData.students.find(item => item.student_id === sid);
   const identity = reportGroupIdentity(localData.groups.find(group => group.group_id === groupId));
-  const result = [rows[0].concat(['Participaciones individuales (todas las fechas)',
-    'Participaciones en equipo (todas las fechas)', 'Total participaciones (todas las fechas)', 'Turno', 'Escuela'])];
+  const activityId = matchingIds ? document.getElementById('report-group-missing-activity')?.value : '';
+  const period = document.getElementById('report-trimester-select')?.value || 'T1';
+  const activity = activityId && period !== 'ANNUAL'
+    ? getOrderedReportActivities(groupId, period).find(item => String(item.activity_id) === activityId) : null;
+  const condition = activity ? document.getElementById('report-group-activity-condition').selectedOptions[0]?.dataset.conditionLabel : '';
+  const deliveries = new Map();
+  if (activity) {
+    for (const result of localData.activity_results) {
+      if (result.activity_id !== activity.activity_id || deliveries.has(result.student_id)) continue;
+      deliveries.set(result.student_id, String(result.delivery_status ?? '').trim());
+    }
+  }
+  const headers = rows[0].concat(['Participaciones individuales (todas las fechas)',
+    'Participaciones en equipo (todas las fechas)', 'Total participaciones (todas las fechas)', 'Turno', 'Escuela']);
+  if (activity) headers.push('Código de actividad filtrada', 'Actividad filtrada', 'Condición del filtro', 'Estado de entrega');
+  const result = [headers];
   let data = rows.slice(1);
   if (type === 'STUDENT' && !data.length && student) data = [[student.full_name, ...Array(rows[0].length - 1).fill('')]];
   data.forEach((row, index) => {
     if (matchingIds && !matchingIds.has(String(students[index]?.student_id))) return;
     const participation = totals.get(type === 'STUDENT' ? sid : students[index]?.student_id) || {individual:0, team:0, total:0};
-    result.push(row.concat([participation.individual, participation.team, participation.total], identity));
+    const output = row.concat([participation.individual, participation.team, participation.total], identity);
+    if (activity) {
+      const status = deliveries.get(students[index]?.student_id);
+      output.push(activity.activity_code || '', activity.activity_name || '', condition || '',
+        groupReportDeliveryLabel(status));
+    }
+    result.push(output);
   });
   if (matchingIds) {
     if (result.length === 1) return showToast('Sin coincidencias para exportar.');
