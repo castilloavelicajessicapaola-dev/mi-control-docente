@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G329 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G330 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11569,6 +11569,7 @@ function renderGradebook(preserveDraft = false) {
       container.replaceChildren();
       if (!archived.length) {
         container.textContent = 'No hay clases archivadas.';
+        g330RefreshArchiveSearch(container,'Buscar clases archivadas');
         return;
       }
       for (const entry of archived) {
@@ -11585,9 +11586,11 @@ function renderGradebook(preserveDraft = false) {
         button.onclick = () => changeScheduleArchive(entry.schedule_id, true);
         button.disabled = !activeGroups.has(entry.group_id);
         if (button.disabled) button.title = 'Activa el grupo y selecciona el ciclo de la clase para restaurarla.';
+        row.dataset.archiveLabel = label.textContent + (g ? ' '+g.grade+g.group_name : '');
         row.append(label, button, g329DeleteButton('schedule',entry.schedule_id));
         container.append(row);
       }
+      g330RefreshArchiveSearch(container,'Buscar clases archivadas');
     }
     async function g64DeleteClass(scheduleId){
       return changeScheduleArchive(scheduleId);
@@ -19867,7 +19870,49 @@ function g253Download(){if(!g249Report||g219Busy||g116Busy)return false;try{down
 const g253Panel=document.createElement('div');g253Panel.id='g253-participation-pupils';document.getElementById('g219-results').after(g253Panel);const g253Button=document.createElement('button');g253Button.id='g253-download-pupils';g253Button.type='button';g253Button.textContent='Descargar participaciones por alumno (CSV)';g253Button.disabled=true;g253Button.onclick=g253Download;document.getElementById('g219-check').after(g253Button);const g253Css='.g253-pupils{overflow:auto;margin:12px 0}.g253-pupils table{width:100%;border-collapse:collapse;font-size:.85rem}.g253-pupils th,.g253-pupils td{border:1px solid #99aaa2;padding:8px;text-align:left;overflow-wrap:anywhere}.g253-pupils thead{display:table-header-group}.g253-pupils tr{break-inside:avoid}#g253-download-pupils{min-height:44px;padding:10px;margin:8px;border-radius:8px}';const g253Style=document.createElement('style');g253Style.textContent=g253Css;document.head.append(g253Style);
 const g253OriginalClear=g219Clear;g219Clear=function(){g253OriginalClear();g253Panel.replaceChildren();g253Button.disabled=true;};const g253OriginalCheck=g219Check;g219Check=async function(...args){if(g219Busy||g116Busy)return false;const result=await g253OriginalCheck(...args);if(g249Report){g249Report.pupils=g253Pupils(g249Report,localData.students);g253Panel.innerHTML=g253Table(g249Report);g253Button.disabled=!g249Report.pupils.length;}return result;};document.getElementById('g219-check').onclick=g219Check;const g253OriginalHtml=g251Html;g251Html=function(report){return g253OriginalHtml(report).replace('</head>','<style>'+g253Css+'</style></head>').replace('<footer>',g253Table(report)+'<footer>');};
 g131Topics.push({id:'participation-pupil-detail',title:'Consultar participaciones por alumno',intro:'La comprobación conserva el desglose individual y el historial que ya está guardado.',steps:['Comprueba las participaciones del grupo y alcance elegidos.','Revisa individuales, en equipo y total por alumno. La referencia avisa de alumnos inactivos, fuera del grupo o sin ficha disponible.','Descarga el CSV por alumno o el reporte imprimible. Los nombres son referencias del listado cargado; los conteos proceden de la lectura guardada.']});
-</script><script id="g329-archived-deletion">
+</script><style>[data-archive-label][hidden] { display: none !important; }</style>
+<script id="g330-archive-search">
+function g330FilterArchived(container, query, status) {
+  const terms = normalizeStudentName(query).split(/\s+/).filter(Boolean);
+  const rows = Array.from(container.querySelectorAll('[data-archive-label]'));
+  let count = 0;
+  for (const row of rows) {
+    const label = normalizeStudentName(row.dataset.archiveLabel);
+    row.hidden = !terms.every(term=>label.includes(term));
+    if (!row.hidden) count++;
+  }
+  status.textContent = !rows.length ? '' : !count ? 'Sin coincidencias' : count+' de '+rows.length;
+}
+
+function g330RefreshArchiveSearch(container, labelText) {
+  const id = container.id+'-search';
+  let input = document.getElementById(id);
+  let status = document.getElementById(id+'-status');
+  if (!input) {
+    const controls = document.createElement('div');
+    controls.className = 'my-2';
+    const label = document.createElement('label');
+    label.className = 'block text-xs font-semibold';
+    label.htmlFor = id;
+    label.textContent = labelText;
+    input = document.createElement('input');
+    input.id = id;
+    input.type = 'search';
+    input.autocomplete = 'off';
+    input.className = 'mt-1 w-full max-w-md rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm';
+    input.setAttribute('aria-controls',container.id);
+    status = document.createElement('p');
+    status.id = id+'-status';
+    status.className = 'mt-1 text-xs text-[#526267]';
+    status.setAttribute('role','status');
+    input.addEventListener('input',()=>g330FilterArchived(container,input.value,status));
+    controls.append(label,input,status);
+    container.before(controls);
+  }
+  g330FilterArchived(container,input.value,status);
+}
+</script>
+<script id="g329-archived-deletion">
 let g329Busy = false;
 const g329Labels = {students:'alumnos',attendance:'asistencias',activities:'actividades',activity_results:'resultados de actividades',observations:'observaciones',
   plans:'planeaciones',academic_closures:'cierres académicos',schedule:'clases del horario',calendar_events:'eventos del grupo',portfolio_evidence:'evidencias',
@@ -19986,7 +20031,7 @@ async function g254Apply(baseline,patch){const saved=await g254Write(baseline,pa
 document.getElementById('g254-cancel').onclick=()=>{if(!g254Busy)g254Dialog.close();};g254Dialog.addEventListener('cancel',event=>{if(g254Busy)event.preventDefault();});document.getElementById('g254-form').onsubmit=async event=>{event.preventDefault();if(g254Busy||!g254Baseline)return;g254Busy=true;document.getElementById('g254-save').disabled=true;try{const patch={};for(const [key] of g254FieldSpecs)patch[key]=document.getElementById('g254-'+key).value;await g254Apply(g254Baseline,patch);g254Dialog.close();showToast('Grupo modificado y guardado. Sus registros se conservaron.');}catch(error){document.getElementById('g254-message').textContent=error.message;}finally{g254Busy=false;document.getElementById('g254-save').disabled=false;}};
 async function g254Remove(groupId,restore=false){if(g254Busy)return;const group=localData.groups.find(item=>item.group_id===groupId);if(!group)return;const students=localData.students.filter(item=>item.group_id===groupId).length,attendance=localData.attendance.filter(item=>item.group_id===groupId).length,activities=localData.activities.filter(item=>item.group_id===groupId).length;const message=restore?'¿Restaurar este grupo a sus listas activas?':'¿Eliminar '+formatGradeDisplay(group.grade,group.group_name)+' de las listas activas?\n\nSe archivará el grupo. No se borrarán alumnos ni registros académicos.\nSe conservan '+students+' alumnos, '+attendance+' asistencias y '+activities+' actividades, además de sus calificaciones, participaciones y demás historial.\nPodrás restaurarlo desde Grupos archivados.';if(!confirm(message))return;g254Busy=true;try{await g254Apply(structuredClone(group),{status:restore?'ACTIVE':'ARCHIVED',school_year:group.school_year||getCurrentSchoolYear()});showToast(restore?'Grupo restaurado.':'Grupo archivado; historial conservado.');}catch(error){showToast(error.message);}finally{g254Busy=false;}}
 function g254Decorate(){for(const gridId of ['group-grid','all-group-grid'])for(const card of document.getElementById(gridId)?.querySelectorAll('.group-card')||[]){if(card.querySelector('.g254-actions'))continue;const trigger=card.querySelector('button[onclick*="g65OpenClassroom"]'),match=trigger?.getAttribute('onclick')?.match(/g65OpenClassroom\('([^']+)'\)/);if(!match)continue;const actions=document.createElement('div');actions.className='g254-actions';for(const [text,handler] of [['Editar grupo',()=>g254Open(match[1])],['Eliminar grupo',()=>g254Remove(match[1])]]){const button=document.createElement('button');button.type='button';button.textContent=text;button.onclick=handler;actions.append(button);}card.append(actions);}g254RenderArchived();}
-const g254Archived=document.createElement('details');g254Archived.id='g254-archived';const g254ArchiveTitle=document.createElement('summary');g254ArchiveTitle.textContent='Grupos archivados';const g254ArchivedBody=document.createElement('div');g254Archived.append(g254ArchiveTitle,g254ArchivedBody);document.getElementById('all-group-grid').after(g254Archived);
+const g254Archived=document.createElement('details');g254Archived.id='g254-archived';const g254ArchiveTitle=document.createElement('summary');g254ArchiveTitle.textContent='Grupos archivados';const g254ArchivedBody=document.createElement('div');g254ArchivedBody.id='archived-group-rows';g254Archived.append(g254ArchiveTitle,g254ArchivedBody);document.getElementById('all-group-grid').after(g254Archived);
 function g254RenderArchived(){
   g254ArchivedBody.replaceChildren();
   const groups=localData.groups.filter(group=>group.status==='ARCHIVED');
@@ -19998,10 +20043,12 @@ function g254RenderArchived(){
     label.textContent=[formatGroupLabelWithShift(group,school),getGroupSchoolYear(group)].filter(Boolean).join(' · ');
     const button=document.createElement('button');
     button.type='button';button.textContent='Restaurar grupo';button.onclick=()=>g254Remove(group.group_id,true);
+    line.dataset.archiveLabel = label.textContent+' '+group.grade+group.group_name;
     line.append(label,button,g329DeleteButton('groups',group.group_id));
     g254ArchivedBody.append(line);
   }
   if(!groups.length)g254ArchivedBody.textContent='No hay grupos archivados.';
+  g330RefreshArchiveSearch(g254ArchivedBody,'Buscar grupos archivados');
 }
 const g254OriginalRender=renderGroups;renderGroups=function(...args){const result=g254OriginalRender(...args);g254Decorate();return result;};g254Decorate();
 </script><script id="g255-group-view-refresh">/* Refresh operational schedule views after a confirmed group mutation. */
