@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G349 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G354 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18202,13 +18202,15 @@ const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const count
   <div class="g128-toolbar">
     <button type="button" onclick="g345Recompare()">Volver a comparar asistencias y calificaciones</button>
   </div>
-  <div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label id="g347-grade-filter" hidden>Trimestre de la actividad<select id="g347-trimester" onchange="g128ChangeFilters()"><option value="">Todos los trimestres</option><option value="T1">Trimestre 1</option><option value="T2">Trimestre 2</option><option value="T3">Trimestre 3</option><option value="unknown">Sin trimestre identificado</option></select></label><label id="g348-activity-filter" hidden>Actividad<select id="g348-activity" onchange="g128ChangeFilters()"><option value="">Todas las actividades</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="applicable">Disponibles para aplicar</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><label id="g344-block-filter" hidden>Motivo del bloqueo<select id="g344-block-reason" onchange="g128ChangeFilters()"><option value="">Todos los motivos</option></select></label><button id="g341-mark-new" type="button" onclick="g341MarkFiltered('new')" disabled>Marcar nuevos del filtro</button><button id="g341-mark-different" type="button" onclick="g341MarkFiltered('different')" disabled>Marcar diferentes del filtro</button><button id="g349-clear-filter" type="button" onclick="g349ClearFiltered()" disabled>Desmarcar del filtro</button><button id="g349-clear-all" type="button" onclick="g128ClearSelection()" disabled>Desmarcar todos</button></div>
+  <div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Alumno<select id="g350-student" onchange="g128ChangeFilters()"><option value="">Todos los alumnos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label id="g347-grade-filter" hidden>Trimestre de la actividad<select id="g347-trimester" onchange="g128ChangeFilters()"><option value="">Todos los trimestres</option><option value="T1">Trimestre 1</option><option value="T2">Trimestre 2</option><option value="T3">Trimestre 3</option><option value="unknown">Sin trimestre identificado</option></select></label><label id="g348-activity-filter" hidden>Actividad<select id="g348-activity" onchange="g128ChangeFilters()"><option value="">Todas las actividades</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="applicable">Disponibles para aplicar</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><label>Ordenar por<select id="g353-order" onchange="g128ChangeFilters()"><option value="">Orden del respaldo</option><option value="student">Grupo y número de lista</option><option value="date">Fecha de asistencia</option><option value="activity">Código de actividad</option></select></label><label id="g344-block-filter" hidden>Motivo del bloqueo<select id="g344-block-reason" onchange="g128ChangeFilters()"><option value="">Todos los motivos</option></select></label><button id="g341-mark-new" type="button" onclick="g341MarkFiltered('new')" disabled>Marcar nuevos del filtro</button><button id="g341-mark-different" type="button" onclick="g341MarkFiltered('different')" disabled>Marcar diferentes del filtro</button><button id="g349-clear-filter" type="button" onclick="g349ClearFiltered()" disabled>Desmarcar del filtro</button><button id="g349-clear-all" type="button" onclick="g128ClearSelection()" disabled>Desmarcar todos</button></div>
   <div id="g346-date-filter" class="g128-toolbar" role="group" aria-label="Fechas de asistencia" hidden>
     <label>Desde<input type="date" id="g346-start-date" aria-describedby="g346-date-status" onchange="g128ChangeFilters()"></label>
     <label>Hasta<input type="date" id="g346-end-date" aria-describedby="g346-date-status" onchange="g128ChangeFilters()"></label>
     <p id="g346-date-status" role="status"></p>
   </div>
-  <p id="g128-selection" role="status"></p><div class="g128-scroll"><table><thead><tr><th>Actualizar</th><th>Alumno y registro</th><th>En este dispositivo</th><th>En el respaldo</th><th>Comparación</th></tr></thead><tbody id="g128-rows"></tbody></table></div><button type="button" id="g128-more" onclick="g128ShowMore()">Mostrar más registros</button><div class="g128-toolbar"><button type="button" onclick="g128Close()">Cerrar comparación</button><button type="button" id="g128-apply" onclick="g128ReviewSelected()">Revisar registros marcados</button></div></div>
+  <p id="g128-selection" role="status"></p>
+  <button type="button" id="g352-show-marks" onclick="g352ShowAllMarked()" hidden>Ver todas las marcas</button>
+  <div class="g128-scroll"><table><thead><tr><th>Actualizar</th><th>Alumno y registro</th><th>En este dispositivo</th><th>En el respaldo</th><th>Comparación</th></tr></thead><tbody id="g128-rows"></tbody></table></div><button type="button" id="g128-more" onclick="g128ShowMore()">Mostrar más registros</button><div class="g128-toolbar"><button type="button" onclick="g128Close()">Cerrar comparación</button><button type="button" id="g351-review-filtered" onclick="g351ReviewFiltered()" hidden>Revisar solo marcas del filtro</button><button type="button" id="g128-apply" onclick="g128ReviewSelected()">Revisar registros marcados</button></div></div>
 <div id="g128-review" hidden>
   <h4 id="g128-review-title" tabindex="-1">Revisar antes de actualizar</h4>
   <p id="g128-review-count" role="status"></p>
@@ -18654,9 +18656,45 @@ function g128AttendanceDraftChanged(record,current){return document.getElementBy
 function g128RefreshAttendance(entry,undo){for(const c of entry.changes)if(c.store==='attendance'&&document.getElementById('attendance-group-select')?.value===c.next.group_id&&document.getElementById('attendance-date')?.value===c.next.attendance_date)tempAttendanceState[c.next.student_id]=(undo?c.previous:c.next)?.attendance_status||null;}
 function g128ValidateHistory(history){if(!g124Plain(history)||history.version!==1||!Array.isArray(history.entries))throw Error('El historial de conciliaciones no es válido.');const ids=new Set();for(const e of history.entries){if(!g124Plain(e)||typeof e.id!=='string'||!e.id||ids.has(e.id)||!Array.isArray(e.changes)||!e.changes.length)throw Error('Hay una conciliación inválida en el historial.');ids.add(e.id);const records=new Set();for(const c of e.changes){if(!g124Plain(c)||!['attendance','activity_results'].includes(c.store)||typeof c.pk!=='string'||!c.pk||!g124Plain(c.next)||!(c.previous===null||g124Plain(c.previous)))throw Error('Hay un cambio inválido en el historial de conciliaciones.');const key=RESTORE_STORE_KEYS[c.store],token=c.store+'::'+c.pk;if(c.next[key]!==c.pk||(c.previous&&c.previous[key]!==c.pk)||records.has(token))throw Error('El historial contiene identificadores de registro inconsistentes.');if(c.previous&&restoreCompositeKey(c.previous,RESTORE_UNIQUE_COMPOSITES[c.store])!==restoreCompositeKey(c.next,RESTORE_UNIQUE_COMPOSITES[c.store]))throw Error('El historial intenta cambiar la identidad de un registro.');records.add(token);}}}
 function g128Meaning(store,r){if(!r)return null;return store==='attendance'?{status:r.attendance_status,note:r.note||'',reason:r.justification_reason||''}:{grade:r.grade===null||r.grade===undefined||r.grade===''?null:Number(r.grade),delivery:r.delivery_status||null,observation:r.observation||''};}
-function g128Compare(backup,snapshot){const validation=validateBackupObject(backup);if(!validation.ok)throw Error(validation.message);const rows=[],sourceActivities=new Map((backup.records.activities||[]).map(a=>[a.activity_id,a]));for(const store of ['attendance','activity_results']){const key=RESTORE_STORE_KEYS[store],fields=RESTORE_UNIQUE_COMPOSITES[store];for(const incoming of backup.records[store]||[]){const identity=restoreCompositeKey(incoming,fields),primary=(snapshot[store]||[]).find(r=>r[key]===incoming[key]),existing=primary||(snapshot[store]||[]).find(r=>restoreCompositeKey(r,fields)===identity)||null,student=snapshot.students.find(s=>s.student_id===incoming.student_id),activity=store==='activity_results'?snapshot.activities.find(a=>a.activity_id===incoming.activity_id):null,groupId=store==='attendance'?incoming.group_id:activity?.group_id||incoming.group_id,group=snapshot.groups.find(g=>g.group_id===groupId),sourceGroup=(backup.records.groups||[]).find(g=>g.group_id===groupId),sourceActivity=store==='activity_results'?sourceActivities.get(incoming.activity_id):null,activityLabel=store==='activity_results'?g348ActivityLabel(activity,sourceActivity,incoming.activity_id):'';let reason='';if(!identity)reason='El registro no tiene una identidad completa.';else if(primary&&restoreCompositeKey(primary,fields)!==identity)reason='El identificador corresponde a otro registro local.';else if(!student||!group)reason='Falta el alumno o el grupo en este dispositivo.';else if(student.group_id!==groupId)reason='El alumno pertenece a otro grupo local.';else if(group.status==='ARCHIVED')reason='El grupo está archivado.';else if(sourceGroup?.school_year&&group.school_year&&sourceGroup.school_year!==group.school_year)reason='El ciclo escolar del grupo es diferente.';else if(store==='attendance'&&(!g125DateValid(incoming.attendance_date)||!['P','R','F','FJ','RJ','SA'].includes(incoming.attendance_status)))reason='La fecha o el estado de asistencia no son válidos.';else if(store==='activity_results'){if(!activity||(activity.status||'ACTIVE')!=='ACTIVE')reason='Falta la actividad o está archivada.';else if(incoming.group_id&&incoming.group_id!==activity.group_id)reason='La actividad y el grupo del archivo no coinciden.';else if(sourceActivity&&(sourceActivity.trimester!==activity.trimester||g115MaxGrade(sourceActivity)!==g115MaxGrade(activity)))reason='La actividad tiene otro trimestre o escala en el archivo.';else if(tempGradebookState.has(gradeResultKey(incoming.activity_id,incoming.student_id)))reason='Hay una calificación sin guardar en el cuaderno.';else if(snapshot.academic_closures.some(c=>c.group_id===groupId&&c.trimester===activity.trimester&&c.status==='CLOSED'))reason='El trimestre está cerrado.';else{const grade=g128Meaning(store,incoming).grade;if(incoming.grade!==null&&incoming.grade!==undefined&&incoming.grade!==''&&!['number','string'].includes(typeof incoming.grade))reason='El formato de la calificación no es válido.';if(grade!==null&&(!Number.isFinite(grade)||grade<0||grade>g115MaxGrade(activity)))reason='La calificación está fuera de la escala local.';if(!['','AT','TA','SE','JU'].includes(incoming.delivery_status||''))reason='El estado de entrega no es válido.';}}if(!reason&&store==='attendance'&&g128AttendanceDraftChanged(incoming,existing))reason='Hay un cambio de asistencia sin guardar para este alumno y fecha.';const kind=reason?'blocked':!existing?'new':g124Stable(g128Meaning(store,existing))===g124Stable(g128Meaning(store,incoming))?'same':'different';rows.push({key:store+'::'+identity,store,pk:existing?.[key]||incoming[key],incoming:structuredClone(incoming),existing:structuredClone(existing),groupId,trimester:g347GradeTrimester(sourceActivity,activity),activityLabel,kind,reason,label:(student?'#'+(student.student_number||'-')+' '+student.full_name:incoming.student_id)+' · '+(group?formatGradeDisplay(group.grade,group.group_name):groupId||'')+' · '+(store==='attendance'?incoming.attendance_date:activityLabel)});}}return rows;}
+function g354IndexFirst(records,keyOf){
+  const index=new Map();
+  for(const record of records){
+    const key=keyOf(record);
+    if(!index.has(key)) index.set(key,record);
+  }
+  return index;
+}
+
+function g128Compare(backup,snapshot){
+  const validation=validateBackupObject(backup);
+  if(!validation.ok) throw Error(validation.message);
+  const rows=[];
+  const sourceActivities=new Map((backup.records.activities||[]).map(activity=>[activity.activity_id,activity]));
+  const sourceStudents=new Map((backup.records.students||[]).map(student=>[student.student_id,student]));
+  const sourceGroups=g354IndexFirst(backup.records.groups||[],group=>group.group_id);
+  const students=g354IndexFirst(snapshot.students,student=>student.student_id);
+  const activities=g354IndexFirst(snapshot.activities,activity=>activity.activity_id);
+  const groups=g354IndexFirst(snapshot.groups,group=>group.group_id);
+  for(const store of ['attendance','activity_results']){
+    const incomingRecords=backup.records[store]||[];
+    if(!incomingRecords.length) continue;
+    const key=RESTORE_STORE_KEYS[store],fields=RESTORE_UNIQUE_COMPOSITES[store];
+    const localRecords=snapshot[store]||[];
+    const primaryRecords=g354IndexFirst(localRecords,record=>record[key]);
+    const recordsByIdentity=g354IndexFirst(localRecords,record=>restoreCompositeKey(record,fields));
+    for(const incoming of incomingRecords){
+      const identity=restoreCompositeKey(incoming,fields);
+      const primary=primaryRecords.get(incoming[key]);
+      const existing=primary||recordsByIdentity.get(identity)||null;
+      const student=students.get(incoming.student_id);
+      const activity=store==='activity_results'?activities.get(incoming.activity_id):null;
+      const groupId=store==='attendance'?incoming.group_id:activity?.group_id||incoming.group_id;
+      const group=groups.get(groupId),sourceGroup=sourceGroups.get(groupId);
+      const sourceActivity=store==='activity_results'?sourceActivities.get(incoming.activity_id):null;
+      const activityLabel=store==='activity_results'?g348ActivityLabel(activity,sourceActivity,incoming.activity_id):'';
+      let reason='';if(!identity)reason='El registro no tiene una identidad completa.';else if(primary&&restoreCompositeKey(primary,fields)!==identity)reason='El identificador corresponde a otro registro local.';else if(!student||!group)reason='Falta el alumno o el grupo en este dispositivo.';else if(student.group_id!==groupId)reason='El alumno pertenece a otro grupo local.';else if(group.status==='ARCHIVED')reason='El grupo está archivado.';else if(sourceGroup?.school_year&&group.school_year&&sourceGroup.school_year!==group.school_year)reason='El ciclo escolar del grupo es diferente.';else if(store==='attendance'&&(!g125DateValid(incoming.attendance_date)||!['P','R','F','FJ','RJ','SA'].includes(incoming.attendance_status)))reason='La fecha o el estado de asistencia no son válidos.';else if(store==='activity_results'){if(!activity||(activity.status||'ACTIVE')!=='ACTIVE')reason='Falta la actividad o está archivada.';else if(incoming.group_id&&incoming.group_id!==activity.group_id)reason='La actividad y el grupo del archivo no coinciden.';else if(sourceActivity&&(sourceActivity.trimester!==activity.trimester||g115MaxGrade(sourceActivity)!==g115MaxGrade(activity)))reason='La actividad tiene otro trimestre o escala en el archivo.';else if(tempGradebookState.has(gradeResultKey(incoming.activity_id,incoming.student_id)))reason='Hay una calificación sin guardar en el cuaderno.';else if(snapshot.academic_closures.some(c=>c.group_id===groupId&&c.trimester===activity.trimester&&c.status==='CLOSED'))reason='El trimestre está cerrado.';else{const grade=g128Meaning(store,incoming).grade;if(incoming.grade!==null&&incoming.grade!==undefined&&incoming.grade!==''&&!['number','string'].includes(typeof incoming.grade))reason='El formato de la calificación no es válido.';if(grade!==null&&(!Number.isFinite(grade)||grade<0||grade>g115MaxGrade(activity)))reason='La calificación está fuera de la escala local.';if(!['','AT','TA','SE','JU'].includes(incoming.delivery_status||''))reason='El estado de entrega no es válido.';}}if(!reason&&store==='attendance'&&g128AttendanceDraftChanged(incoming,existing))reason='Hay un cambio de asistencia sin guardar para este alumno y fecha.';const kind=reason?'blocked':!existing?'new':g124Stable(g128Meaning(store,existing))===g124Stable(g128Meaning(store,incoming))?'same':'different';const displayStudent=student||sourceStudents.get(incoming.student_id),studentLabel=g350StudentLabel(displayStudent,incoming.student_id);rows.push({key:store+'::'+identity,store,pk:existing?.[key]||incoming[key],incoming:structuredClone(incoming),existing:structuredClone(existing),groupId,trimester:g347GradeTrimester(sourceActivity,activity),activityLabel,studentLabel,studentNumber:displayStudent?.student_number,kind,reason,label:studentLabel+' · '+(group?formatGradeDisplay(group.grade,group.group_name):groupId||'')+' · '+(store==='attendance'?incoming.attendance_date:activityLabel)});}}return rows;}
 function g128Value(row,record){if(!record)return 'Sin registro';if(row.store==='attendance')return record.attendance_status+(record.justification_reason?' · '+record.justification_reason:'')+(record.note?' · '+record.note:'');return (record.grade===null||record.grade===undefined||record.grade===''?'Sin calificación':record.grade)+' · '+(record.delivery_status||'Sin estado')+(record.observation?' · '+record.observation:'');}
-async function g128Open(backup,source){if(g128Busy)return;const parsed=structuredClone(backup),snapshot=await g124Snapshot();if(source&&!source.isCurrent())return;const rows=g128Compare(parsed,snapshot);g128Model={source,id:generateId('reconcile'),backup:parsed,rows};g332Open(snapshot,parsed.records);g128SetupFilters(rows,snapshot,parsed);if(source?.recordType)document.getElementById('g128-record-type').value=source.recordType;g128SetReview(null);g128Selected.clear();g128Limit=100;document.getElementById('g128-search').value='';document.getElementById('g128-mode').value='changes';document.getElementById('g344-block-reason').value='';document.getElementById('g346-start-date').value='';document.getElementById('g346-end-date').value='';document.getElementById('g347-trimester').value='';document.getElementById('g348-activity').value='';document.getElementById('g128-error').textContent='';document.getElementById('g128-source').textContent='Respaldo creado: '+(parsed.created_at||'Sin fecha')+' · Origen: '+(parsed.sync_meta?.source_device_label||'Sin etiqueta de dispositivo')+'.';g128UpdateSummary(rows);document.getElementById('g339-status').textContent='';closeModal('modal-confirm-restore');openModal('modal-g128-reconcile');g128RenderRows();document.getElementById('g128-search').focus();}
+async function g128Open(backup,source){if(g128Busy)return;const parsed=structuredClone(backup),snapshot=await g124Snapshot();if(source&&!source.isCurrent())return;const rows=g128Compare(parsed,snapshot);g128Model={source,id:generateId('reconcile'),backup:parsed,rows};g332Open(snapshot,parsed.records);g128SetupFilters(rows,snapshot,parsed);g128SetReview(null);g128Selected.clear();g128Limit=100;g352ResetFilters('changes',source?.recordType||'all');document.getElementById('g353-order').value='';document.getElementById('g128-error').textContent='';document.getElementById('g128-source').textContent='Respaldo creado: '+(parsed.created_at||'Sin fecha')+' · Origen: '+(parsed.sync_meta?.source_device_label||'Sin etiqueta de dispositivo')+'.';g128UpdateSummary(rows);document.getElementById('g339-status').textContent='';closeModal('modal-confirm-restore');openModal('modal-g128-reconcile');g128RenderRows();document.getElementById('g128-search').focus();}
 function g128UpdateSummary(rows){
   const counts={new:0,different:0,same:0,blocked:0};
   for(const row of rows) counts[row.kind]++;
@@ -18748,6 +18786,20 @@ async function g345Recompare(){
   }
 }
 
+function g352ResetFilters(mode,type){
+  for(const id of ['g128-search','g128-group','g344-block-reason','g346-start-date','g346-end-date','g347-trimester','g348-activity','g350-student'])
+    document.getElementById(id).value='';
+  document.getElementById('g128-record-type').value=type;
+  document.getElementById('g128-mode').value=mode;
+}
+
+function g352ShowAllMarked(){
+  if(g128Busy||!g128Model||!g128Selected.size) return;
+  g352ResetFilters('selected','all');
+  g128ChangeFilters();
+  document.getElementById('g128-mode').focus();
+}
+
 function g128ChangeFilters(){
   if(g128Busy) return;
   g128Limit=100;
@@ -18789,6 +18841,35 @@ function g348RefreshGradeFilters(){
   select.disabled=g128Busy||!options.size;
 }
 
+function g350StudentLabel(student,id){
+  if(!student?.full_name) return id;
+  return student.student_number ? '#'+student.student_number+' '+student.full_name : student.full_name;
+}
+
+function g350RefreshStudentFilter(){
+  const group=document.getElementById('g128-group');
+  const select=document.getElementById('g350-student');
+  const selected=select.value;
+  const groupLabels=new Map(Array.from(group.options,option=>[option.value,option.text]));
+  const students=new Map();
+  for(const row of g128Model?.rows||[]){
+    const id=row.incoming.student_id;
+    if(!id||(group.value&&row.groupId!==group.value)) continue;
+    if(!students.has(id)) students.set(id,{label:row.studentLabel||id,groups:new Set()});
+    const groupName=groupLabels.get(row.groupId);
+    if(groupName) students.get(id).groups.add(groupName);
+  }
+  const labels=[...students].map(([id,student])=>[id,
+    (group.value?[student.label]:[student.label,...student.groups]).join(' · ')]);
+  const counts=new Map();
+  for(const [,label] of labels) counts.set(label,(counts.get(label)||0)+1);
+  select.replaceChildren(new Option('Todos los alumnos',''));
+  for(const [id,label] of labels.sort((a,b)=>a[1].localeCompare(b[1],'es',{numeric:true})))
+    select.add(new Option(counts.get(label)>1?label+' · '+id:label,id));
+  select.value=students.has(selected)?selected:'';
+  select.disabled=g128Busy||!students.size;
+}
+
 function g346AttendanceRange(){
   const start=document.getElementById('g346-start-date').value;
   const end=document.getElementById('g346-end-date').value;
@@ -18806,6 +18887,7 @@ function g128Filtered(blockReason=document.getElementById('g344-block-reason').v
   const query=g131Normalize(document.getElementById('g128-search').value.trim());
   const mode=document.getElementById('g128-mode').value;
   const group=document.getElementById('g128-group').value;
+  const student=document.getElementById('g350-student').value;
   const type=document.getElementById('g128-record-type').value;
   const range=type==='attendance'?g346AttendanceRange():null;
   const trimester=type==='activity_results'?document.getElementById('g347-trimester').value:'';
@@ -18817,7 +18899,7 @@ function g128Filtered(blockReason=document.getElementById('g344-block-reason').v
       const date=row.incoming.attendance_date;
       if(row.store!=='attendance'||!g125DateValid(date)||(range.start&&date<range.start)||(range.end&&date>range.end)) return false;
     }
-    return (!group||row.groupId===group)&&(type==='all'||row.store===type)&&(!trimester||row.trimester===trimester)&&
+    return (!group||row.groupId===group)&&(!student||row.incoming.student_id===student)&&(type==='all'||row.store===type)&&(!trimester||row.trimester===trimester)&&
     (!activity||row.incoming.activity_id===activity)&&
     (mode!=='selected'||g128Selected.has(row.key))&&
     (mode==='all'||mode==='selected'||(mode==='changes'&&row.kind!=='same')||
@@ -18845,6 +18927,31 @@ function g344RefreshBlockReasons(){
   select.disabled=g128Busy||!counts.size;
 }
 
+function g353SortRows(rows){
+  const order=document.getElementById('g353-order').value;
+  if(!order) return rows;
+  const labels=new Map(Array.from(document.getElementById('g128-group').options,option=>[option.value,option.text]));
+  const collator=new Intl.Collator('es',{numeric:true,sensitivity:'base'});
+  const compare=collator.compare;
+  const rank=row=>{
+    const number=Number(row.studentNumber);
+    return Number.isFinite(number)&&number>0?number:Number.MAX_SAFE_INTEGER;
+  };
+  const byStudent=(a,b)=>compare(labels.get(a.groupId)||a.groupId||'',labels.get(b.groupId)||b.groupId||'')||
+    rank(a)-rank(b)||compare(a.studentLabel,b.studentLabel);
+  if(order==='student') return [...rows].sort(byStudent);
+  const store=order==='date'?'attendance':'activity_results';
+  const field=row=>{
+    if(row.store!==store) return '';
+    return order==='date'?row.incoming.attendance_date:row.activityLabel;
+  };
+  return [...rows].sort((a,b)=>{
+    const first=field(a),second=field(b);
+    return Number(b.store===store)-Number(a.store===store)||Number(!!second)-Number(!!first)||
+      compare(first||'',second||'')||byStudent(a,b);
+  });
+}
+
 function g128UpdateSelection(filtered=g128Filtered()){
   const count=g128Selected.size;
   const unmarked={new:0,different:0};
@@ -18854,6 +18961,14 @@ function g128UpdateSelection(filtered=g128Filtered()){
     else if(row.kind==='new'||row.kind==='different') unmarked[row.kind]++;
   }
   const hidden=count-markedInFilter;
+  const showMarks=document.getElementById('g352-show-marks');
+  showMarks.hidden=!hidden;
+  showMarks.disabled=g128Busy||!hidden;
+  showMarks.textContent='Ver todas las marcas ('+count+')';
+  const reviewFiltered=document.getElementById('g351-review-filtered');
+  reviewFiltered.hidden=!hidden||!markedInFilter;
+  reviewFiltered.disabled=g128Busy||reviewFiltered.hidden;
+  reviewFiltered.textContent='Revisar solo marcas del filtro ('+markedInFilter+')';
   const markNew=document.getElementById('g341-mark-new');
   const markDifferent=document.getElementById('g341-mark-different');
   const clearFiltered=document.getElementById('g349-clear-filter');
@@ -18870,7 +18985,7 @@ function g128UpdateSelection(filtered=g128Filtered()){
   document.getElementById('g128-apply').textContent=count?'Revisar '+count+' '+(count===1?'registro':'registros'):'Revisar registros marcados';
 }
 
-function g128RenderRows(){g348RefreshGradeFilters();g346RefreshDateFilter();g344RefreshBlockReasons();const filtered=g128Filtered(),labels={new:'Nuevo',different:'Diferente',same:'Igual: se conserva',blocked:'Bloqueado'};document.getElementById('g128-rows').innerHTML=filtered.slice(0,g128Limit).map(r=>'<tr><td><input type="checkbox" aria-label="Actualizar '+escapeHTML(r.label)+'" data-key="'+escapeHTML(r.key)+'" '+(g128Selected.has(r.key)?'checked ':'')+(['new','different'].includes(r.kind)?'':'disabled ')+'onchange="g128Toggle(this.dataset.key,this.checked)"></td><th>'+escapeHTML(r.label)+'</th><td>'+escapeHTML(g128Value(r,r.existing))+'</td><td>'+escapeHTML(g128Value(r,r.incoming))+'</td><td>'+escapeHTML(labels[r.kind])+(r.reason?'<p>'+escapeHTML(r.reason)+'</p>':'')+'</td></tr>').join('')||'<tr><td colspan="5">Sin registros que coincidan con el filtro.</td></tr>';document.getElementById('g128-more').hidden=filtered.length<=g128Limit;g128UpdateSelection(filtered);}
+function g128RenderRows(){g350RefreshStudentFilter();g348RefreshGradeFilters();g346RefreshDateFilter();g344RefreshBlockReasons();const filtered=g128Filtered(),labels={new:'Nuevo',different:'Diferente',same:'Igual: se conserva',blocked:'Bloqueado'};document.getElementById('g128-rows').innerHTML=g353SortRows(filtered).slice(0,g128Limit).map(r=>'<tr><td><input type="checkbox" aria-label="Actualizar '+escapeHTML(r.label)+'" data-key="'+escapeHTML(r.key)+'" '+(g128Selected.has(r.key)?'checked ':'')+(['new','different'].includes(r.kind)?'':'disabled ')+'onchange="g128Toggle(this.dataset.key,this.checked)"></td><th>'+escapeHTML(r.label)+'</th><td>'+escapeHTML(g128Value(r,r.existing))+'</td><td>'+escapeHTML(g128Value(r,r.incoming))+'</td><td>'+escapeHTML(labels[r.kind])+(r.reason?'<p>'+escapeHTML(r.reason)+'</p>':'')+'</td></tr>').join('')||'<tr><td colspan="5">Sin registros que coincidan con el filtro.</td></tr>';document.getElementById('g128-more').hidden=filtered.length<=g128Limit;g128UpdateSelection(filtered);}
 function g128Toggle(key,checked){if(g128Busy)return;if(!g128Model?.rows.some(r=>r.key===key&&['new','different'].includes(r.kind)))return;if(checked)g128Selected.add(key);else g128Selected.delete(key);if(document.getElementById('g128-mode').value==='selected')g128RenderRows();else g128UpdateSelection();}
 function g341MarkFiltered(kind){
   if(g128Busy||!['new','different'].includes(kind)) return;
@@ -18885,7 +19000,8 @@ function g349ClearFiltered(){
 
 function g128ClearSelection(){if(g128Busy)return;g128Selected.clear();g128RenderRows();}
 function g128ShowMore(){g128Limit+=100;g128RenderRows();}
-async function g128Write(model,keys,expected=null){const selected=[...new Set(keys)];if(!selected.length)throw Error('Marca al menos un registro.');const db=await openDatabase(),names=[...db.objectStoreNames];const entry=await new Promise((resolve,reject)=>{const tx=db.transaction(names,'readwrite'),current={};let n=0,error,out;tx.oncomplete=()=>resolve(out);tx.onabort=()=>reject(error||tx.error||Error('No se guardó la conciliación.'));tx.onerror=()=>{};for(const name of names){const q=tx.objectStore(name).getAll();q.onsuccess=()=>{current[name]=q.result;if(++n!==names.length)return;try{const log=current.settings.find(s=>s.key===g128AuditKey)?.value||{version:1,entries:[]};g128ValidateHistory(log);const prior=log.entries.find(e=>e.id===model.id);if(prior){out=prior;return;}if(expected&&g124StateSignature(current)!==g124StateSignature(expected))throw Error('Los datos cambiaron después de preparar la copia de seguridad. Revisa de nuevo.');const latest=g128Compare(model.backup,current),now=new Date().toISOString();out={id:model.id,at:now,sourceCreatedAt:model.backup.created_at||'',changes:[]};for(const key of selected){const reviewed=model.rows.find(r=>r.key===key),live=latest.find(r=>r.key===key);if(!reviewed||!live||!['new','different'].includes(reviewed.kind)||!['new','different'].includes(live.kind)||g124Stable(live.existing)!==g124Stable(reviewed.existing)||live.kind!==reviewed.kind)throw Error('Un registro cambió o está bloqueado. Cierra y compara el respaldo nuevamente.');const pk=RESTORE_STORE_KEYS[live.store],record={...(live.existing||{}),...live.incoming,[pk]:live.pk,group_id:live.groupId,school_id:current.groups.find(g=>g.group_id===live.groupId)?.school_id||'',created_at:live.existing?.created_at||live.incoming.created_at||now,updated_at:now,reconciled_source_updated_at:live.incoming.updated_at||''};if(live.store==='activity_results'){record.grade=g128Meaning(live.store,live.incoming).grade;record.delivery_status=live.incoming.delivery_status||null;record.observation=live.incoming.observation||'';}else{record.note=live.incoming.note||'';record.justification_reason=live.incoming.justification_reason||'';}tx.objectStore(live.store).put(record);out.changes.push({store:live.store,pk:live.pk,previous:live.existing,next:record});}log.entries.push(out);tx.objectStore('settings').put({key:g128AuditKey,value:log});}catch(e){error=e;tx.abort();}};}});for(const c of entry.changes)if(g124Stable(await dbGet(c.store,c.pk))!==g124Stable(c.next))throw Error('Un registro cambió durante la verificación. Revisa su valor actual.');await refreshLocalCache();g128RefreshAttendance(entry,false);return entry;}
+async function g128Write(model,keys,expected=null){const selected=[...new Set(keys)];if(!selected.length)throw Error('Marca al menos un registro.');const db=await openDatabase(),names=[...db.objectStoreNames];const entry=await new Promise((resolve,reject)=>{const tx=db.transaction(names,'readwrite'),current={};let n=0,error,out;tx.oncomplete=()=>resolve(out);tx.onabort=()=>reject(error||tx.error||Error('No se guardó la conciliación.'));tx.onerror=()=>{};for(const name of names){const q=tx.objectStore(name).getAll();q.onsuccess=()=>{current[name]=q.result;if(++n!==names.length)return;try{const log=current.settings.find(s=>s.key===g128AuditKey)?.value||{version:1,entries:[]};g128ValidateHistory(log);const prior=log.entries.find(e=>e.id===model.id);if(prior){const applied=new Set(prior.changes.map(change=>change.store+'::'+restoreCompositeKey(change.next,RESTORE_UNIQUE_COMPOSITES[change.store])));if(applied.size!==selected.length||selected.some(key=>!applied.has(key)))throw Error('Vuelve a comparar los registros antes de guardar otra selección.');out=prior;return;}if(expected&&g124StateSignature(current)!==g124StateSignature(expected))throw Error('Los datos cambiaron después de preparar la copia de seguridad. Revisa de nuevo.');const latest=g354IndexFirst(g128Compare(model.backup,current),row=>row.key);
+const reviewedRows=g354IndexFirst(model.rows,row=>row.key),groups=g354IndexFirst(current.groups,group=>group.group_id),now=new Date().toISOString();out={id:model.id,at:now,sourceCreatedAt:model.backup.created_at||'',changes:[]};for(const key of selected){const reviewed=reviewedRows.get(key),live=latest.get(key);if(!reviewed||!live||!['new','different'].includes(reviewed.kind)||!['new','different'].includes(live.kind)||g124Stable(live.existing)!==g124Stable(reviewed.existing)||live.kind!==reviewed.kind)throw Error('Un registro cambió o está bloqueado. Cierra y compara el respaldo nuevamente.');const pk=RESTORE_STORE_KEYS[live.store],record={...(live.existing||{}),...live.incoming,[pk]:live.pk,group_id:live.groupId,school_id:groups.get(live.groupId)?.school_id||'',created_at:live.existing?.created_at||live.incoming.created_at||now,updated_at:now,reconciled_source_updated_at:live.incoming.updated_at||''};if(live.store==='activity_results'){record.grade=g128Meaning(live.store,live.incoming).grade;record.delivery_status=live.incoming.delivery_status||null;record.observation=live.incoming.observation||'';}else{record.note=live.incoming.note||'';record.justification_reason=live.incoming.justification_reason||'';}tx.objectStore(live.store).put(record);out.changes.push({store:live.store,pk:live.pk,previous:live.existing,next:record});}log.entries.push(out);tx.objectStore('settings').put({key:g128AuditKey,value:log});}catch(e){error=e;tx.abort();}};}});for(const c of entry.changes)if(g124Stable(await dbGet(c.store,c.pk))!==g124Stable(c.next))throw Error('Un registro cambió durante la verificación. Revisa su valor actual.');await refreshLocalCache();g128RefreshAttendance(entry,false);return entry;}
 
 function g128UndoIssue(change,data){
   const key=RESTORE_STORE_KEYS[change.store];
@@ -18980,10 +19096,17 @@ function g128SetReview(review){
   }
 }
 
-function g128ReviewSelected(focusIndex=null,focusGroup=false){
+function g351ReviewFiltered(){
+  if(g128Busy||!g128Model) return;
+  const keys=g128Filtered().filter(row=>g128Selected.has(row.key)).map(row=>row.key);
+  if(keys.length) g128ReviewSelected(null,false,keys);
+}
+
+function g128ReviewSelected(focusIndex=null,focusGroup=false,scope=null){
   if(g128Busy||!g128Model||!g128Selected.size) return;
-  const rows=g128Model.rows.filter(row=>g128Selected.has(row.key)&&['new','different'].includes(row.kind));
-  if(rows.length!==g128Selected.size){
+  const keys=scope?new Set(scope):g128Selected;
+  const rows=g128Model.rows.filter(row=>keys.has(row.key)&&g128Selected.has(row.key)&&['new','different'].includes(row.kind));
+  if(rows.length!==keys.size){
     document.getElementById('g128-error').textContent='La selección cambió. Revísala de nuevo.';
     return;
   }
@@ -19003,8 +19126,10 @@ function g128ReviewSelected(focusIndex=null,focusGroup=false){
     .map(([id,group])=>'<tr><th scope="row">'+escapeHTML(group.label)+'</th><td>'+group.attendance+
       '</td><td>'+(group.keys.length-group.attendance)+'</td><td><button type="button" data-group="'+
       escapeHTML(id)+'" aria-label="Quitar '+escapeHTML(group.label)+' del lote" onclick="g343RemoveGroup(this)">Quitar grupo</button></td></tr>').join('');
-  document.getElementById('g128-review-count').textContent=rows.length+' en total · '+attendance+' de asistencia · '+grades+' de calificaciones.';
-  document.getElementById('g128-review-rows').innerHTML=rows.map(row=>{
+  const pending=g128Selected.size-rows.length;
+  document.getElementById('g128-review-count').textContent=rows.length+' en total · '+attendance+' de asistencia · '+grades+' de calificaciones.'+
+    (pending?' Marcas reservadas para otro lote ('+pending+').':'');
+  document.getElementById('g128-review-rows').innerHTML=g353SortRows(rows).map(row=>{
     const group=groupLabels.get(row.groupId);
     const label=escapeHTML(row.label)+(group?'<br><small>'+escapeHTML(group)+'</small>':'');
     return '<tr><th scope="row">'+label+'</th><td>'+escapeHTML(g128Value(row,row.existing))+
@@ -19027,8 +19152,7 @@ function g342RemoveReviewed(button){
   if(g128Busy||!g128Review||g128Review.model!==g128Model) return;
   const key=button.dataset.key;
   if(!g128Review.keys.includes(key)||!g128Selected.delete(key)) return;
-  if(g128Selected.size) g128ReviewSelected(button.closest('tr').sectionRowIndex);
-  else g128EditSelection();
+  g351RefreshReviewAfterRemoval(button);
 }
 
 function g343RemoveGroup(button){
@@ -19036,7 +19160,12 @@ function g343RemoveGroup(button){
   const group=g128Review.groups.get(button.dataset.group);
   if(!group) return;
   for(const key of group.keys) g128Selected.delete(key);
-  if(g128Selected.size) g128ReviewSelected(button.closest('tr').sectionRowIndex,true);
+  g351RefreshReviewAfterRemoval(button,true);
+}
+
+function g351RefreshReviewAfterRemoval(button,focusGroup=false){
+  const keys=g128Review.keys.filter(key=>g128Selected.has(key));
+  if(keys.length) g128ReviewSelected(button.closest('tr').sectionRowIndex,focusGroup,keys);
   else g128EditSelection();
 }
 
@@ -19052,7 +19181,7 @@ async function g128ApplySelected(){
   if(g128Busy||!g128Review||g128Review.model!==g128Model) return;
   const {model,keys}=g128Review;
   const errorMessage=document.getElementById('g128-error');
-  if(keys.length!==g128Selected.size||keys.some(key=>!g128Selected.has(key))){
+  if(!keys.length||keys.some(key=>!g128Selected.has(key))){
     g128EditSelection();
     errorMessage.textContent='La selección cambió. Revisa los registros marcados antes de guardar.';
     return;
@@ -19076,11 +19205,12 @@ async function g128ApplySelected(){
     if(typeof g116RenderOutputs==='function')g116RenderOutputs();
     showToast('Conciliación guardada.');
 
+    for(const key of keys) g128Selected.delete(key);
     const updated=await g124Snapshot();
-    g128Selected.clear();
     const remaining=g340RefreshAcademic(model,updated,true);
     model.id=generateId('reconcile');
-    status.textContent=savedMessage+(remaining ? ' Quedan '+remaining+' '+(remaining===1?'registro disponible':'registros disponibles')+' en todo el respaldo.' : ' Ya no quedan cambios de asistencia o calificaciones disponibles para aplicar.');
+    status.textContent=savedMessage+(remaining ? ' Quedan '+remaining+' '+(remaining===1?'registro disponible':'registros disponibles')+' en todo el respaldo.' : ' Ya no quedan cambios de asistencia o calificaciones disponibles para aplicar.')+
+      (g128Selected.size?' Marcas conservadas para otro lote ('+g128Selected.size+').':'');
   }catch(error){
     if(savedMessage){
       g128Model=null;
@@ -19244,7 +19374,7 @@ function g128UndoLast(){
 
 
 const g128OldValidate=validateBackupObject;validateBackupObject=function(parsed){const validation=g128OldValidate(parsed);if(!validation.ok)return validation;try{if(parsed.records.settings?.[g128AuditKey]!==undefined)g128ValidateHistory(parsed.records.settings[g128AuditKey]);return validation;}catch(e){return {ok:false,message:e.message};}};
-{const style=document.createElement('style');style.textContent='#g128-reconcile-card{border:1px solid #c6d8cc;border-radius:14px;padding:16px;margin:14px 0;font-size:13px}#g128-receipts{margin-top:12px;border-top:1px solid #c6d8cc;padding-top:10px}#g128-receipts summary{cursor:pointer;font-weight:700}#g128-receipt-select{max-width:100%;padding:8px;border:1px solid #b6c7bc;border-radius:8px;background:white}#g128-reconcile-card h4{font-size:16px;font-weight:700}#g128-reconcile-card p{line-height:1.6}.g128-file{display:inline-flex;flex-direction:column;gap:6px;margin:10px 10px 10px 0}#modal-g128-reconcile{position:fixed;inset:0;z-index:160;background:#14221bbb;align-items:center;justify-content:center;padding:16px}.g128-modal-box{background:white;border-radius:20px;padding:22px;width:min(1150px,100%);max-height:92vh;overflow:auto;color:#172226}.g128-modal-box h3{font-size:22px}.g128-modal-box p{font-size:12px;line-height:1.6}.g128-toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:14px 0}.g128-toolbar label{display:flex;flex-direction:column;gap:5px;font-size:12px;max-width:100%}#g344-block-filter[hidden],#g346-date-filter[hidden],#g347-grade-filter[hidden],#g348-activity-filter[hidden]{display:none}#g348-activity{width:min(20rem,100%);text-overflow:ellipsis}#g346-date-status:empty{display:none}#g344-block-reason{max-width:100%;text-overflow:ellipsis}.g128-modal-box button,.g128-modal-box select,.g128-modal-box input[type=search],#g346-date-filter input[type=date],#g128-reconcile-card button,#g124-preflight button{padding:9px;border:1px solid #b6c7bc;border-radius:8px;background:white;color:#145b4b;font:inherit;font-size:12px;max-width:100%}.g128-scroll{overflow:auto}.g128-scroll table{width:100%;min-width:740px;border-collapse:collapse}.g128-scroll td,.g128-scroll th{padding:10px;border-bottom:1px solid #ddd;text-align:left;font-size:12px;overflow-wrap:anywhere}.g128-modal-box button:disabled{opacity:.5}#g128-error{color:#a12626;font-weight:600}';document.head.appendChild(style);}
+{const style=document.createElement('style');style.textContent='#g128-reconcile-card{border:1px solid #c6d8cc;border-radius:14px;padding:16px;margin:14px 0;font-size:13px}#g128-receipts{margin-top:12px;border-top:1px solid #c6d8cc;padding-top:10px}#g128-receipts summary{cursor:pointer;font-weight:700}#g128-receipt-select{max-width:100%;padding:8px;border:1px solid #b6c7bc;border-radius:8px;background:white}#g128-reconcile-card h4{font-size:16px;font-weight:700}#g128-reconcile-card p{line-height:1.6}.g128-file{display:inline-flex;flex-direction:column;gap:6px;margin:10px 10px 10px 0}#modal-g128-reconcile{position:fixed;inset:0;z-index:160;background:#14221bbb;align-items:center;justify-content:center;padding:16px}.g128-modal-box{background:white;border-radius:20px;padding:22px;width:min(1150px,100%);max-height:92vh;overflow:auto;color:#172226}.g128-modal-box h3{font-size:22px}.g128-modal-box p{font-size:12px;line-height:1.6}.g128-toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:14px 0}.g128-toolbar label{display:flex;flex-direction:column;gap:5px;font-size:12px;max-width:100%}#g344-block-filter[hidden],#g346-date-filter[hidden],#g347-grade-filter[hidden],#g348-activity-filter[hidden],#g351-review-filtered[hidden],#g352-show-marks[hidden]{display:none}#g348-activity,#g350-student{width:min(20rem,100%);text-overflow:ellipsis}#g346-date-status:empty{display:none}#g344-block-reason{max-width:100%;text-overflow:ellipsis}.g128-modal-box button,.g128-modal-box select,.g128-modal-box input[type=search],#g346-date-filter input[type=date],#g128-reconcile-card button,#g124-preflight button{padding:9px;border:1px solid #b6c7bc;border-radius:8px;background:white;color:#145b4b;font:inherit;font-size:12px;max-width:100%}.g128-scroll{overflow:auto}.g128-scroll table{width:100%;min-width:740px;border-collapse:collapse}.g128-scroll td,.g128-scroll th{padding:10px;border-bottom:1px solid #ddd;text-align:left;font-size:12px;overflow-wrap:anywhere}.g128-modal-box button:disabled{opacity:.5}#g128-error{color:#a12626;font-weight:600}';document.head.appendChild(style);}
 </script><div id="modal-g129-copy" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="g129-title"><div class="g129-box"><div class="g116-heading"><h3 id="g129-title" class="serif">Reutilizar actividades entre grupos</h3><button type="button" onclick="g129Close()">Cerrar</button></div><p>Copia los datos de las actividades y, si lo eliges, sus instrumentos de evaluación. Las nuevas actividades comienzan sin calificaciones ni entregas de alumnos.</p>
  <div class="g129-grid"><section><h4>Origen</h4><label>Grupo<select id="g129-source-group" onchange="g129LoadSources()"></select></label><label>Trimestre<select id="g129-source-trimester" onchange="g129LoadSources()"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option></select></label><div class="g129-actions"><button type="button" onclick="g129SelectSources(true)">Marcar actividades</button><button type="button" onclick="g129SelectSources(false)">Desmarcar</button></div><div id="g129-source-activities" class="g129-options"></div></section>
  <section><h4>Destino</h4><div id="g129-target-groups" class="g129-options"></div><label>Trimestre de destino<select id="g129-target-trimester" onchange="g129Invalidate()"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option></select></label><label>Fecha de entrega<select id="g129-date-mode" onchange="g129DateChanged()"><option value="keep">Conservar la fecha de cada actividad</option><option value="date">Usar una fecha común</option></select></label><label>Fecha común<input id="g129-date" type="date" disabled onchange="g129Invalidate()"></label><label class="g129-check"><input id="g129-instruments" type="checkbox" onchange="g129Invalidate()"> Copiar también los instrumentos activos vinculados</label></section></div>
