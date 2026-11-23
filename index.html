@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G330 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G332 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2881,7 +2881,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
                 <strong>Restauración segura:</strong> puedes combinar datos sin sobrescribir IDs existentes o reemplazar toda la base. Antes de reemplazar, la app descarga automáticamente un respaldo de seguridad de los datos actuales.
               </div>
 
-              <section id="g128-reconcile-card"><h4>Comparar respaldos entre dispositivos</h4><p>Revisa asistencias y calificaciones del archivo antes de actualizar registros locales. La conciliación es manual; no mantiene una sincronización automática.</p><label class="g128-file">Elegir respaldo para comparar<input id="g128-file" type="file" accept=".json,application/json" onchange="g128ReadFile(event)"></label><button type="button" onclick="g128UndoLast()">Deshacer última conciliación</button><p id="g128-card-status" role="status"></p><section id="g128-undo-issues" class="g188-quick-help" aria-label="Registros bloqueados" hidden></section><details id="g128-receipts" ontoggle="g128ToggleReceipts(this)">
+              <section id="g128-reconcile-card"><h4>Comparar respaldos entre dispositivos</h4><p>Compara grupos, horarios y actividades del respaldo. Revisa asistencias y calificaciones antes de actualizar registros locales. La conciliación es manual; no mantiene una sincronización automática.</p><label class="g128-file">Elegir respaldo para comparar<input id="g128-file" type="file" accept=".json,application/json" onchange="g128ReadFile(event)"></label><button type="button" onclick="g128UndoLast()">Deshacer última conciliación</button><p id="g128-card-status" role="status"></p><section id="g128-undo-issues" class="g188-quick-help" aria-label="Registros bloqueados" hidden></section><details id="g128-receipts" ontoggle="g128ToggleReceipts(this)">
   <summary>Historial de recuperaciones</summary>
   <div class="g128-toolbar">
     <label>Recuperación<select id="g128-receipt-select" onchange="g128RenderReceipt()" disabled></select></label>
@@ -14236,7 +14236,12 @@ function renderSchedule() {
       const activities=(localData.activities||[]).filter(activity=>
         activity.group_id===groupId&&(period==='ANNUAL'||(activity.trimester||'T1')===period)&&
         (includeArchived||(activity.status||'ACTIVE')==='ACTIVE'));
-      return activities.sort(makeReportActivityComparator(period==='ANNUAL'));
+      activities.sort(makeReportActivityComparator(period==='ANNUAL'));
+      const order = (rows, trimester) => applyPresentationOrder(rows,'activity_id',presentationOrderKey('activities',groupId,trimester));
+      if (period !== 'ANNUAL') return order(activities,period);
+      const periods = ['T1','T2','T3'];
+      return periods.flatMap(trimester => order(activities.filter(activity => (activity.trimester || 'T1') === trimester),trimester))
+        .concat(activities.filter(activity => activity.trimester && !periods.includes(activity.trimester)));
     }
 
     function renderStudentReport(studentId,groupId,period,cfg) {
@@ -18171,7 +18176,21 @@ const g127OldPrint=g122PrintHTML;g122PrintHTML=function(){const doc=new DOMParse
 const g127OldValidate=validateBackupObject;validateBackupObject=function(parsed){const v=g127OldValidate(parsed);if(!v.ok)return v;try{for(const [key,value] of Object.entries(parsed.records.settings||{}))if(key.startsWith('g127_seating_layouts::'))g127Validate(value);return v;}catch(e){return {ok:false,message:'La colección de planos del respaldo no es válida: '+e.message};}};
 const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const counts=g127OldCounts(settings);for(const [key,value] of Object.entries(settings||{}))if(key.startsWith('g127_seating_layouts::')){const groupId=key.slice('g127_seating_layouts::'.length),active=settings[g122Key(groupId)]||null,library=g127Resolved(value,active);counts.plans+=library.items.length-(active?1:0);counts.placed+=library.items.reduce((n,item)=>n+item.plan.seats.filter(Boolean).length,0)-(active?.seats||[]).filter(Boolean).length;}return counts;};
 {const style=document.createElement('style');style.textContent='#g127-layouts{border:1px solid #d9e1da;border-radius:14px;padding:12px;margin:14px 0}#g127-layout-name{max-width:100%}#g127-layouts .g116-actions label{min-width:0}';document.head.appendChild(style);}
-</script><div id="modal-g128-reconcile" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="g128-title"><div class="g128-modal-box"><div class="g116-heading"><h3 id="g128-title" class="serif">Comparar asistencia y calificaciones</h3><button type="button" onclick="g128Close()">Cerrar</button></div><p id="g128-source"></p><p id="g128-summary"></p><p>Solo se actualizarán los registros que marques. Los demás módulos del respaldo se conservan sin cambios. Las referencias deben existir en este dispositivo.</p>
+</script><div id="modal-g128-reconcile" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="g128-title"><div class="g128-modal-box"><div class="g116-heading"><h3 id="g128-title" class="serif">Comparar respaldos entre dispositivos</h3><button type="button" onclick="g128Close()">Cerrar</button></div><p id="g128-source"></p><p id="g128-summary"></p><p>Solo se actualizarán los registros que marques. Los demás módulos del respaldo se conservan sin cambios. Las referencias deben existir en este dispositivo.</p>
+ <details id="g332-structure" class="my-3 rounded-xl border p-3">
+  <summary class="cursor-pointer font-bold">Diferencias en grupos, horarios y actividades</summary>
+  <p class="mt-2">Esta consulta compara los identificadores de los registros. Un registro presente en una sola copia puede haberse creado o eliminado entre respaldos.</p>
+  <div class="g128-toolbar">
+    <label>Tipo de registro<select id="g332-type" onchange="g332Render(true)"><option value="all">Todos los tipos</option><option value="groups">Grupos</option><option value="schedule">Horario</option><option value="activities">Actividades</option></select></label>
+    <label>Buscar grupo o actividad<input id="g332-search" type="search" oninput="g332Render(true)"></label>
+  </div>
+  <p id="g332-status" role="status"></p>
+  <div class="g128-scroll"><table>
+    <thead><tr><th scope="col">Registro</th><th scope="col">En este dispositivo</th><th scope="col">En el respaldo</th><th scope="col">Comparación</th></tr></thead>
+    <tbody id="g332-rows"></tbody>
+  </table></div>
+  <button id="g332-more" type="button" onclick="g332ShowMore()" hidden>Mostrar más diferencias</button>
+ </details>
  <div id="g128-browser"><div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><button type="button" onclick="g128SelectNew()">Marcar nuevos del filtro</button><button type="button" onclick="g128ClearSelection()">Desmarcar todos</button></div>
  <p id="g128-selection" role="status"></p><div class="g128-scroll"><table><thead><tr><th>Actualizar</th><th>Alumno y registro</th><th>En este dispositivo</th><th>En el respaldo</th><th>Comparación</th></tr></thead><tbody id="g128-rows"></tbody></table></div><button type="button" id="g128-more" onclick="g128ShowMore()">Mostrar más registros</button><div class="g128-toolbar"><button type="button" onclick="g128Close()">Cancelar</button><button type="button" id="g128-apply" onclick="g128ReviewSelected()">Revisar registros marcados</button></div></div>
 <div id="g128-review" hidden>
@@ -18186,6 +18205,79 @@ const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const count
     <button type="button" onclick="g128ApplySelected()">Confirmar y actualizar</button>
   </div>
 </div><p id="g128-error" role="alert"></p></div></div>
+<script id="g332-backup-structure">
+const g332Types = {groups:'Grupo',schedule:'Horario',activities:'Actividad'};
+let g332Rows = [], g332Limit = 100;
+
+function g332Compare(local, backup) {
+  const describe = data => {
+    const schools = new Map((data.schools||[]).map(record=>[record.school_id,record.school_name]));
+    const groups = new Map((data.groups||[]).map(record=>[record.group_id,record]));
+    const groupLabel = id => {
+      const group = groups.get(id);
+      return group ? formatGroupLabelWithShift(group,{school_name:schools.get(group.school_id)}) : id || 'Sin grupo';
+    };
+    const fields = (store, row) => {
+      if (!row) return null;
+      const status = row.status || 'ACTIVE';
+      const common = [['Estado',status,status==='ARCHIVED'?'Archivado':status==='ACTIVE'?'Activo':status]];
+      if (store === 'groups') return [
+        ['Escuela',row.school_id,schools.get(row.school_id) || row.school_id], ['Grado',String(row.grade ?? '')],
+        ['Grupo',row.group_name], ['Turno',groupShiftBadge(row.shift)[1]], ['Asignatura',row.subject], ['Ciclo',row.school_year], ...common
+      ];
+      const group = ['Grupo',row.group_id,groupLabel(row.group_id)];
+      if (store === 'schedule') return [group,['Día',String(row.day_of_week ?? ''),DAY_NAMES[row.day_of_week]],
+        ['Inicio',row.start_time], ['Fin',row.end_time], ...common];
+      return [group,['Clave',row.activity_code],['Actividad',row.activity_name],['Trimestre',row.trimester||'T1'],
+        ['Tipo',row.activity_type,activityTypeLabel(row.activity_type)],['Fecha de entrega',row.due_date],['Escala máxima',String(row.max_grade??10)],...common];
+    };
+    return {groupLabel,fields};
+  };
+  const left = describe(local), right = describe(backup), rows = [];
+  for (const [store,type] of Object.entries(g332Types)) {
+    const pk = RESTORE_STORE_KEYS[store];
+    const current = new Map((local[store]||[]).map(record=>[record[pk],record]));
+    const incoming = new Map((backup[store]||[]).map(record=>[record[pk],record]));
+    for (const id of new Set([...current.keys(),...incoming.keys()])) {
+      const before = current.get(id), after = incoming.get(id);
+      const group = (after ? right : left).groupLabel((after || before).group_id);
+      const record = after || before;
+      const detail = store==='activities' ? [record.activity_code,record.activity_name].filter(Boolean).join(' · ')
+        : store==='schedule' ? [DAY_NAMES[record.day_of_week],record.start_time,record.end_time].filter(Boolean).join(' ') : '';
+      const title = [type,group,detail].filter(Boolean).join(' · ');
+      const a = left.fields(store,before), b = right.fields(store,after);
+      const changes = a && b ? a.map((field,i)=>i).filter(i=>String(a[i][1]??'')!==String(b[i][1]??'')) : null;
+      if (changes && !changes.length) continue;
+      const asText = (fields) => fields ? fields.filter((_,i)=>!changes||changes.includes(i))
+        .map(([label,value,display])=>label+' · '+((display??value)||'—')).join('\n') : '—';
+      rows.push({store,title,before:asText(a),after:asText(b),kind:a&&b?'Diferente':a?'Solo en este dispositivo':'Solo en el respaldo'});
+    }
+  }
+  return rows;
+}
+
+function g332Open(snapshot, records) {
+  g332Rows = g332Compare(snapshot,records);
+  document.getElementById('g332-type').value = 'all';
+  document.getElementById('g332-search').value = '';
+  document.getElementById('g332-structure').open = false;
+  g332Render(true);
+}
+
+function g332Render(reset=false) {
+  if (reset) g332Limit=100;
+  const type=document.getElementById('g332-type').value;
+  const terms=normalizeStudentName(document.getElementById('g332-search').value).split(/\s+/).filter(Boolean);
+  const rows=g332Rows.filter(row=>(type==='all'||row.store===type) &&
+    terms.every(term=>normalizeStudentName([row.title,row.before,row.after].join(' ')).includes(term)));
+  document.getElementById('g332-status').textContent=rows.length ? 'Diferencias encontradas: '+rows.length : 'Sin diferencias en esta consulta.';
+  document.getElementById('g332-rows').innerHTML=rows.slice(0,g332Limit).map(row=>
+    '<tr><th scope="row">'+escapeHTML(row.title)+'</th><td style="white-space:pre-line">'+escapeHTML(row.before)+'</td><td style="white-space:pre-line">'+escapeHTML(row.after)+'</td><td>'+escapeHTML(row.kind)+'</td></tr>').join('');
+  document.getElementById('g332-more').hidden = rows.length <= g332Limit;
+}
+
+function g332ShowMore() { g332Limit += 100; g332Render(); }
+</script>
 <script id="g128-reconcile-backups">/* G305: opt-in reconciliation of attendance and activity results; never automatic sync. */
 let g128Model=null,g128Selected=new Set(),g128Busy=false,g128Limit=100,g128Review=null;
 const g128AuditKey='g128_reconciliation_history';
@@ -18195,9 +18287,9 @@ function g128ValidateHistory(history){if(!g124Plain(history)||history.version!==
 function g128Meaning(store,r){if(!r)return null;return store==='attendance'?{status:r.attendance_status,note:r.note||'',reason:r.justification_reason||''}:{grade:r.grade===null||r.grade===undefined||r.grade===''?null:Number(r.grade),delivery:r.delivery_status||null,observation:r.observation||''};}
 function g128Compare(backup,snapshot){const validation=validateBackupObject(backup);if(!validation.ok)throw Error(validation.message);const rows=[];for(const store of ['attendance','activity_results']){const key=RESTORE_STORE_KEYS[store],fields=RESTORE_UNIQUE_COMPOSITES[store];for(const incoming of backup.records[store]||[]){const identity=restoreCompositeKey(incoming,fields),primary=(snapshot[store]||[]).find(r=>r[key]===incoming[key]),existing=primary||(snapshot[store]||[]).find(r=>restoreCompositeKey(r,fields)===identity)||null,student=snapshot.students.find(s=>s.student_id===incoming.student_id),activity=store==='activity_results'?snapshot.activities.find(a=>a.activity_id===incoming.activity_id):null,groupId=store==='attendance'?incoming.group_id:activity?.group_id||incoming.group_id,group=snapshot.groups.find(g=>g.group_id===groupId),sourceGroup=(backup.records.groups||[]).find(g=>g.group_id===groupId),sourceActivity=activity?(backup.records.activities||[]).find(a=>a.activity_id===activity.activity_id):null;let reason='';if(!identity)reason='El registro no tiene una identidad completa.';else if(primary&&restoreCompositeKey(primary,fields)!==identity)reason='El identificador corresponde a otro registro local.';else if(!student||!group)reason='Falta el alumno o el grupo en este dispositivo.';else if(student.group_id!==groupId)reason='El alumno pertenece a otro grupo local.';else if(group.status==='ARCHIVED')reason='El grupo está archivado.';else if(sourceGroup?.school_year&&group.school_year&&sourceGroup.school_year!==group.school_year)reason='El ciclo escolar del grupo es diferente.';else if(store==='attendance'&&(!g125DateValid(incoming.attendance_date)||!['P','R','F','FJ','RJ','SA'].includes(incoming.attendance_status)))reason='La fecha o el estado de asistencia no son válidos.';else if(store==='activity_results'){if(!activity||(activity.status||'ACTIVE')!=='ACTIVE')reason='Falta la actividad o está archivada.';else if(incoming.group_id&&incoming.group_id!==activity.group_id)reason='La actividad y el grupo del archivo no coinciden.';else if(sourceActivity&&(sourceActivity.trimester!==activity.trimester||g115MaxGrade(sourceActivity)!==g115MaxGrade(activity)))reason='La actividad tiene otro trimestre o escala en el archivo.';else if(tempGradebookState.has(gradeResultKey(incoming.activity_id,incoming.student_id)))reason='Hay una calificación sin guardar en el cuaderno.';else if(snapshot.academic_closures.some(c=>c.group_id===groupId&&c.trimester===activity.trimester&&c.status==='CLOSED'))reason='El trimestre está cerrado.';else{const grade=g128Meaning(store,incoming).grade;if(incoming.grade!==null&&incoming.grade!==undefined&&incoming.grade!==''&&!['number','string'].includes(typeof incoming.grade))reason='El formato de la calificación no es válido.';if(grade!==null&&(!Number.isFinite(grade)||grade<0||grade>g115MaxGrade(activity)))reason='La calificación está fuera de la escala local.';if(!['','AT','TA','SE','JU'].includes(incoming.delivery_status||''))reason='El estado de entrega no es válido.';}}if(!reason&&store==='attendance'&&g128AttendanceDraftChanged(incoming,existing))reason='Hay un cambio de asistencia sin guardar para este alumno y fecha.';const kind=reason?'blocked':!existing?'new':g124Stable(g128Meaning(store,existing))===g124Stable(g128Meaning(store,incoming))?'same':'different';rows.push({key:store+'::'+identity,store,pk:existing?.[key]||incoming[key],incoming:structuredClone(incoming),existing:structuredClone(existing),groupId,kind,reason,label:(student?'#'+(student.student_number||'-')+' '+student.full_name:incoming.student_id)+' · '+(group?formatGradeDisplay(group.grade,group.group_name):groupId||'')+' · '+(store==='attendance'?incoming.attendance_date:activity?.activity_name||incoming.activity_id)});}}return rows;}
 function g128Value(row,record){if(!record)return 'Sin registro';if(row.store==='attendance')return record.attendance_status+(record.justification_reason?' · '+record.justification_reason:'')+(record.note?' · '+record.note:'');return (record.grade===null||record.grade===undefined||record.grade===''?'Sin calificación':record.grade)+' · '+(record.delivery_status||'Sin estado')+(record.observation?' · '+record.observation:'');}
-async function g128Open(backup,source){if(g128Busy)return;const parsed=structuredClone(backup),snapshot=await g124Snapshot();if(source&&!source.isCurrent())return;const rows=g128Compare(parsed,snapshot);g128Model={source,id:generateId('reconcile'),backup:parsed,rows};g128SetupFilters(rows,snapshot,parsed);if(source?.recordType)document.getElementById('g128-record-type').value=source.recordType;g128SetReview(null);g128Selected.clear();g128Limit=100;document.getElementById('g128-search').value='';document.getElementById('g128-mode').value='changes';document.getElementById('g128-error').textContent='';document.getElementById('g128-source').textContent='Respaldo creado: '+(parsed.created_at||'Sin fecha')+' · Origen: '+(parsed.sync_meta?.source_device_label||'Sin etiqueta de dispositivo')+'.';const counts=Object.fromEntries(['new','different','same','blocked'].map(k=>[k,rows.filter(r=>r.kind===k).length]));document.getElementById('g128-summary').textContent=counts.new+' nuevos · '+counts.different+' diferentes · '+counts.same+' iguales · '+counts.blocked+' bloqueados.';closeModal('modal-confirm-restore');openModal('modal-g128-reconcile');g128RenderRows();document.getElementById('g128-search').focus();}
+async function g128Open(backup,source){if(g128Busy)return;const parsed=structuredClone(backup),snapshot=await g124Snapshot();if(source&&!source.isCurrent())return;const rows=g128Compare(parsed,snapshot);g128Model={source,id:generateId('reconcile'),backup:parsed,rows};g332Open(snapshot,parsed.records);g128SetupFilters(rows,snapshot,parsed);if(source?.recordType)document.getElementById('g128-record-type').value=source.recordType;g128SetReview(null);g128Selected.clear();g128Limit=100;document.getElementById('g128-search').value='';document.getElementById('g128-mode').value='changes';document.getElementById('g128-error').textContent='';document.getElementById('g128-source').textContent='Respaldo creado: '+(parsed.created_at||'Sin fecha')+' · Origen: '+(parsed.sync_meta?.source_device_label||'Sin etiqueta de dispositivo')+'.';const counts=Object.fromEntries(['new','different','same','blocked'].map(k=>[k,rows.filter(r=>r.kind===k).length]));document.getElementById('g128-summary').textContent=counts.new+' nuevos · '+counts.different+' diferentes · '+counts.same+' iguales · '+counts.blocked+' bloqueados.';closeModal('modal-confirm-restore');openModal('modal-g128-reconcile');g128RenderRows();document.getElementById('g128-search').focus();}
 async function g128ReadFile(event){const file=event.target.files?.[0];if(!file)return;try{if(file.size>50*1024*1024)throw Error('El archivo supera 50 MB.');await g128Open(JSON.parse(await file.text()));}catch(e){document.getElementById('g128-card-status').textContent='No se pudo comparar: '+e.message;}finally{event.target.value='';}}
-function g128Close(){if(g128Busy)return;const source=g128Model?.source;closeModal('modal-g128-reconcile');g128Model=null;g128Selected.clear();g128SetReview(null);source?.returnToPreview();}
+function g128Close(){if(g128Busy)return;const source=g128Model?.source;closeModal('modal-g128-reconcile');g128Model=null;g332Rows=[];document.getElementById('g332-rows').replaceChildren();g128Selected.clear();g128SetReview(null);source?.returnToPreview();}
 
 function g128SetupFilters(rows,snapshot,backup){
   const select=document.getElementById('g128-group');
@@ -21157,9 +21249,7 @@ function g325RenderStudentGrades() {
   if (students.some(student => student.student_id === previous)) select.value = previous;
   const student = students.find(row => row.student_id === select.value);
   const closed = isTrimesterClosed(groupId,period);
-  const activities = student
-    ? applyPresentationOrder(getOrderedReportActivities(groupId,period),'activity_id',presentationOrderKey('activities',groupId,period))
-    : [];
+  const activities = student ? getOrderedReportActivities(groupId,period) : [];
   document.getElementById('student-grade-fields').disabled = closed;
   const message = document.getElementById('student-grade-message');
   message.textContent = closed ? 'Trimestre cerrado. Las calificaciones se muestran en modo de consulta.'
