@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G305 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G308 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2296,6 +2296,16 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
             </div>
           </div>
 
+          <div id="report-global-filters" class="no-print bg-white rounded-3xl border border-[#d9e1da] p-5 mb-5" hidden>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <label for="report-school-filter" class="block text-xs font-bold text-[#66767a]">Escuela
+                <select id="report-school-filter" class="block w-full mt-1 rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" onchange="renderReports()"></select>
+              </label>
+              <label for="report-shift-filter" class="block text-xs font-bold text-[#66767a]">Turno
+                <select id="report-shift-filter" class="block w-full mt-1 rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" onchange="renderReports()"></select>
+              </label>
+            </div>
+          </div>
           <div id="report-cycle-banner" class="hidden rounded-2xl border border-[#d9e1da] bg-[#f7faf7] p-4 mb-4 no-print"></div>
           <div id="report-print-area" class="bg-white rounded-3xl border border-[#d9e1da] p-7">
             <div class="border-b pb-4 mb-6">
@@ -2327,7 +2337,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
               <h3 class="font-bold text-lg mb-3">Resumen por Grupo</h3>
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm border-collapse">
-                  <thead><tr class="border-b bg-slate-100"><th class="p-2">Grupo</th><th class="p-2">Asignatura</th><th class="p-2">Activos</th><th class="p-2">Asistencia %</th><th class="p-2">Promedio</th><th class="p-2">Estatus</th></tr></thead>
+                  <thead><tr class="border-b bg-slate-100"><th class="p-2">Grupo</th><th class="p-2">Turno</th><th class="p-2">Escuela</th><th class="p-2">Asignatura</th><th class="p-2">Activos</th><th class="p-2">Asistencia %</th><th class="p-2">Promedio</th><th class="p-2">Estatus</th></tr></thead>
                   <tbody id="report-summary-tbody"></tbody>
                 </table>
               </div>
@@ -12754,7 +12764,20 @@ function renderSchedule() {
       renderReports();
     }
 
-function populateReportControls() {
+    function groupShiftBadge(shift) {
+      const text=String(shift||'').trim();
+      const normalized=text.toLowerCase().replace(/^turno\s+/,'');
+      if (['matutino','m','tm','t.m.'].includes(normalized)) return ['☀','Matutino','morning'];
+      if (['vespertino','v','tv','t.v.'].includes(normalized)) return ['☾','Vespertino','evening'];
+      return ['',text||'Turno sin definir','other'];
+    }
+
+    function formatReportGroupLabel(group, school) {
+      const [, shift] = groupShiftBadge(group.shift);
+      return [shift, formatGradeDisplay(group.grade, group.group_name), group.subject, school?.school_name].filter(Boolean).join(' · ');
+    }
+
+    function populateReportControls() {
       populateReportCycleOptions();
       const groupSelect = document.getElementById('report-group-select');
       if (!groupSelect) return;
@@ -12762,8 +12785,7 @@ function populateReportControls() {
       const groups = getReportCycleGroups();
       renderSelectOptions(groupSelect, groups.map(g => {
         const school = localData.schools.find(s => s.school_id === g.school_id);
-        const label = formatGradeDisplay(g.grade, g.group_name) + ' - ' + (g.subject || '');
-        return [g.group_id, school ? label + ' · ' + (school.school_name || '') : label];
+        return [g.group_id, formatReportGroupLabel(g, school)];
       }), 'Sin grupos para este ciclo');
       if (groups.some(g=>g.group_id===current)) groupSelect.value=current;
       else if (groups.length) groupSelect.value=groups[0].group_id;
@@ -13115,20 +13137,29 @@ function populateReportControls() {
       const title = document.getElementById('report-main-title');
       const context = document.getElementById('report-context-line');
       if (title) title.textContent = type==='STUDENT' ? 'Reporte Individual del Alumno' : (type==='GROUP' ? 'Concentrado Académico por Grupo' : (type==='ANALYTICS' ? 'Analítica y Alertas Pedagógicas' : (type==='TRIMESTER_REVIEW' ? 'Centro de Evaluación del Trimestre' : 'Informe Consolidado Docente Local')));
-      if (context) context.textContent = group ? `${formatGradeDisplay(group.grade,group.group_name)} · ${group.subject}${school ? ' · '+school.school_name : ''} · ${resolveReportCycleYear()} · ${period==='ANNUAL'?'Anual':period}` : `Ciclo ${resolveReportCycleYear()} · ${period==='ANNUAL'?'Anual':period}`;
+      const global = type === 'GLOBAL';
       const cycleGroups = getReportCycleGroups();
-      const cycleGroupIds = new Set(cycleGroups.map(g=>g.group_id));
-      const students = group ? localData.students.filter(s=>s.group_id===groupId && (isHistoricalReportCycle() || s.status!=='INACTIVE')) : localData.students.filter(s=>cycleGroupIds.has(s.group_id) && (isHistoricalReportCycle() || s.status!=='INACTIVE'));
-      const atts = group ? localData.attendance.filter(a=>a.group_id===groupId) : localData.attendance.filter(a=>cycleGroupIds.has(a.group_id));
+      populateGlobalReportFilters(global, cycleGroups);
+      const reportGroups = global ? getFilteredGlobalReportGroups(cycleGroups) : cycleGroups;
+      if (context && global) {
+        const schoolLabel = document.getElementById('report-school-filter').selectedOptions[0]?.textContent;
+        const shiftLabel = document.getElementById('report-shift-filter').selectedOptions[0]?.textContent;
+        context.textContent = [schoolLabel, shiftLabel, resolveReportCycleYear(), period === 'ANNUAL' ? 'Anual' : period,
+          reportGroups.length + (reportGroups.length === 1 ? ' grupo' : ' grupos')].filter(Boolean).join(' · ');
+      } else if (context) context.textContent = group ? `${formatReportGroupLabel(group, school)} · ${resolveReportCycleYear()} · ${period==='ANNUAL'?'Anual':period}` : `Ciclo ${resolveReportCycleYear()} · ${period==='ANNUAL'?'Anual':period}`;
+      const cycleGroupIds = new Set(reportGroups.map(g=>g.group_id));
+      const useSelectedGroup = !global && group;
+      const students = useSelectedGroup ? localData.students.filter(s=>s.group_id===groupId && (isHistoricalReportCycle() || s.status!=='INACTIVE')) : localData.students.filter(s=>cycleGroupIds.has(s.group_id) && ((!global && isHistoricalReportCycle()) || s.status!=='INACTIVE'));
+      const atts = useSelectedGroup ? localData.attendance.filter(a=>a.group_id===groupId) : localData.attendance.filter(a=>cycleGroupIds.has(a.group_id));
       const attPct = calculateAttendancePercentage(atts);
-      const groupAvg = group ? getGroupAcademicAverage(groupId,period) : (()=>{ const vals=cycleGroups.map(g=>getGroupAcademicAverage(g.group_id,period)).filter(v=>v!==null); return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null; })();
-      const missing = group ? localData.activity_results.filter(r=>r.group_id===groupId && r.delivery_status==='SE').length : localData.activity_results.filter(r=>cycleGroupIds.has(r.group_id) && r.delivery_status==='SE').length;
+      const groupAvg = useSelectedGroup ? getGroupAcademicAverage(groupId,period) : (()=>{ const vals=reportGroups.map(g=>getGroupAcademicAverage(g.group_id,period)).filter(v=>v!==null); return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null; })();
+      const missing = useSelectedGroup ? localData.activity_results.filter(r=>r.group_id===groupId && r.delivery_status==='SE').length : localData.activity_results.filter(r=>cycleGroupIds.has(r.group_id) && r.delivery_status==='SE').length;
       document.getElementById('report-total-students').textContent = students.length || '—';
       document.getElementById('report-avg-attendance').textContent = attPct===null?'—':`${Math.round(attPct)}%`;
       document.getElementById('report-avg-grade').textContent = groupAvg===null?'—':groupAvg.toFixed(1);
       document.getElementById('report-missing-count').textContent = missing || '—';
 
-      if (type==='GLOBAL') renderGlobalReportTable(period);
+      if (global) renderGlobalReportTable(period, reportGroups);
       if (type==='GROUP') renderGroupReportTable(groupId,period);
       if (type==='STUDENT') renderStudentReport(studentId,groupId,period,cfg);
       if (type==='ANALYTICS') renderAnalyticsReport();
@@ -13766,16 +13797,53 @@ function populateReportControls() {
       }).join('') : '<tr><td colspan="7" class="p-4 text-center text-[#66767a]">Sin alumnos activos en el grupo.</td></tr>';
     }
 
-    function renderGlobalReportTable(period) {
+    function reportGroupIdentity(group) {
+      const school = localData.schools.find(s => s.school_id === group?.school_id);
+      return [groupShiftBadge(group?.shift)[1], school?.school_name || ''];
+    }
+
+    function populateGlobalReportFilters(visible, groups) {
+      const panel = document.getElementById('report-global-filters');
+      if (!panel) return;
+      panel.hidden = !visible;
+      if (!visible) return;
+      const schools = new Map();
+      const shifts = new Map();
+      for (const group of groups) {
+        const [shift, school] = reportGroupIdentity(group);
+        if (group.school_id) schools.set(String(group.school_id), school || 'Escuela sin nombre');
+        shifts.set(shift, shift);
+      }
+      for (const [id, options, allLabel] of [
+        ['report-school-filter', schools, 'Todas las escuelas'],
+        ['report-shift-filter', shifts, 'Todos los turnos']
+      ]) {
+        const select = document.getElementById(id);
+        const previous = select.value;
+        const rows = [...options].sort((a, b) => a[1].localeCompare(b[1], 'es-MX'));
+        renderSelectOptions(select, [['', allLabel], ...rows]);
+        select.value = options.has(previous) ? previous : '';
+      }
+    }
+
+    function getFilteredGlobalReportGroups(groups = getReportCycleGroups()) {
+      const school = document.getElementById('report-school-filter')?.value;
+      const shift = document.getElementById('report-shift-filter')?.value;
+      return groups.filter(group =>
+        (!school || String(group.school_id) === school) && (!shift || groupShiftBadge(group.shift)[1] === shift)
+      );
+    }
+
+    function renderGlobalReportTable(period, cycleGroups) {
       const tbody=document.getElementById('report-summary-tbody'); if(!tbody) return;
-      const cycleGroups=getReportCycleGroups();
-      if(!cycleGroups.length){tbody.innerHTML='<tr><td colspan="6" class="p-4 text-center text-[#66767a]">Sin datos de grupos para este ciclo.</td></tr>'; return;}
+      if(!cycleGroups.length){tbody.innerHTML='<tr><td colspan="8" class="p-4 text-center text-[#66767a]">No hay grupos que coincidan con los filtros.</td></tr>'; return;}
       tbody.innerHTML=cycleGroups.map(g=>{
         const st=localData.students.filter(s=>s.group_id===g.group_id && s.status!=='INACTIVE');
         const at=localData.attendance.filter(a=>a.group_id===g.group_id); const ap=calculateAttendancePercentage(at);
         const avg=getGroupAcademicAverage(g.group_id,period); const cfg=getEvaluationConfig(g.group_id);
         const status=avg===null?'Pendiente':(avg>=cfg.passing_grade?'Aprobado':'Requiere seguimiento');
-        return `<tr class="border-b"><td class="p-2 font-bold">${escapeHTML(formatGradeDisplay(g.grade,g.group_name))}</td><td class="p-2">${escapeHTML(g.subject)}</td><td class="p-2">${st.length}</td><td class="p-2">${ap===null?'—':Math.round(ap)+'%'}</td><td class="p-2">${reportGradeDisplay(avg)}</td><td class="p-2 font-bold">${status}</td></tr>`;
+        const [shift, school] = reportGroupIdentity(g);
+        return `<tr class="border-b"><td class="p-2 font-bold">${escapeHTML(formatGradeDisplay(g.grade,g.group_name))}</td><td class="p-2">${escapeHTML(shift)}</td><td class="p-2">${escapeHTML(school)}</td><td class="p-2">${escapeHTML(g.subject)}</td><td class="p-2">${st.length}</td><td class="p-2">${ap===null?'—':Math.round(ap)+'%'}</td><td class="p-2">${reportGradeDisplay(avg)}</td><td class="p-2 font-bold">${status}</td></tr>`;
       }).join('');
     }
 
@@ -13863,7 +13931,9 @@ function populateReportControls() {
         g119DownloadAcademicCSV(`analitica_${formatGradeDisplay(group.grade,group.group_name).replace(/\s+/g,'_')}_${resolveReportCycleYear()}_${period}.csv`,rows); return;
       }
       if(type==='GLOBAL'){
-        const rows=[['Grupo','Asignatura','Ciclo','Alumnos','Asistencia %','Promedio','Estatus']]; getReportCycleGroups().forEach(g=>{const st=localData.students.filter(s=>s.group_id===g.group_id&&s.status!=='INACTIVE'); const ap=calculateAttendancePercentage(localData.attendance.filter(a=>a.group_id===g.group_id)); const avg=getGroupAcademicAverage(g.group_id,period); const cfg=getEvaluationConfig(g.group_id); rows.push([formatGradeDisplay(g.grade,g.group_name),g.subject,resolveReportCycleYear(),st.length,ap===null?'':Math.round(ap),avg===null?'':avg.toFixed(1),avg===null?'Pendiente':(avg>=cfg.passing_grade?'Aprobado':'Requiere seguimiento')]);}); g119DownloadAcademicCSV(`resumen_general_${resolveReportCycleYear()}_${period}.csv`,rows); return;
+        const groups = getFilteredGlobalReportGroups();
+        if (!groups.length) return showToast('No hay grupos que coincidan con los filtros.');
+        const rows=[['Grupo','Asignatura','Ciclo','Alumnos','Asistencia %','Promedio','Estatus','Turno','Escuela']]; groups.forEach(g=>{const st=localData.students.filter(s=>s.group_id===g.group_id&&s.status!=='INACTIVE'); const ap=calculateAttendancePercentage(localData.attendance.filter(a=>a.group_id===g.group_id)); const avg=getGroupAcademicAverage(g.group_id,period); const cfg=getEvaluationConfig(g.group_id); rows.push([formatGradeDisplay(g.grade,g.group_name),g.subject,resolveReportCycleYear(),st.length,ap===null?'':Math.round(ap),avg===null?'':avg.toFixed(1),avg===null?'Pendiente':(avg>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'),...reportGroupIdentity(g)]);}); g119DownloadAcademicCSV(`resumen_general_${resolveReportCycleYear()}_${period}.csv`,rows); return;
       }
       if(!group) return showToast('Seleccione un grupo'); const students=localData.students.filter(s=>s.group_id===groupId&&s.status!=='INACTIVE').sort((a,b)=>(a.student_number||999)-(b.student_number||999));
       if(period==='ANNUAL'){
@@ -17541,7 +17611,7 @@ function g119RenderRows(hostId){const c=g119Context(hostId),rows=g119FilteredRow
 g118Export=function(hostId){const c=g119Context(hostId);if(c.from&&c.to&&c.from>c.to)return;const group=localData.groups.find(g=>g.group_id===c.groupId),rows=[['Grupo','Desde','Hasta','Número','Alumno','Participaciones individuales','Participaciones en equipo','Total participaciones']];for(const r of g119FilteredRows(hostId))rows.push([group?formatGradeDisplay(group.grade,group.group_name):c.groupId,c.from||'Todas',c.to||'Todas',r.student.student_number,r.student.full_name,r.individual,r.team,r.total]);downloadCSV('participaciones_reporte_aula.csv',rows);};
 function g119PrintHTML(hostId){const c=g119Context(hostId),group=localData.groups.find(g=>g.group_id===c.groupId),school=localData.schools.find(s=>s.school_id===group?.school_id),rows=g119FilteredRows(hostId);return '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte de participaciones del aula</title><style>body{font:12px Arial,sans-serif;color:#172226;padding:20px}h1{font-size:21px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #bbb;text-align:center}th:first-child{text-align:left}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:15mm}</style></head><body><h1>Reporte de participaciones del aula</h1><p>'+escapeHTML(school?.school_name||'')+' · '+escapeHTML(group?formatGradeDisplay(group.grade,group.group_name):'')+' · '+escapeHTML(group?.subject||'')+'</p><p>'+escapeHTML(c.host.querySelector('[data-caption]').textContent)+'</p><table><thead><tr><th>Alumno</th><th>Individuales</th><th>En equipo</th><th>Total</th></tr></thead><tbody>'+rows.map(r=>'<tr><th>'+escapeHTML('#'+(r.student.student_number||'-')+' '+r.student.full_name)+'</th><td>'+r.individual+'</td><td>'+r.team+'</td><td>'+r.total+'</td></tr>').join('')+'</tbody></table><p>Las participaciones no modifican automáticamente las calificaciones.</p></body></html>';}
 function g119Print(hostId){const c=g119Context(hostId);if(c.from&&c.to&&c.from>c.to)return;document.getElementById('g119-print-frame')?.remove();const frame=document.createElement('iframe');frame.id='g119-print-frame';frame.title='Impresión del reporte de participaciones';frame.style.cssText='position:fixed;width:1px;height:1px;left:-10000px;border:0';frame.onload=()=>{frame.contentWindow.focus();frame.contentWindow.print();};frame.srcdoc=g119PrintHTML(hostId);document.body.appendChild(frame);}
-function g119DownloadAcademicCSV(filename,rows){const type=document.getElementById('report-type-select')?.value,groupId=document.getElementById('report-group-select')?.value||activeGroupId;if(!['GROUP','STUDENT'].includes(type))return downloadCSV(filename,rows);const totals=new Map(g118Rows(groupId).map(r=>[r.student.student_id,r])),students=localData.students.filter(s=>s.group_id===groupId&&s.status!=='INACTIVE').sort((a,b)=>(a.student_number||999)-(b.student_number||999)),sid=document.getElementById('report-student-select')?.value,student=localData.students.find(s=>s.student_id===sid);const result=[rows[0].concat(['Participaciones individuales (todas las fechas)','Participaciones en equipo (todas las fechas)','Total participaciones (todas las fechas)'])];let data=rows.slice(1);if(type==='STUDENT'&&!data.length&&student)data=[[student.full_name,...Array(rows[0].length-1).fill('')]];data.forEach((row,i)=>{const x=totals.get(type==='STUDENT'?sid:students[i]?.student_id)||{individual:0,team:0,total:0};result.push(row.concat([x.individual,x.team,x.total]));});downloadCSV(filename,result);}
+function g119DownloadAcademicCSV(filename,rows){const type=document.getElementById('report-type-select')?.value,groupId=document.getElementById('report-group-select')?.value||activeGroupId;if(!['GROUP','STUDENT'].includes(type))return downloadCSV(filename,rows);const totals=new Map(g118Rows(groupId).map(r=>[r.student.student_id,r])),students=localData.students.filter(s=>s.group_id===groupId&&s.status!=='INACTIVE').sort((a,b)=>(a.student_number||999)-(b.student_number||999)),sid=document.getElementById('report-student-select')?.value,student=localData.students.find(s=>s.student_id===sid);const identity=reportGroupIdentity(localData.groups.find(g=>g.group_id===groupId));const result=[rows[0].concat(['Participaciones individuales (todas las fechas)','Participaciones en equipo (todas las fechas)','Total participaciones (todas las fechas)','Turno','Escuela'])];let data=rows.slice(1);if(type==='STUDENT'&&!data.length&&student)data=[[student.full_name,...Array(rows[0].length-1).fill('')]];data.forEach((row,i)=>{const x=totals.get(type==='STUDENT'?sid:students[i]?.student_id)||{individual:0,team:0,total:0};result.push(row.concat([x.individual,x.team,x.total],identity));});downloadCSV(filename,result);}
 </script><script id="g120-charts-module">/* G305: local SVG report charts, derived from saved data. */
 function g120Bars(title,items,options={}){
  const rows=items.filter(x=>Number.isFinite(Number(x.value))&&Number(x.value)>=0),max=Math.max(1,...rows.map(x=>Number(x.value))),height=50+rows.length*36;
@@ -17557,7 +17627,10 @@ const g120OriginalPrintHTML=g119PrintHTML;
 g119PrintHTML=function(hostId){const doc=new DOMParser().parseFromString(g120OriginalPrintHTML(hostId),'text/html'),style=doc.createElement('style');style.textContent=g120ChartCSS;doc.head.appendChild(style);const charts=doc.createElement('section');charts.className='g120-charts';charts.innerHTML=g120ParticipationCharts(hostId);charts.querySelectorAll('details').forEach(e=>e.open=true);doc.querySelector('table').before(charts);return '<!doctype html>'+doc.documentElement.outerHTML;};
 const g120ChartCSS='.g120-charts{margin:18px 0}.g120-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.g120-chart{background:#fff;border:1px solid #d9e1da;border-radius:14px;padding:14px;margin:10px 0;min-width:0;break-inside:avoid}.g120-chart h4{font-size:14px;font-weight:700;margin:0 0 8px}.g120-chart svg{display:block;width:100%;height:auto;min-width:420px}.g120-chart{overflow-x:auto}.g120-charts h3{font-size:20px;font-weight:700}.g120-charts p{font-size:12px;color:#58696e;margin:8px 0}.g120-charts summary{cursor:pointer;color:#145b4b;font-size:13px}@media(max-width:760px){.g120-grid{grid-template-columns:1fr}}@media print{.g120-grid{display:block}.g120-chart{overflow:visible}.g120-chart svg{min-width:0;width:100%}}';
 function g120AcademicCharts(){const host=document.getElementById('g120-academic-charts');if(!host)return;const type=document.getElementById('report-type-select')?.value,groupId=document.getElementById('report-group-select')?.value||activeGroupId,period=document.getElementById('report-trimester-select')?.value||'T1';host.hidden=!['GROUP','STUDENT','GLOBAL'].includes(type);if(host.hidden)return;let html='<h3>Gráficas del reporte académico</h3><p>Calificaciones del periodo '+escapeHTML(period==='ANNUAL'?'anual':period)+'. Los valores sin calificación se conservan como pendientes.</p>';
- if(type==='GLOBAL'){html+=g120Bars('Promedio por grupo',getReportCycleGroups().map(g=>({label:formatGradeDisplay(g.grade,g.group_name)+' '+(g.subject||''),value:getGroupAcademicAverage(g.group_id,period)})).filter(r=>r.value!==null&&r.value!==undefined),{note:'Los grupos sin promedio no se grafican. Cada grupo conserva su escala de evaluación.'});}
+ if(type==='GLOBAL'){html+=g120Bars('Promedio por grupo',getFilteredGlobalReportGroups().map(g=>{
+   const [shift, school] = reportGroupIdentity(g);
+   return {label:[shift,formatGradeDisplay(g.grade,g.group_name),school,g.subject].filter(Boolean).join(' · '),value:getGroupAcademicAverage(g.group_id,period)};
+ }).filter(r=>r.value!==null&&r.value!==undefined),{note:'Los grupos sin promedio no se grafican. Cada grupo conserva su escala de evaluación.'});}
  else{const sid=document.getElementById('report-student-select')?.value,students=localData.students.filter(s=>s.group_id===groupId&&s.status!=='INACTIVE'&&(type!=='STUDENT'||s.student_id===sid)),cfg=getEvaluationConfig(groupId),pass=Number(cfg.passing_grade??6);let pending=0,below=0,above=0;for(const s of students){const avg=period==='ANNUAL'?getAnnualAverageForStudent(s.student_id,groupId):getStudentTrimesterEvaluation(s.student_id,groupId,period,false).average;if(avg===null||avg===undefined||!Number.isFinite(Number(avg)))pending++;else if(Number(avg)>=pass)above++;else below++;}html+='<div class="g120-grid">'+g120Bars('Distribución de resultados',[{label:'Alcanza criterio',value:above},{label:'Requiere seguimiento',value:below},{label:'Sin calificación',value:pending}],{note:'Criterio de aprobación configurado: '+pass+'. Cantidad de alumnos.'});const ids=new Set(students.map(s=>s.student_id)),counts={P:0,R:0,F:0,FJ:0,RJ:0,SA:0};for(const a of localData.attendance.filter(a=>a.group_id===groupId&&ids.has(a.student_id)))if(a.attendance_status in counts)counts[a.attendance_status]++;html+=g120Bars('Registros de asistencia acumulados',Object.entries(counts).map(([label,value])=>({label,value})),{note:'Todas las fechas del grupo, independiente del trimestre. P: presente; R: retardo; F: falta; FJ/RJ: justificados; SA: salida anticipada.'})+'</div>';}
  host.innerHTML=html;
 }
@@ -19461,14 +19534,6 @@ function schoolCardColors(schoolId) {
   const hues=[218,151,276,16,190,329,47,245,100,360];
   const hue=hues[index]??(index<0?210:(index*137.508)%360);
   return {accent:'hsl('+hue+' 58% 43%)', ink:'hsl('+hue+' 58% 25%)', tint:'hsl('+hue+' 75% 93%)'};
-}
-
-function groupShiftBadge(shift) {
-  const text=String(shift||'').trim();
-  const normalized=text.toLowerCase().replace(/^turno\s+/,'');
-  if (['matutino','m','tm','t.m.'].includes(normalized)) return ['☀','Matutino','morning'];
-  if (['vespertino','v','tv','t.v.'].includes(normalized)) return ['☾','Vespertino','evening'];
-  return ['',text||'Turno sin definir','other'];
 }
 
 let presentationOrderBusy=false;
