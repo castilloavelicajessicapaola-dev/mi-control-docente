@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G308 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G311 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2307,9 +2307,22 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
             </div>
           </div>
           <div id="report-cycle-banner" class="hidden rounded-2xl border border-[#d9e1da] bg-[#f7faf7] p-4 mb-4 no-print"></div>
+          <div id="report-back-to-summary" class="no-print mb-3" hidden>
+            <button type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] hover:bg-[#eef5ef]" onclick="showGeneralReport()">Volver al resumen general</button>
+          </div>
+          <div id="report-back-to-group" class="no-print mb-3" hidden>
+            <button type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] hover:bg-[#eef5ef]" onclick="showGroupFromStudentReport()">Volver al concentrado del grupo</button>
+          </div>
+          <div id="report-student-navigation" class="no-print mb-3" hidden>
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="report-previous-student" type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] enabled:hover:bg-[#eef5ef] disabled:opacity-50" onclick="moveReportStudent(-1, this)" disabled>Alumno anterior</button>
+              <button id="report-next-student" type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] enabled:hover:bg-[#eef5ef] disabled:opacity-50" onclick="moveReportStudent(1, this)" disabled>Alumno siguiente</button>
+              <p id="report-student-position" role="status" class="text-sm text-[#526267]"></p>
+            </div>
+          </div>
           <div id="report-print-area" class="bg-white rounded-3xl border border-[#d9e1da] p-7">
             <div class="border-b pb-4 mb-6">
-              <h1 class="serif text-2xl font-bold text-[#145b4b]" id="report-main-title">Informe Consolidado Docente Local</h1>
+              <h1 class="serif text-2xl font-bold text-[#145b4b]" id="report-main-title" tabindex="-1">Informe Consolidado Docente Local</h1>
               <p class="text-xs text-[#66767a]">Generado el: <span id="report-generated-date"></span></p>
               <p class="text-xs text-[#66767a] mt-1" id="report-context-line"></p>
             </div>
@@ -2338,7 +2351,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm border-collapse">
                   <thead><tr class="border-b bg-slate-100"><th class="p-2">Grupo</th><th class="p-2">Turno</th><th class="p-2">Escuela</th><th class="p-2">Asignatura</th><th class="p-2">Activos</th><th class="p-2">Asistencia %</th><th class="p-2">Promedio</th><th class="p-2">Estatus</th></tr></thead>
-                  <tbody id="report-summary-tbody"></tbody>
+                  <tbody id="report-summary-tbody" onclick="openReportGroupFromSummary(event)"></tbody>
                 </table>
               </div>
             </div>
@@ -2348,7 +2361,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm border-collapse">
                   <thead id="report-group-thead"></thead>
-                  <tbody id="report-group-tbody"></tbody>
+                  <tbody id="report-group-tbody" onclick="openStudentFromGroupReport(event)"></tbody>
                 </table>
               </div>
             </div>
@@ -12804,6 +12817,33 @@ function renderSchedule() {
       else if (students.length) select.value=students[0].student_id;
     }
 
+    function updateReportStudentNavigation(visible) {
+      const nav = document.getElementById('report-student-navigation');
+      nav.hidden = !visible;
+      if (!visible) return;
+      const select = document.getElementById('report-student-select');
+      const index = select.selectedIndex;
+      const option = select.options[index];
+      const hasSelection = Boolean(option?.value);
+      document.getElementById('report-previous-student').disabled = !hasSelection || !select.options[index - 1]?.value;
+      document.getElementById('report-next-student').disabled = !hasSelection || !select.options[index + 1]?.value;
+      document.getElementById('report-student-position').textContent = hasSelection
+        ? 'Alumno ' + (index + 1) + ' de ' + select.options.length + ' · ' + option.textContent
+        : 'Sin alumnos en el grupo';
+    }
+
+    function moveReportStudent(step, button) {
+      if (document.getElementById('report-type-select')?.value !== 'STUDENT') return;
+      const select = document.getElementById('report-student-select');
+      const target = select.options[select.selectedIndex + step];
+      if (!select.value || !target?.value) return;
+      select.value = target.value;
+      renderReports();
+      if (button.disabled) {
+        document.getElementById(step < 0 ? 'report-next-student' : 'report-previous-student')?.focus();
+      }
+    }
+
     let selectedProfileStudentId = null;
 
     function populateProfileGroupSelect(preferredGroupId = null) {
@@ -13130,8 +13170,13 @@ function renderSchedule() {
       const cfg = group ? getEvaluationConfig(groupId) : {passing_grade:6};
       const globalSec=document.getElementById('report-global-section'), groupSec=document.getElementById('report-group-section'), studentSec=document.getElementById('report-student-section'), analyticsSec=document.getElementById('report-analytics-section'), trimesterReviewSec=document.getElementById('report-trimester-review-section');
       globalSec?.classList.toggle('hidden', type!=='GLOBAL');
+      const backToSummary = document.getElementById('report-back-to-summary');
+      if (backToSummary) backToSummary.hidden = type !== 'GROUP';
       groupSec?.classList.toggle('hidden', type!=='GROUP');
-      studentSec?.classList.toggle('hidden', type!=='STUDENT');
+      const backToGroup = document.getElementById('report-back-to-group');
+      if (backToGroup) backToGroup.hidden = type !== 'STUDENT';
+      updateReportStudentNavigation(type === 'STUDENT');
+      studentSec?.classList.toggle('hidden', type!=='STUDENT' || !studentId);
       analyticsSec?.classList.toggle('hidden', type!=='ANALYTICS');
       trimesterReviewSec?.classList.toggle('hidden', type!=='TRIMESTER_REVIEW');
       const title = document.getElementById('report-main-title');
@@ -13834,6 +13879,29 @@ function renderSchedule() {
       );
     }
 
+    function openReportGroupFromSummary(event) {
+      const button = event.target.closest('button[data-report-group]');
+      if (!button) return;
+      const type = document.getElementById('report-type-select');
+      const group = document.getElementById('report-group-select');
+      if (!type || !group || type.value !== 'GLOBAL') return;
+      const groupId = button.dataset.reportGroup;
+      if (!getFilteredGlobalReportGroups().some(item => String(item.group_id) === groupId)) return;
+      group.value = groupId;
+      if (group.value !== groupId) return;
+      type.value = 'GROUP';
+      renderReports();
+      document.getElementById('report-main-title')?.focus();
+    }
+
+    function showGeneralReport() {
+      const type = document.getElementById('report-type-select');
+      if (!type) return;
+      type.value = 'GLOBAL';
+      renderReports();
+      document.getElementById('report-school-filter')?.focus();
+    }
+
     function renderGlobalReportTable(period, cycleGroups) {
       const tbody=document.getElementById('report-summary-tbody'); if(!tbody) return;
       if(!cycleGroups.length){tbody.innerHTML='<tr><td colspan="8" class="p-4 text-center text-[#66767a]">No hay grupos que coincidan con los filtros.</td></tr>'; return;}
@@ -13843,8 +13911,38 @@ function renderSchedule() {
         const avg=getGroupAcademicAverage(g.group_id,period); const cfg=getEvaluationConfig(g.group_id);
         const status=avg===null?'Pendiente':(avg>=cfg.passing_grade?'Aprobado':'Requiere seguimiento');
         const [shift, school] = reportGroupIdentity(g);
-        return `<tr class="border-b"><td class="p-2 font-bold">${escapeHTML(formatGradeDisplay(g.grade,g.group_name))}</td><td class="p-2">${escapeHTML(shift)}</td><td class="p-2">${escapeHTML(school)}</td><td class="p-2">${escapeHTML(g.subject)}</td><td class="p-2">${st.length}</td><td class="p-2">${ap===null?'—':Math.round(ap)+'%'}</td><td class="p-2">${reportGradeDisplay(avg)}</td><td class="p-2 font-bold">${status}</td></tr>`;
+        return `<tr class="border-b"><td class="p-2 font-bold">${escapeHTML(formatGradeDisplay(g.grade,g.group_name))}<button type="button" class="no-print block mt-1 text-xs font-semibold text-[#145b4b] underline" data-report-group="${escapeHTML(String(g.group_id))}" aria-label="${escapeHTML('Ver concentrado de ' + [formatGradeDisplay(g.grade,g.group_name), shift, school].filter(Boolean).join(' · '))}">Ver concentrado</button></td><td class="p-2">${escapeHTML(shift)}</td><td class="p-2">${escapeHTML(school)}</td><td class="p-2">${escapeHTML(g.subject)}</td><td class="p-2">${st.length}</td><td class="p-2">${ap===null?'—':Math.round(ap)+'%'}</td><td class="p-2">${reportGradeDisplay(avg)}</td><td class="p-2 font-bold">${status}</td></tr>`;
       }).join('');
+    }
+
+    function openStudentFromGroupReport(event) {
+      const button = event.target.closest('button[data-report-student]');
+      if (!button) return;
+      const type = document.getElementById('report-type-select');
+      const student = document.getElementById('report-student-select');
+      if (type?.value !== 'GROUP' || !student) return;
+      const studentId = button.dataset.reportStudent;
+      if (!Array.from(student.options).some(option => option.value === studentId)) return;
+      student.value = studentId;
+      type.value = 'STUDENT';
+      renderReports();
+      document.getElementById('report-main-title')?.focus();
+    }
+
+    function showGroupFromStudentReport() {
+      const type = document.getElementById('report-type-select');
+      if (type?.value !== 'STUDENT') return;
+      type.value = 'GROUP';
+      renderReports();
+      const studentId = document.getElementById('report-student-select')?.value;
+      const buttons = document.querySelectorAll('#report-group-tbody button[data-report-student]');
+      const target = Array.from(buttons).find(button => button.dataset.reportStudent === studentId);
+      (target || document.getElementById('report-main-title'))?.focus();
+    }
+
+    function renderGroupReportStudentCell(student, listNumber) {
+      const label = 'Ver reporte de ' + (student.full_name || 'alumno') + ', número ' + listNumber;
+      return `<td class="p-2 font-bold">${escapeHTML(student.full_name)}<button type="button" class="no-print block mt-1 text-xs font-semibold text-[#145b4b] underline" data-report-student="${escapeHTML(String(student.student_id))}" aria-label="${escapeHTML(label)}">Ver reporte</button></td>`;
     }
 
     function renderGroupReportTable(groupId,period) {
@@ -13853,12 +13951,12 @@ function renderSchedule() {
       if(period==='ANNUAL'){
         thead.innerHTML='<tr class="border-b bg-slate-100"><th class="p-2">#</th><th class="p-2">Alumno</th><th class="p-2 text-center">T1</th><th class="p-2 text-center">T2</th><th class="p-2 text-center">T3</th><th class="p-2 text-center">Promedio anual</th><th class="p-2">Estatus</th></tr>';
         const cfg=getEvaluationConfig(groupId);
-        tbody.innerHTML=students.map((s,i)=>{const vals=['T1','T2','T3'].map(t=>getStudentTrimesterEvaluation(s.student_id,groupId,t,false).average); const annual=getAnnualAverageForStudent(s.student_id,groupId); const status=annual===null?'Pendiente':(annual>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); return `<tr class="border-b"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td><td class="p-2 font-bold">${escapeHTML(s.full_name)}</td>${vals.map(v=>`<td class="p-2 text-center">${reportGradeDisplay(v)}</td>`).join('')}<td class="p-2 text-center font-bold">${reportGradeDisplay(annual)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
+        tbody.innerHTML=students.map((s,i)=>{const vals=['T1','T2','T3'].map(t=>getStudentTrimesterEvaluation(s.student_id,groupId,t,false).average); const annual=getAnnualAverageForStudent(s.student_id,groupId); const status=annual===null?'Pendiente':(annual>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); return `<tr class="border-b"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${vals.map(v=>`<td class="p-2 text-center">${reportGradeDisplay(v)}</td>`).join('')}<td class="p-2 text-center font-bold">${reportGradeDisplay(annual)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
       } else {
         const acts=getOrderedReportActivities(groupId,period);
         thead.innerHTML=`<tr class="border-b bg-slate-100"><th class="p-2">#</th><th class="p-2">Alumno</th>${acts.map(a=>`<th class="p-2 text-center">${escapeHTML(a.activity_code||a.activity_name)}</th>`).join('')}<th class="p-2 text-center">Promedio</th><th class="p-2">Estatus</th></tr>`;
         const cfg=getEvaluationConfig(groupId);
-        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); return `<td class="p-2 text-center">${r && r.grade!==null && r.grade!==undefined && r.grade!=='' ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td><td class="p-2 font-bold">${escapeHTML(s.full_name)}</td>${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
+        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); return `<td class="p-2 text-center">${r && r.grade!==null && r.grade!==undefined && r.grade!=='' ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
       }
     }
 
