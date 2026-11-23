@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G360 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G365 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18202,15 +18202,23 @@ const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const count
   <div class="g128-toolbar">
     <button type="button" onclick="g345Recompare()">Volver a comparar asistencias y calificaciones</button>
   </div>
-  <div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Alumno<select id="g350-student" onchange="g128ChangeFilters()"><option value="">Todos los alumnos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label id="g347-grade-filter" hidden>Trimestre de la actividad<select id="g347-trimester" onchange="g128ChangeFilters()"><option value="">Todos los trimestres</option><option value="T1">Trimestre 1</option><option value="T2">Trimestre 2</option><option value="T3">Trimestre 3</option><option value="unknown">Sin trimestre identificado</option></select></label><label id="g348-activity-filter" hidden>Actividad<select id="g348-activity" onchange="g128ChangeFilters()"><option value="">Todas las actividades</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="applicable">Disponibles para aplicar</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><label id="g357-change-filter" hidden>Campo modificado<select id="g357-change-field" onchange="g128ChangeFilters()"><option value="">Todos los campos</option></select></label><label>Ordenar por<select id="g353-order" onchange="g128ChangeFilters()"><option value="">Orden del respaldo</option><option value="student">Grupo y número de lista</option><option value="date">Fecha de asistencia</option><option value="activity">Código de actividad</option></select></label><label id="g344-block-filter" hidden>Motivo del bloqueo<select id="g344-block-reason" onchange="g128ChangeFilters()"><option value="">Todos los motivos</option></select></label><button id="g341-mark-new" type="button" onclick="g341MarkFiltered('new')" disabled>Marcar nuevos del filtro</button><button id="g341-mark-different" type="button" onclick="g341MarkFiltered('different')" disabled>Marcar diferentes del filtro</button><button id="g349-clear-filter" type="button" onclick="g349ClearFiltered()" disabled>Desmarcar del filtro</button><button id="g349-clear-all" type="button" onclick="g128ClearSelection()" disabled>Desmarcar todos</button></div>
+  <div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Alumno<select id="g350-student" onchange="g128ChangeFilters()"><option value="">Todos los alumnos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label id="g347-grade-filter" hidden>Trimestre de la actividad<select id="g347-trimester" onchange="g128ChangeFilters()"><option value="">Todos los trimestres</option><option value="T1">Trimestre 1</option><option value="T2">Trimestre 2</option><option value="T3">Trimestre 3</option><option value="unknown">Sin trimestre identificado</option></select></label><label id="g348-activity-filter" hidden>Actividad<select id="g348-activity" onchange="g128ChangeFilters()"><option value="">Todas las actividades</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="applicable">Disponibles para aplicar</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><label id="g357-change-filter" hidden>Campo modificado<select id="g357-change-field" onchange="g128ChangeFilters()"><option value="">Todos los campos</option></select></label><label>Ordenar por<select id="g353-order" onchange="g128ChangeFilters()"><option value="">Orden del respaldo</option><option value="student">Grupo y número de lista</option><option value="date">Fecha de asistencia</option><option value="activity">Código de actividad</option></select></label><label id="g344-block-filter" hidden>Motivo del bloqueo<select id="g344-block-reason" onchange="g128ChangeFilters()"><option value="">Todos los motivos</option></select></label><button type="button" onclick="g362ClearFilters()">Quitar filtros</button><button id="g341-mark-new" type="button" onclick="g341MarkFiltered('new')" disabled>Marcar nuevos del filtro</button><button id="g341-mark-different" type="button" onclick="g341MarkFiltered('different')" disabled>Marcar diferentes del filtro</button><button id="g349-clear-filter" type="button" onclick="g349ClearFiltered()" disabled>Desmarcar del filtro</button><button id="g349-clear-all" type="button" onclick="g128ClearSelection()" disabled>Desmarcar todos</button></div>
   <div id="g346-date-filter" class="g128-toolbar" role="group" aria-label="Fechas de asistencia" hidden>
     <label>Desde<input type="date" id="g346-start-date" aria-describedby="g346-date-status" onchange="g128ChangeFilters()"></label>
     <label>Hasta<input type="date" id="g346-end-date" aria-describedby="g346-date-status" onchange="g128ChangeFilters()"></label>
     <p id="g346-date-status" role="status"></p>
   </div>
-  <p id="g128-selection" role="status"></p>
+  <p id="g128-selection" role="status" tabindex="-1"></p>
   <button type="button" id="g352-show-marks" onclick="g352ShowAllMarked()" hidden>Ver todas las marcas</button>
   <button type="button" id="g355-export-filtered" onclick="g355ExportFiltered()" disabled>Descargar comparación filtrada (CSV)</button>
+  <button type="button" id="g363-export-summary" onclick="g363ExportSummary()" disabled>Descargar resumen por grupo (CSV)</button>
+  <details id="g364-summary" class="g188-quick-help" ontoggle="g364RenderSummary()">
+    <summary>Resumen por grupo y turno</summary>
+    <div class="g128-scroll"><table aria-label="Totales de la comparación filtrada">
+      <thead id="g364-summary-head"></thead>
+      <tbody id="g364-summary-rows"></tbody>
+    </table></div>
+  </details>
   <div class="g128-scroll"><table><thead><tr><th>Actualizar</th><th>Alumno y registro</th><th>En este dispositivo</th><th>En el respaldo</th><th>Comparación</th></tr></thead><tbody id="g128-rows"></tbody></table></div><button type="button" id="g128-more" onclick="g128ShowMore()">Mostrar más registros</button><div class="g128-toolbar"><button type="button" onclick="g128Close()">Cerrar comparación</button><button type="button" id="g351-review-filtered" onclick="g351ReviewFiltered()" hidden>Revisar solo marcas del filtro</button><button type="button" id="g128-apply" onclick="g128ReviewSelected()">Revisar registros marcados</button></div></div>
 <div id="g128-review" hidden>
   <h4 id="g128-review-title" tabindex="-1">Revisar antes de actualizar</h4>
@@ -18768,7 +18776,7 @@ async function g359Resume(){
   if(wasReviewing) g128SetReview(null);
   closeModal('modal-confirm-restore');
   openModal('modal-g128-reconcile');
-  await g345Recompare(wasReviewing);
+  await g345Recompare(wasReviewing,true);
   if(g128Model!==model) return;
   const status=document.getElementById('g339-status');
   (status.textContent?status:document.getElementById('g128-search')).focus();
@@ -18808,7 +18816,20 @@ function g128SetupFilters(rows,snapshot,backup){
   document.getElementById('g128-record-type').value='all';
 }
 
-async function g345Recompare(wasReviewing=false){
+function g361RefreshStructure(snapshot,records){
+  const rows=g332Compare(snapshot,records);
+  const eligible=new Set(rows.filter(row=>!g333ScopeIssue(row)).map(row=>row.key));
+  const previouslyMarked=g338Explicit.size;
+  for(const key of g338Explicit) if(!eligible.has(key)) g338Explicit.delete(key);
+  g332Rows=rows;
+  const wasReviewing=g333Reviewing;
+  g333Reviewing=false;
+  g338UpdateSelection();
+  g332Render();
+  return {removed:previouslyMarked-g338Explicit.size,needsReview:wasReviewing&&g333Selected.size>0};
+}
+
+async function g345Recompare(wasReviewing=false,refreshStructure=false){
   if(g128Busy||!g128Model||g128Review) return;
   const model=g128Model, marked=g128Selected.size;
   const controls=[...document.querySelectorAll('#modal-g128-reconcile button,#modal-g128-reconcile input,#modal-g128-reconcile select')].map(control=>[control,control.disabled]);
@@ -18822,12 +18843,15 @@ async function g345Recompare(wasReviewing=false){
     const snapshot=await g124Snapshot();
     if(g128Model!==model) return;
     const available=g340RefreshAcademic(model,snapshot,true);
+    const structure=refreshStructure?g361RefreshStructure(snapshot,model.backup.records):null;
     model.id=generateId('reconcile');
     const blocked=model.rows.filter(row=>row.kind==='blocked').length;
     const removed=marked-g128Selected.size;
     status.textContent='Comparación actualizada. Registros disponibles ('+available+') y bloqueados ('+blocked+') en todo el respaldo.'+
       (removed?' Se retiraron de la selección los registros que ya coinciden o están bloqueados ('+removed+').':'')+
-      (wasReviewing&&g128Selected.size?' Revisa nuevamente las marcas antes de confirmar.':'');
+      (wasReviewing&&g128Selected.size?' Revisa nuevamente las marcas académicas antes de confirmar.':'')+
+      (structure?.removed?' Se retiraron marcas de escuelas, grupos, horarios o actividades que ya coinciden o quedaron bloqueadas ('+structure.removed+').':'')+
+      (structure?.needsReview?' Revisa nuevamente los cambios de escuelas, grupos, horarios o actividades antes de confirmar.':'');
   }catch(error){
     status.textContent='';
     errorMessage.textContent='No se pudo volver a comparar: '+error.message;
@@ -18846,6 +18870,13 @@ function g352ResetFilters(mode,type){
     document.getElementById(id).value='';
   document.getElementById('g128-record-type').value=type;
   document.getElementById('g128-mode').value=mode;
+}
+
+function g362ClearFilters(){
+  if(g128Busy||!g128Model) return;
+  g352ResetFilters('all','all');
+  g128ChangeFilters();
+  document.getElementById('g128-search').focus();
 }
 
 function g352ShowAllMarked(){
@@ -19061,7 +19092,71 @@ function g355ExportFiltered(){
   downloadCSV('Comparacion_respaldo_'+dateToLocalISO(new Date())+'.csv',rows.map(row=>row.map(g140CsvCell)));
 }
 
+const g364SummaryHeaders=['Escuela, grupo y turno','Tipo de registro','Nuevos','Diferentes','Iguales','Bloqueados','Total'];
+
+function g364SummaryRows(filtered){
+  const labels=new Map(Array.from(document.getElementById('g128-group').options,option=>[option.value,option.text]));
+  const totals=new Map();
+  for(const row of filtered){
+    const groupId=row.groupId||'';
+    const key=JSON.stringify([groupId,row.store]);
+    if(!totals.has(key)) totals.set(key,{groupId,store:row.store,new:0,different:0,same:0,blocked:0,total:0});
+    const summary=totals.get(key);
+    summary[row.kind]++;
+    summary.total++;
+  }
+  const entries=[...totals.values()].map(summary=>({
+    groupId:summary.groupId&&labels.has(summary.groupId)?summary.groupId:'',
+    store:summary.store,
+    cells:[
+      (summary.groupId&&labels.get(summary.groupId))||'Grupo sin identificar',
+      summary.store==='attendance'?'Asistencias':'Calificaciones',
+      summary.new,summary.different,summary.same,summary.blocked,summary.total
+    ]
+  }));
+  entries.sort((a,b)=>a.cells[0].localeCompare(b.cells[0],'es',{numeric:true})||a.cells[1].localeCompare(b.cells[1],'es'));
+  return entries;
+}
+
+function g363ExportSummary(){
+  if(g128Busy||!g128Model) return;
+  const rows=g364SummaryRows(g128Filtered());
+  if(!rows.length) return;
+  downloadCSV('Resumen_comparacion_'+dateToLocalISO(new Date())+'.csv',[g364SummaryHeaders,...rows.map(row=>row.cells)].map(row=>row.map(g140CsvCell)));
+}
+
+function g364RenderSummary(filtered){
+  if(!document.getElementById('g364-summary').open) return;
+  const rows=g364SummaryRows(filtered??g128Filtered());
+  document.getElementById('g364-summary-head').innerHTML='<tr>'+[...g364SummaryHeaders,'Consultar'].map(label=>'<th scope="col">'+escapeHTML(label)+'</th>').join('')+'</tr>';
+  document.getElementById('g364-summary-rows').innerHTML=rows.length?rows.map(({groupId,store,cells:[group,type,...counts]})=>{
+    const button=groupId?'<button type="button" data-group="'+escapeHTML(groupId)+'" data-store="'+escapeHTML(store)+
+      '" aria-label="Ver '+escapeHTML(type.toLowerCase())+' de '+escapeHTML(group)+'" onclick="g365OpenSummaryRows(this)"'+
+      (g128Busy?' disabled':'')+'>Ver registros</button>':'—';
+    return '<tr><th scope="row">'+escapeHTML(group)+'</th><td>'+escapeHTML(type)+'</td>'+
+      counts.map(count=>'<td>'+count+'</td>').join('')+'<td>'+button+'</td></tr>';
+  }).join(''):'<tr><td colspan="8">Sin registros para los filtros elegidos.</td></tr>';
+}
+
+function g365OpenSummaryRows(button){
+  if(g128Busy||!g128Model) return;
+  const {group,store}=button.dataset;
+  const groupSelect=document.getElementById('g128-group');
+  const recordType=document.getElementById('g128-record-type');
+  if(!group||!Array.from(groupSelect.options).some(option=>option.value===group)||!['attendance','activity_results'].includes(store)) return;
+  if(recordType.value!==store){
+    const inactive=store==='attendance'?['g346-start-date','g346-end-date']:['g347-trimester','g348-activity'];
+    for(const id of inactive) document.getElementById(id).value='';
+  }
+  groupSelect.value=group;
+  recordType.value=store;
+  g128ChangeFilters();
+  document.getElementById('g128-selection').focus();
+}
+
 function g128UpdateSelection(filtered=g128Filtered()){
+  document.getElementById('g363-export-summary').disabled=g128Busy||!filtered.length;
+  g364RenderSummary(filtered);
   document.getElementById('g355-export-filtered').disabled=g128Busy||!filtered.length;
   const count=g128Selected.size;
   const unmarked={new:0,different:0};
