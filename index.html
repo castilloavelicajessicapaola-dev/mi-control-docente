@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G321 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G323 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,22 @@
       main { padding-bottom: 7rem; }
     }
     
-    @media screen { #report-group-tbody .report-student-no-match { display: none; } }
+    @media screen {
+      #report-group-tbody .report-student-no-match { display: none; }
+      #report-group-scroll { --report-number-width: 3.5rem; }
+      #report-group-scroll table { border-collapse: separate; border-spacing: 0; }
+      #report-group-scroll :is(th, td) { border-bottom: 1px solid #e2e8e3; }
+      #report-group-scroll :is(th, td):nth-child(-n+2) { position: sticky; z-index: 1; background: #fff; }
+      #report-group-scroll th:nth-child(-n+2) { background: #f1f5f9; }
+      #report-group-scroll :is(th, td):first-child {
+        left: 0; width: var(--report-number-width); min-width: var(--report-number-width);
+        max-width: var(--report-number-width); box-sizing: border-box;
+      }
+      #report-group-scroll :is(th, td):nth-child(2) {
+        left: var(--report-number-width); width: clamp(7.5rem, 21vw, 12rem);
+        min-width: 7.5rem; max-width: 12rem; overflow-wrap: anywhere; box-shadow: 1px 0 #d9e1da;
+      }
+    }
     #report-group-tbody [data-report-delivery]:not([hidden]) { display: block; color: #526267; }
 
     @media print {
@@ -1337,6 +1352,8 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
   <summary class="cursor-pointer font-bold">Sincronizar actividades y calificaciones de una clase</summary>
   <p class="my-2 text-sm">Elige la clase de Classroom y el grupo y trimestre de destino. Puedes crear las actividades o vincularlas con las que ya existen. Se incluyen las calificaciones publicadas con coincidencia única de alumno. Los casos sin coincidencia se pueden revisar en la importación individual.</p>
   <button type="button" id="classroom-sync-load" class="rounded-lg bg-[#145b4b] px-3 py-2 text-sm font-bold text-white">Leer actividades y notas de Classroom</button>
+  <button type="button" id="classroom-sync-load-activities" class="mt-2 rounded-lg border border-[#145b4b] px-3 py-2 text-sm font-bold text-[#145b4b]">Leer solo actividades</button>
+  <p id="classroom-sync-reading-note" class="my-2 text-sm text-[#526267]" hidden></p>
   <div id="classroom-sync-controls" hidden class="my-2">
     <div id="classroom-sync-tasks" class="max-h-64 overflow-auto"></div>
     <label class="my-2 block text-sm"><input id="classroom-sync-overwrite" type="checkbox"> Actualizar también las notas que ya existen en el cuaderno</label>
@@ -2380,7 +2397,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
                     <div class="grid gap-2 sm:grid-cols-2">
                       <div>
                         <label class="block text-xs font-bold text-[#66767a]" for="report-group-missing-activity">Actividad del trimestre</label>
-                        <select id="report-group-missing-activity" class="mt-1 w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" aria-controls="report-group-tbody" onchange="applyGroupReportStudentSearch()"></select>
+                        <select id="report-group-missing-activity" class="mt-1 w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" aria-controls="report-group-tbody" onchange="showGroupReportActivityColumn()"></select>
                       </div>
                       <div>
                         <label class="block text-xs font-bold text-[#66767a]" for="report-group-activity-condition">Condición de la actividad</label>
@@ -2401,7 +2418,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
                 </div>
                 <p id="report-group-student-search-status" role="status" class="mt-1 text-xs text-[#526267]"></p>
               </div>
-              <div class="overflow-x-auto">
+              <div id="report-group-scroll" class="overflow-x-auto" tabindex="0" role="region" aria-label="Concentrado de calificaciones">
                 <table class="w-full text-left text-sm border-collapse">
                   <thead id="report-group-thead"></thead>
                   <tbody id="report-group-tbody" onclick="openStudentFromGroupReport(event)"></tbody>
@@ -14046,6 +14063,22 @@ function renderSchedule() {
       return filtered ? matchingIds : null;
     }
 
+    function showGroupReportActivityColumn() {
+      applyGroupReportStudentSearch();
+      const activity = document.getElementById('report-group-missing-activity');
+      if (!activity.value) return;
+      const scroll = document.getElementById('report-group-scroll');
+      const header = document.getElementById('report-group-thead').rows[0];
+      const selected = header?.cells[activity.selectedIndex + 1];
+      if (!selected) return;
+      const activityBounds = selected.getBoundingClientRect();
+      const studentRight = header.cells[1].getBoundingClientRect().right;
+      const visibleRight = scroll.getBoundingClientRect().left + scroll.clientWidth;
+      if (activityBounds.left < studentRight || activityBounds.right > visibleRight) {
+        scroll.scrollLeft += activityBounds.left - studentRight;
+      }
+    }
+
     function clearGroupReportFilters() {
       const search = document.getElementById('report-group-student-search');
       search.value = '';
@@ -20694,11 +20727,14 @@ function classroomSyncStatus(text){classroomSyncEl('status').textContent=text;}
 
 function classroomSyncReset(){
   classroomSyncReading=null;classroomSyncPreview=null;
+  const note = classroomSyncEl('reading-note');
+  note.hidden = true;
+  note.textContent = '';
   classroomSyncEl('tasks').replaceChildren();classroomSyncEl('review').replaceChildren();
   classroomSyncEl('controls').hidden=true;classroomSyncEl('apply').hidden=true;
 }
 
-async function classroomSyncLoad() {
+async function classroomSyncLoad(activitiesOnly = false) {
   if(classroomSyncBusy||classroomGradeBusy)return;
   classroomSyncReset();
   classroomSyncBusy=true;
@@ -20707,19 +20743,30 @@ async function classroomSyncLoad() {
     const course=classroomGradeCourses.find(row=>row.id===target.courseId);
     const base='courses/'+encodeURIComponent(target.courseId);
     classroomSyncStatus('Leyendo actividades y calificaciones publicadas…');
-    const [work,roster,submissions,scope]=await Promise.all([
+    const [work, scope] = await Promise.all([
       classroomGradeList(base+'/courseWork',{courseWorkStates:'PUBLISHED',fields:'nextPageToken,courseWork(id,title,maxPoints,dueDate,creationTime)'},'courseWork'),
-      classroomGradeList(base+'/students',{fields:'nextPageToken,students(userId,profile(name(fullName)))'},'students'),
-      classroomGradeList(base+'/courseWork/-/studentSubmissions',{fields:'nextPageToken,studentSubmissions(courseWorkId,userId,assignedGrade)'},'studentSubmissions'),
       classroomSyncTransaction(false,target,scope=>scope)
     ]);
+    let roster = [], submissions = [], gradeError = null;
     if(token!==classroomGradeToken||g124Stable(target)!==g124Stable(classroomSyncTarget()))throw Error('Cambió la selección. Vuelve a leer la clase.');
     const published=work.filter(row=>typeof row.id==='string'&&typeof row.title==='string'&&row.title.trim())
       .sort((a,b)=>String(classroomSyncDueDate(a)||'9999').localeCompare(String(classroomSyncDueDate(b)||'9999')) ||
         String(a.creationTime||'9999').localeCompare(String(b.creationTime||'9999')) ||
         a.title.localeCompare(b.title,'es',{numeric:true}) || a.id.localeCompare(b.id));
     if(new Set(published.map(row=>row.id)).size!==published.length)throw Error('Classroom devolvió tareas repetidas.');
-    if(!published.length)throw Error('La clase no tiene actividades publicadas.');
+    if (!published.length) throw Error('La clase '+[course.name, course.section].filter(Boolean).join(' · ')+' no tiene actividades publicadas.');
+    if (!activitiesOnly) {
+      const [studentsRead, gradesRead] = await Promise.allSettled([
+        classroomGradeList(base+'/students',{fields:'nextPageToken,students(userId,profile(name(fullName)))'},'students'),
+        classroomGradeList(base+'/courseWork/-/studentSubmissions',{fields:'nextPageToken,studentSubmissions(courseWorkId,userId,assignedGrade)'},'studentSubmissions')
+      ]);
+      if (studentsRead.status === 'rejected') gradeError = studentsRead.reason;
+      else if (gradesRead.status === 'rejected') gradeError = gradesRead.reason;
+      else { roster = studentsRead.value; submissions = gradesRead.value; }
+    }
+    if (token !== classroomGradeToken) throw gradeError || Error('Cambió la conexión. Vuelve a leer la clase.');
+    if (g124Stable(target) !== g124Stable(classroomSyncTarget())) throw Error('Cambió la selección. Vuelve a leer la clase.');
+    const includesGrades = !activitiesOnly && !gradeError;
     const byTask=new Map();
     for (const row of submissions) {
       if (!byTask.has(row.courseWorkId)) byTask.set(row.courseWorkId,[]);
@@ -20748,8 +20795,19 @@ async function classroomSyncLoad() {
       row.append(label,select);tasks.append(row);
     }
     classroomSyncEl('controls').hidden=false;
-    classroomSyncEl('overwrite').checked=false;
-    classroomSyncStatus('Origen: '+course.name+'. Destino: '+formatGradeDisplay(scope.group.grade,scope.group.group_name)+' · '+target.period+'. Revisa qué actividades incluir.');
+    const overwrite = classroomSyncEl('overwrite');
+    overwrite.checked = false;
+    overwrite.closest('label').hidden = !includesGrades;
+    classroomSyncEl('apply').textContent = includesGrades ? 'Guardar actividades y notas en Mi Control Docente' : 'Guardar actividades en Mi Control Docente';
+    const school = localData.schools.find(row => row.school_id === scope.group.school_id);
+    const origin = [course.name, course.section].filter(Boolean).join(' · ');
+    const destination = formatReportGroupLabel(scope.group, school) + ' · ' + target.period;
+    const note = classroomSyncEl('reading-note');
+    note.hidden = false;
+    const mode = gradeError ? ' Solo se importarán actividades. No se pudieron leer las notas o la lista de alumnos. '+gradeError.message
+      : activitiesOnly ? ' Solo se importarán actividades.' : '';
+    note.textContent = 'Origen: '+origin+'. Destino: '+destination+'. '+published.length+' actividades publicadas.'+mode;
+    classroomSyncStatus('Revisa qué actividades incluir.');
   }catch(error){classroomSyncStatus(error.message||'No se pudo leer Classroom.');}
   finally{classroomSyncBusy=false;}
 }
@@ -20832,7 +20890,8 @@ async function classroomSyncApply() {
   }
 }
 
-classroomSyncEl('load').onclick=classroomSyncLoad;
+classroomSyncEl('load').onclick = () => classroomSyncLoad();
+classroomSyncEl('load-activities').onclick = () => classroomSyncLoad(true);
 classroomSyncEl('preview').onclick=classroomSyncReview;
 classroomSyncEl('apply').onclick=classroomSyncApply;
 classroomGradeEl('grade-course').addEventListener('change',classroomSyncReset);
