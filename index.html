@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G340 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G343 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18198,13 +18198,18 @@ const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const count
   </div>
   <p id="g333-status" role="status"></p>
  </details>
- <div id="g128-browser"><div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><button type="button" onclick="g128SelectNew()">Marcar nuevos del filtro</button><button type="button" onclick="g128ClearSelection()">Desmarcar todos</button></div>
+ <div id="g128-browser"><div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="applicable">Disponibles para aplicar</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><button id="g341-mark-new" type="button" onclick="g341MarkFiltered('new')" disabled>Marcar nuevos del filtro</button><button id="g341-mark-different" type="button" onclick="g341MarkFiltered('different')" disabled>Marcar diferentes del filtro</button><button type="button" onclick="g128ClearSelection()">Desmarcar todos</button></div>
  <p id="g128-selection" role="status"></p><div class="g128-scroll"><table><thead><tr><th>Actualizar</th><th>Alumno y registro</th><th>En este dispositivo</th><th>En el respaldo</th><th>Comparación</th></tr></thead><tbody id="g128-rows"></tbody></table></div><button type="button" id="g128-more" onclick="g128ShowMore()">Mostrar más registros</button><div class="g128-toolbar"><button type="button" onclick="g128Close()">Cerrar comparación</button><button type="button" id="g128-apply" onclick="g128ReviewSelected()">Revisar registros marcados</button></div></div>
 <div id="g128-review" hidden>
   <h4 id="g128-review-title" tabindex="-1">Revisar antes de actualizar</h4>
-  <p id="g128-review-count"></p>
+  <p id="g128-review-count" role="status"></p>
   <div class="g128-scroll"><table>
-    <thead><tr><th scope="col">Alumno y registro</th><th scope="col">En este dispositivo</th><th scope="col">En el respaldo</th><th scope="col">Cambio</th></tr></thead>
+    <caption>Registros en el lote por grupo y turno</caption>
+    <thead><tr><th scope="col">Escuela, grupo y turno</th><th scope="col">Asistencias</th><th scope="col">Calificaciones</th><th scope="col">Quitar del lote</th></tr></thead>
+    <tbody id="g343-review-groups"></tbody>
+  </table></div>
+  <div class="g128-scroll"><table>
+    <thead><tr><th scope="col">Alumno y registro</th><th scope="col">En este dispositivo</th><th scope="col">En el respaldo</th><th scope="col">Cambio</th><th scope="col">Quitar del lote</th></tr></thead>
     <tbody id="g128-review-rows"></tbody>
   </table></div>
   <div class="g128-toolbar">
@@ -18716,13 +18721,26 @@ function g128Filtered(){
   return (g128Model?.rows||[]).filter(row=>
     (!group||row.groupId===group)&&(type==='all'||row.store===type)&&
     (mode!=='selected'||g128Selected.has(row.key))&&
-    (mode==='all'||mode==='selected'||(mode==='changes'&&row.kind!=='same')||row.kind===mode)&&
+    (mode==='all'||mode==='selected'||(mode==='changes'&&row.kind!=='same')||
+      (mode==='applicable'&&['new','different'].includes(row.kind))||row.kind===mode)&&
     (!query||g131Normalize(row.label).includes(query)));
 }
 
 function g128UpdateSelection(filtered=g128Filtered()){
   const count=g128Selected.size;
-  const hidden=count-filtered.filter(row=>g128Selected.has(row.key)).length;
+  const unmarked={new:0,different:0};
+  let markedInFilter=0;
+  for(const row of filtered){
+    if(g128Selected.has(row.key)) markedInFilter++;
+    else if(row.kind==='new'||row.kind==='different') unmarked[row.kind]++;
+  }
+  const hidden=count-markedInFilter;
+  const markNew=document.getElementById('g341-mark-new');
+  const markDifferent=document.getElementById('g341-mark-different');
+  markNew.disabled=g128Busy||!unmarked.new;
+  markDifferent.disabled=g128Busy||!unmarked.different;
+  markNew.textContent='Marcar nuevos del filtro ('+unmarked.new+')';
+  markDifferent.textContent='Marcar diferentes del filtro ('+unmarked.different+')';
   document.getElementById('g128-selection').textContent=filtered.length+' registros con estos filtros. '+count+' marcados'+
     (hidden?' ('+hidden+' fuera de los filtros actuales)':'')+'.';
   document.getElementById('g128-apply').disabled=g128Busy||!count;
@@ -18731,7 +18749,11 @@ function g128UpdateSelection(filtered=g128Filtered()){
 
 function g128RenderRows(){const filtered=g128Filtered(),labels={new:'Nuevo',different:'Diferente',same:'Igual: se conserva',blocked:'Bloqueado'};document.getElementById('g128-rows').innerHTML=filtered.slice(0,g128Limit).map(r=>'<tr><td><input type="checkbox" aria-label="Actualizar '+escapeHTML(r.label)+'" data-key="'+escapeHTML(r.key)+'" '+(g128Selected.has(r.key)?'checked ':'')+(['new','different'].includes(r.kind)?'':'disabled ')+'onchange="g128Toggle(this.dataset.key,this.checked)"></td><th>'+escapeHTML(r.label)+'</th><td>'+escapeHTML(g128Value(r,r.existing))+'</td><td>'+escapeHTML(g128Value(r,r.incoming))+'</td><td>'+escapeHTML(labels[r.kind])+(r.reason?'<p>'+escapeHTML(r.reason)+'</p>':'')+'</td></tr>').join('')||'<tr><td colspan="5">Sin registros que coincidan con el filtro.</td></tr>';document.getElementById('g128-more').hidden=filtered.length<=g128Limit;g128UpdateSelection(filtered);}
 function g128Toggle(key,checked){if(g128Busy)return;if(!g128Model?.rows.some(r=>r.key===key&&['new','different'].includes(r.kind)))return;if(checked)g128Selected.add(key);else g128Selected.delete(key);if(document.getElementById('g128-mode').value==='selected')g128RenderRows();else g128UpdateSelection();}
-function g128SelectNew(){if(g128Busy)return;for(const r of g128Filtered())if(r.kind==='new')g128Selected.add(r.key);g128RenderRows();}
+function g341MarkFiltered(kind){
+  if(g128Busy||!['new','different'].includes(kind)) return;
+  for(const row of g128Filtered()) if(row.kind===kind) g128Selected.add(row.key);
+  g128RenderRows();
+}
 function g128ClearSelection(){if(g128Busy)return;g128Selected.clear();g128RenderRows();}
 function g128ShowMore(){g128Limit+=100;g128RenderRows();}
 async function g128Write(model,keys,expected=null){const selected=[...new Set(keys)];if(!selected.length)throw Error('Marca al menos un registro.');const db=await openDatabase(),names=[...db.objectStoreNames];const entry=await new Promise((resolve,reject)=>{const tx=db.transaction(names,'readwrite'),current={};let n=0,error,out;tx.oncomplete=()=>resolve(out);tx.onabort=()=>reject(error||tx.error||Error('No se guardó la conciliación.'));tx.onerror=()=>{};for(const name of names){const q=tx.objectStore(name).getAll();q.onsuccess=()=>{current[name]=q.result;if(++n!==names.length)return;try{const log=current.settings.find(s=>s.key===g128AuditKey)?.value||{version:1,entries:[]};g128ValidateHistory(log);const prior=log.entries.find(e=>e.id===model.id);if(prior){out=prior;return;}if(expected&&g124StateSignature(current)!==g124StateSignature(expected))throw Error('Los datos cambiaron después de preparar la copia de seguridad. Revisa de nuevo.');const latest=g128Compare(model.backup,current),now=new Date().toISOString();out={id:model.id,at:now,sourceCreatedAt:model.backup.created_at||'',changes:[]};for(const key of selected){const reviewed=model.rows.find(r=>r.key===key),live=latest.find(r=>r.key===key);if(!reviewed||!live||!['new','different'].includes(reviewed.kind)||!['new','different'].includes(live.kind)||g124Stable(live.existing)!==g124Stable(reviewed.existing)||live.kind!==reviewed.kind)throw Error('Un registro cambió o está bloqueado. Cierra y compara el respaldo nuevamente.');const pk=RESTORE_STORE_KEYS[live.store],record={...(live.existing||{}),...live.incoming,[pk]:live.pk,group_id:live.groupId,school_id:current.groups.find(g=>g.group_id===live.groupId)?.school_id||'',created_at:live.existing?.created_at||live.incoming.created_at||now,updated_at:now,reconciled_source_updated_at:live.incoming.updated_at||''};if(live.store==='activity_results'){record.grade=g128Meaning(live.store,live.incoming).grade;record.delivery_status=live.incoming.delivery_status||null;record.observation=live.incoming.observation||'';}else{record.note=live.incoming.note||'';record.justification_reason=live.incoming.justification_reason||'';}tx.objectStore(live.store).put(record);out.changes.push({store:live.store,pk:live.pk,previous:live.existing,next:record});}log.entries.push(out);tx.objectStore('settings').put({key:g128AuditKey,value:log});}catch(e){error=e;tx.abort();}};}});for(const c of entry.changes)if(g124Stable(await dbGet(c.store,c.pk))!==g124Stable(c.next))throw Error('Un registro cambió durante la verificación. Revisa su valor actual.');await refreshLocalCache();g128RefreshAttendance(entry,false);return entry;}
@@ -18823,10 +18845,13 @@ function g128SetReview(review){
   g128Review=review;
   document.getElementById('g128-browser').hidden=!!review;
   document.getElementById('g128-review').hidden=!review;
-  if(!review) document.getElementById('g128-review-rows').replaceChildren();
+  if(!review){
+    document.getElementById('g128-review-rows').replaceChildren();
+    document.getElementById('g343-review-groups').replaceChildren();
+  }
 }
 
-function g128ReviewSelected(){
+function g128ReviewSelected(focusIndex=null,focusGroup=false){
   if(g128Busy||!g128Model||!g128Selected.size) return;
   const rows=g128Model.rows.filter(row=>g128Selected.has(row.key)&&['new','different'].includes(row.kind));
   if(rows.length!==g128Selected.size){
@@ -18834,26 +18859,64 @@ function g128ReviewSelected(){
     return;
   }
   const groupLabels=new Map(Array.from(document.getElementById('g128-group').options,option=>[option.value,option.text]));
-  const attendance=rows.filter(row=>row.store==='attendance').length;
+  const groups=new Map();
+  let attendance=0;
+  for(const row of rows){
+    const id=row.groupId||'';
+    if(!groups.has(id)) groups.set(id,{label:id?(groupLabels.get(id)||id):'Grupo sin identificar',attendance:0,keys:[]});
+    const group=groups.get(id);
+    group.keys.push(row.key);
+    if(row.store==='attendance'){group.attendance++;attendance++;}
+  }
   const grades=rows.length-attendance;
+  document.getElementById('g343-review-groups').innerHTML=[...groups]
+    .sort((a,b)=>a[1].label.localeCompare(b[1].label,'es',{numeric:true}))
+    .map(([id,group])=>'<tr><th scope="row">'+escapeHTML(group.label)+'</th><td>'+group.attendance+
+      '</td><td>'+(group.keys.length-group.attendance)+'</td><td><button type="button" data-group="'+
+      escapeHTML(id)+'" aria-label="Quitar '+escapeHTML(group.label)+' del lote" onclick="g343RemoveGroup(this)">Quitar grupo</button></td></tr>').join('');
   document.getElementById('g128-review-count').textContent=rows.length+' en total · '+attendance+' de asistencia · '+grades+' de calificaciones.';
   document.getElementById('g128-review-rows').innerHTML=rows.map(row=>{
     const group=groupLabels.get(row.groupId);
     const label=escapeHTML(row.label)+(group?'<br><small>'+escapeHTML(group)+'</small>':'');
     return '<tr><th scope="row">'+label+'</th><td>'+escapeHTML(g128Value(row,row.existing))+
       '</td><td>'+escapeHTML(g128Value(row,row.incoming))+'</td><td>'+
-      (row.kind==='new'?'Agregar':'Actualizar')+'</td></tr>';
+      (row.kind==='new'?'Agregar':'Actualizar')+'</td><td>'+
+      '<button type="button" data-key="'+escapeHTML(row.key)+'" aria-label="Quitar '+
+      escapeHTML([row.label,group].filter(Boolean).join(' · '))+' del lote" onclick="g342RemoveReviewed(this)">Quitar</button></td></tr>';
   }).join('');
   document.getElementById('g128-error').textContent='';
-  g128SetReview({model:g128Model,keys:rows.map(row=>row.key)});
-  document.getElementById('g128-review-title').focus();
+  g128SetReview({model:g128Model,keys:rows.map(row=>row.key),groups});
+  if(focusIndex===null){
+    document.getElementById('g128-review-title').focus();
+  }else{
+    const reviewRows=document.getElementById(focusGroup?'g343-review-groups':'g128-review-rows').rows;
+    reviewRows[Math.min(focusIndex,reviewRows.length-1)].querySelector('button').focus();
+  }
+}
+
+function g342RemoveReviewed(button){
+  if(g128Busy||!g128Review||g128Review.model!==g128Model) return;
+  const key=button.dataset.key;
+  if(!g128Review.keys.includes(key)||!g128Selected.delete(key)) return;
+  if(g128Selected.size) g128ReviewSelected(button.closest('tr').sectionRowIndex);
+  else g128EditSelection();
+}
+
+function g343RemoveGroup(button){
+  if(g128Busy||!g128Review||g128Review.model!==g128Model) return;
+  const group=g128Review.groups.get(button.dataset.group);
+  if(!group) return;
+  for(const key of group.keys) g128Selected.delete(key);
+  if(g128Selected.size) g128ReviewSelected(button.closest('tr').sectionRowIndex,true);
+  else g128EditSelection();
 }
 
 function g128EditSelection(){
   if(g128Busy) return;
   g128SetReview(null);
   document.getElementById('g128-error').textContent='';
-  document.getElementById('g128-apply').focus();
+  g128RenderRows();
+  document.getElementById(g128Selected.size?'g128-apply':'g128-search').focus();
 }
 
 async function g128ApplySelected(){
