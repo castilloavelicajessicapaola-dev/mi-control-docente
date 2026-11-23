@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G366 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G368 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -1343,7 +1343,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
   </div>
   <div id="classroom-grade-source" hidden>
     <div class="grid sm:grid-cols-2 gap-2">
-      <label class="text-sm sm:col-span-2">Buscar clase por nombre o sección
+      <label class="text-sm sm:col-span-2">Buscar clase por nombre, sección, aula o ID
         <input id="classroom-grade-course-search" type="search" class="block w-full rounded-lg border p-2" autocomplete="off" aria-controls="classroom-grade-course">
       </label>
       <label class="text-sm">Clase de Classroom<select id="classroom-grade-course" class="block w-full rounded-lg border p-2"></select></label>
@@ -18208,6 +18208,7 @@ const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const count
     <label>Hasta<input type="date" id="g346-end-date" aria-describedby="g346-date-status" onchange="g128ChangeFilters()"></label>
     <p id="g346-date-status" role="status"></p>
   </div>
+  <button id="g367-return-filters" type="button" onclick="g367ReturnToFilters()" hidden>Volver a los filtros anteriores</button>
   <p id="g128-selection" role="status" tabindex="-1"></p>
   <button type="button" id="g352-show-marks" onclick="g352ShowAllMarked()" hidden>Ver todas las marcas</button>
   <button type="button" id="g355-export-filtered" onclick="g355ExportFiltered()" disabled>Descargar comparación filtrada (CSV)</button>
@@ -18866,8 +18867,10 @@ async function g345Recompare(wasReviewing=false,refreshStructure=false){
   }
 }
 
+const g367FilterIds=['g128-search','g128-group','g344-block-reason','g346-start-date','g346-end-date','g347-trimester','g348-activity','g350-student','g357-change-field'];
+
 function g352ResetFilters(mode,type){
-  for(const id of ['g128-search','g128-group','g344-block-reason','g346-start-date','g346-end-date','g347-trimester','g348-activity','g350-student','g357-change-field'])
+  for(const id of g367FilterIds)
     document.getElementById(id).value='';
   document.getElementById('g128-record-type').value=type;
   document.getElementById('g128-mode').value=mode;
@@ -19153,6 +19156,8 @@ function g365OpenSummaryRows(button){
   const groupSelect=document.getElementById('g128-group');
   const recordType=document.getElementById('g128-record-type');
   if(!group||!Array.from(groupSelect.options).some(option=>option.value===group)||!['attendance','activity_results'].includes(store)) return;
+  g128Model.summaryFilters??=Object.fromEntries([...g367FilterIds,'g128-record-type','g128-mode']
+    .map(id=>[id,document.getElementById(id).value]));
   if(recordType.value!==store){
     const inactive=store==='attendance'?['g346-start-date','g346-end-date']:['g347-trimester','g348-activity'];
     for(const id of inactive) document.getElementById(id).value='';
@@ -19169,7 +19174,33 @@ function g365OpenSummaryRows(button){
   document.getElementById('g128-selection').focus();
 }
 
+function g367ReturnToFilters(){
+  const filters=g128Model?.summaryFilters;
+  if(g128Busy||!filters) return;
+  delete g128Model.summaryFilters;
+  function restore(id,checkOptions=false){
+    const control=document.getElementById(id);
+    const value=filters[id];
+    control.value=checkOptions&&!Array.from(control.options).some(option=>option.value===value)?'':value;
+  }
+  for(const id of ['g128-search','g128-record-type','g128-mode','g346-start-date','g346-end-date','g347-trimester']) restore(id);
+  restore('g128-group',true);
+  g350RefreshStudentFilter();
+  restore('g350-student',true);
+  g348RefreshGradeFilters();
+  restore('g348-activity',true);
+  g357RefreshChangedFieldFilter();
+  restore('g357-change-field',true);
+  g344RefreshBlockReasons();
+  restore('g344-block-reason',true);
+  g128ChangeFilters();
+  document.getElementById('g128-selection').focus();
+}
+
 function g128UpdateSelection(filtered=g128Filtered()){
+  const returnFilters=document.getElementById('g367-return-filters');
+  returnFilters.hidden=!g128Model?.summaryFilters;
+  returnFilters.disabled=g128Busy||returnFilters.hidden;
   document.getElementById('g363-export-summary').disabled=g128Busy||!filtered.length;
   g364RenderSummary(filtered);
   document.getElementById('g355-export-filtered').disabled=g128Busy||!filtered.length;
@@ -19594,7 +19625,7 @@ function g128UndoLast(){
 
 
 const g128OldValidate=validateBackupObject;validateBackupObject=function(parsed){const validation=g128OldValidate(parsed);if(!validation.ok)return validation;try{if(parsed.records.settings?.[g128AuditKey]!==undefined)g128ValidateHistory(parsed.records.settings[g128AuditKey]);return validation;}catch(e){return {ok:false,message:e.message};}};
-{const style=document.createElement('style');style.textContent='#g128-reconcile-card{border:1px solid #c6d8cc;border-radius:14px;padding:16px;margin:14px 0;font-size:13px}#g128-receipts{margin-top:12px;border-top:1px solid #c6d8cc;padding-top:10px}#g128-receipts summary{cursor:pointer;font-weight:700}#g128-receipt-select{max-width:100%;padding:8px;border:1px solid #b6c7bc;border-radius:8px;background:white}#g128-reconcile-card h4{font-size:16px;font-weight:700}#g128-reconcile-card p{line-height:1.6}.g128-file{display:inline-flex;flex-direction:column;gap:6px;margin:10px 10px 10px 0}#modal-g128-reconcile{position:fixed;inset:0;z-index:160;background:#14221bbb;align-items:center;justify-content:center;padding:16px}.g128-modal-box{background:white;border-radius:20px;padding:22px;width:min(1150px,100%);max-height:92vh;overflow:auto;color:#172226}.g128-modal-box h3{font-size:22px}.g128-modal-box p{font-size:12px;line-height:1.6}.g128-toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:14px 0}.g128-toolbar label{display:flex;flex-direction:column;gap:5px;font-size:12px;max-width:100%}#g344-block-filter[hidden],#g346-date-filter[hidden],#g347-grade-filter[hidden],#g348-activity-filter[hidden],#g351-review-filtered[hidden],#g352-show-marks[hidden],#g357-change-filter[hidden]{display:none}#g348-activity,#g350-student{width:min(20rem,100%);text-overflow:ellipsis}#g346-date-status:empty{display:none}#g344-block-reason{max-width:100%;text-overflow:ellipsis}.g128-modal-box button,.g128-modal-box select,.g128-modal-box input[type=search],#g346-date-filter input[type=date],#g128-reconcile-card button,#g124-preflight button{padding:9px;border:1px solid #b6c7bc;border-radius:8px;background:white;color:#145b4b;font:inherit;font-size:12px;max-width:100%}.g128-scroll{overflow:auto}.g128-scroll table{width:100%;min-width:740px;border-collapse:collapse}.g128-scroll td,.g128-scroll th{padding:10px;border-bottom:1px solid #ddd;text-align:left;font-size:12px;overflow-wrap:anywhere}.g128-modal-box button:disabled{opacity:.5}#g128-error{color:#a12626;font-weight:600}';document.head.appendChild(style);}
+{const style=document.createElement('style');style.textContent='#g128-reconcile-card{border:1px solid #c6d8cc;border-radius:14px;padding:16px;margin:14px 0;font-size:13px}#g128-receipts{margin-top:12px;border-top:1px solid #c6d8cc;padding-top:10px}#g128-receipts summary{cursor:pointer;font-weight:700}#g128-receipt-select{max-width:100%;padding:8px;border:1px solid #b6c7bc;border-radius:8px;background:white}#g128-reconcile-card h4{font-size:16px;font-weight:700}#g128-reconcile-card p{line-height:1.6}.g128-file{display:inline-flex;flex-direction:column;gap:6px;margin:10px 10px 10px 0}#modal-g128-reconcile{position:fixed;inset:0;z-index:160;background:#14221bbb;align-items:center;justify-content:center;padding:16px}.g128-modal-box{background:white;border-radius:20px;padding:22px;width:min(1150px,100%);max-height:92vh;overflow:auto;color:#172226}.g128-modal-box h3{font-size:22px}.g128-modal-box p{font-size:12px;line-height:1.6}.g128-toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:14px 0}.g128-toolbar label{display:flex;flex-direction:column;gap:5px;font-size:12px;max-width:100%}#g344-block-filter[hidden],#g346-date-filter[hidden],#g347-grade-filter[hidden],#g348-activity-filter[hidden],#g351-review-filtered[hidden],#g352-show-marks[hidden],#g357-change-filter[hidden],#g367-return-filters[hidden]{display:none}#g348-activity,#g350-student{width:min(20rem,100%);text-overflow:ellipsis}#g346-date-status:empty{display:none}#g344-block-reason{max-width:100%;text-overflow:ellipsis}.g128-modal-box button,.g128-modal-box select,.g128-modal-box input[type=search],#g346-date-filter input[type=date],#g128-reconcile-card button,#g124-preflight button{padding:9px;border:1px solid #b6c7bc;border-radius:8px;background:white;color:#145b4b;font:inherit;font-size:12px;max-width:100%}.g128-scroll{overflow:auto}.g128-scroll table{width:100%;min-width:740px;border-collapse:collapse}.g128-scroll td,.g128-scroll th{padding:10px;border-bottom:1px solid #ddd;text-align:left;font-size:12px;overflow-wrap:anywhere}.g128-modal-box button:disabled{opacity:.5}#g128-error{color:#a12626;font-weight:600}';document.head.appendChild(style);}
 </script><div id="modal-g129-copy" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="g129-title"><div class="g129-box"><div class="g116-heading"><h3 id="g129-title" class="serif">Reutilizar actividades entre grupos</h3><button type="button" onclick="g129Close()">Cerrar</button></div><p>Copia los datos de las actividades y, si lo eliges, sus instrumentos de evaluación. Las nuevas actividades comienzan sin calificaciones ni entregas de alumnos.</p>
  <div class="g129-grid"><section><h4>Origen</h4><label>Grupo<select id="g129-source-group" onchange="g129LoadSources()"></select></label><label>Trimestre<select id="g129-source-trimester" onchange="g129LoadSources()"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option></select></label><div class="g129-actions"><button type="button" onclick="g129SelectSources(true)">Marcar actividades</button><button type="button" onclick="g129SelectSources(false)">Desmarcar</button></div><div id="g129-source-activities" class="g129-options"></div></section>
  <section><h4>Destino</h4><div id="g129-target-groups" class="g129-options"></div><label>Trimestre de destino<select id="g129-target-trimester" onchange="g129Invalidate()"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option></select></label><label>Fecha de entrega<select id="g129-date-mode" onchange="g129DateChanged()"><option value="keep">Conservar la fecha de cada actividad</option><option value="date">Usar una fecha común</option></select></label><label>Fecha común<input id="g129-date" type="date" disabled onchange="g129Invalidate()"></label><label class="g129-check"><input id="g129-instruments" type="checkbox" onchange="g129Invalidate()"> Copiar también los instrumentos activos vinculados</label></section></div>
@@ -21594,17 +21625,33 @@ async function classroomGradeAction(task) {
 }
 
 function classroomGradeCourseLabel(course) {
-  const label = [course.name,course.section].filter(Boolean).join(' · ');
+  const label = [...new Set([course.name,course.section,course.room].filter(Boolean))].join(' · ');
   return course.courseState === 'ARCHIVED' ? label+' (Archivada)' : label;
+}
+
+function classroomGradeCourseTerms(value) {
+  return normalizeStudentName(value)
+    .replace(/(\d)\s*\.?\s*[º°ª]/gu,'$1')
+    .replace(/(\d)\s*\.?\s*(?:er|ro|to)\b/gu,'$1')
+    .replace(/(\d)\s*\.?\s*[oa](?=\s+[a-z]\b)/gu,'$1')
+    .replace(/[^\p{L}\p{N}]+/gu,' ')
+    .replace(/\b(\d+)\s+([a-z])\b/gu,'$1$2')
+    .trim().split(/\s+/).filter(Boolean);
 }
 
 function classroomGradeRenderCourses() {
   const search = classroomGradeEl('grade-course-search');
   const select = classroomGradeEl('grade-course');
-  const key = value => normalizeStudentName(value).replace(/[\u00ba\u00aa]|[^\p{L}\p{N}]/gu, '');
-  const query = key(search.value);
-  const previous = select.value;
-  const courses = classroomGradeCourses.filter(course => key(classroomGradeCourseLabel(course)).includes(query));
+  const query=classroomGradeCourseTerms(search.value);
+  const previous=select.value;
+  const courses=classroomGradeCourses.filter(course=>{
+    if(course.id===search.value.trim()) return true;
+    const terms=classroomGradeCourseTerms(classroomGradeCourseLabel(course));
+    return query.every(word=>terms.some(term=>{
+      if(/^\d+$/.test(word)) return term.match(/^\d+/)?.[0]===word;
+      return /^\d/.test(word)?term===word:term.includes(word);
+    }));
+  });
   const placeholder = courses.length ? 'Elige una clase' : 'Sin clases que coincidan';
   renderSelectOptions(select, [['',placeholder], ...courses.map(course => [course.id,classroomGradeCourseLabel(course)])]);
   if (courses.some(course => course.id === previous)) select.value = previous;
@@ -21624,7 +21671,7 @@ async function connectClassroomGrades(prompt) {
     classroomGradeToken = token.access_token;
     classroomGradeExpiresAt = Date.now() + Math.max(0,Math.min(Number(token.expires_in || 3600),3600)-30)*1000;
     classroomGradeCourses = await classroomGradeList('courses',{
-      teacherId:'me',courseStates:['ACTIVE','ARCHIVED'],fields:'nextPageToken,courses(id,name,section,courseState)'
+      teacherId:'me',courseStates:['ACTIVE','ARCHIVED'],fields:'nextPageToken,courses(id,name,section,room,courseState)'
     },'courses');
     classroomGradeEl('grade-course-search').value = '';
     classroomGradeRenderCourses();
@@ -22012,6 +22059,13 @@ function classroomSyncReset(){
   classroomSyncEl('controls').hidden=true;classroomSyncEl('apply').hidden=true;
 }
 
+function classroomSyncPublishedWork(work) {
+  return work.filter(row=>typeof row.id==='string'&&typeof row.title==='string'&&row.title.trim())
+      .sort((a,b)=>String(classroomSyncDueDate(a)||'9999').localeCompare(String(classroomSyncDueDate(b)||'9999')) ||
+        String(a.creationTime||'9999').localeCompare(String(b.creationTime||'9999')) ||
+        a.title.localeCompare(b.title,'es',{numeric:true}) || a.id.localeCompare(b.id));
+}
+
 async function classroomSyncLoad(activitiesOnly = false) {
   if(classroomSyncBusy||classroomGradeBusy)return;
   classroomSyncReset();
@@ -22027,10 +22081,7 @@ async function classroomSyncLoad(activitiesOnly = false) {
     ]);
     let roster = [], submissions = [], gradeError = null;
     if(token!==classroomGradeToken||g124Stable(target)!==g124Stable(classroomSyncTarget()))throw Error('Cambió la selección. Vuelve a leer la clase.');
-    const published=work.filter(row=>typeof row.id==='string'&&typeof row.title==='string'&&row.title.trim())
-      .sort((a,b)=>String(classroomSyncDueDate(a)||'9999').localeCompare(String(classroomSyncDueDate(b)||'9999')) ||
-        String(a.creationTime||'9999').localeCompare(String(b.creationTime||'9999')) ||
-        a.title.localeCompare(b.title,'es',{numeric:true}) || a.id.localeCompare(b.id));
+    const published=classroomSyncPublishedWork(work);
     if(new Set(published.map(row=>row.id)).size!==published.length)throw Error('Classroom devolvió tareas repetidas.');
     if (!published.length) throw Error('La clase '+classroomGradeCourseLabel(course)+' no tiene actividades publicadas.');
     if (!activitiesOnly) {
