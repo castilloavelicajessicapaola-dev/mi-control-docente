@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G327 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G329 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11564,24 +11564,28 @@ function renderGradebook(preserveDraft = false) {
       const container = document.getElementById('archived-schedule-rows');
       if (!container) return;
       const activeGroups = new Set(getActiveCycleGroups().map(group => group.group_id));
-      const archived = localData.schedule.filter(row => row.status === 'ARCHIVED' && activeGroups.has(row.group_id))
+      const archived = localData.schedule.filter(row => row.status === 'ARCHIVED')
         .sort((a,b) => Number(a.day_of_week) - Number(b.day_of_week) || String(a.start_time).localeCompare(String(b.start_time)));
       container.replaceChildren();
       if (!archived.length) {
-        container.textContent = 'No hay clases archivadas de grupos activos en este ciclo.';
+        container.textContent = 'No hay clases archivadas.';
         return;
       }
       for (const entry of archived) {
         const row = document.createElement('div');
         row.className = 'flex flex-wrap items-center gap-3 py-2';
         const label = document.createElement('span');
-        label.textContent = [scheduleGroupLabel(entry).label,DAY_NAMES[entry.day_of_week],entry.start_time + '–' + entry.end_time].filter(Boolean).join(' · ');
+        const {g,school} = scheduleGroupLabel(entry);
+        label.textContent = [g ? formatGroupLabelWithShift(g,school) : 'Grupo no disponible',g && getGroupSchoolYear(g),
+          DAY_NAMES[entry.day_of_week],entry.start_time + '-' + entry.end_time].filter(Boolean).join(' · ');
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'rounded-lg border border-[#145b4b] px-3 py-2 text-xs font-bold text-[#145b4b]';
         button.textContent = 'Restaurar al horario';
         button.onclick = () => changeScheduleArchive(entry.schedule_id, true);
-        row.append(label, button);
+        button.disabled = !activeGroups.has(entry.group_id);
+        if (button.disabled) button.title = 'Activa el grupo y selecciona el ciclo de la clase para restaurarla.';
+        row.append(label, button, g329DeleteButton('schedule',entry.schedule_id));
         container.append(row);
       }
     }
@@ -19863,6 +19867,115 @@ function g253Download(){if(!g249Report||g219Busy||g116Busy)return false;try{down
 const g253Panel=document.createElement('div');g253Panel.id='g253-participation-pupils';document.getElementById('g219-results').after(g253Panel);const g253Button=document.createElement('button');g253Button.id='g253-download-pupils';g253Button.type='button';g253Button.textContent='Descargar participaciones por alumno (CSV)';g253Button.disabled=true;g253Button.onclick=g253Download;document.getElementById('g219-check').after(g253Button);const g253Css='.g253-pupils{overflow:auto;margin:12px 0}.g253-pupils table{width:100%;border-collapse:collapse;font-size:.85rem}.g253-pupils th,.g253-pupils td{border:1px solid #99aaa2;padding:8px;text-align:left;overflow-wrap:anywhere}.g253-pupils thead{display:table-header-group}.g253-pupils tr{break-inside:avoid}#g253-download-pupils{min-height:44px;padding:10px;margin:8px;border-radius:8px}';const g253Style=document.createElement('style');g253Style.textContent=g253Css;document.head.append(g253Style);
 const g253OriginalClear=g219Clear;g219Clear=function(){g253OriginalClear();g253Panel.replaceChildren();g253Button.disabled=true;};const g253OriginalCheck=g219Check;g219Check=async function(...args){if(g219Busy||g116Busy)return false;const result=await g253OriginalCheck(...args);if(g249Report){g249Report.pupils=g253Pupils(g249Report,localData.students);g253Panel.innerHTML=g253Table(g249Report);g253Button.disabled=!g249Report.pupils.length;}return result;};document.getElementById('g219-check').onclick=g219Check;const g253OriginalHtml=g251Html;g251Html=function(report){return g253OriginalHtml(report).replace('</head>','<style>'+g253Css+'</style></head>').replace('<footer>',g253Table(report)+'<footer>');};
 g131Topics.push({id:'participation-pupil-detail',title:'Consultar participaciones por alumno',intro:'La comprobación conserva el desglose individual y el historial que ya está guardado.',steps:['Comprueba las participaciones del grupo y alcance elegidos.','Revisa individuales, en equipo y total por alumno. La referencia avisa de alumnos inactivos, fuera del grupo o sin ficha disponible.','Descarga el CSV por alumno o el reporte imprimible. Los nombres son referencias del listado cargado; los conteos proceden de la lectura guardada.']});
+</script><script id="g329-archived-deletion">
+let g329Busy = false;
+const g329Labels = {students:'alumnos',attendance:'asistencias',activities:'actividades',activity_results:'resultados de actividades',observations:'observaciones',
+  plans:'planeaciones',academic_closures:'cierres académicos',schedule:'clases del horario',calendar_events:'eventos del grupo',portfolio_evidence:'evidencias',
+  assessment_instruments:'instrumentos',instrument_results:'resultados de instrumentos',document_records:'documentos',teacher_journal:'bitácoras',
+  weekly_reviews:'revisiones semanales',family_contacts:'contactos familiares',recovery_plans:'planes de recuperación',settings:'registros de configuración e historial de aula'};
+
+function g329DeleteButton(store,id) {
+  const button=document.createElement('button');
+  button.type='button';button.textContent='Eliminar definitivamente';
+  button.className='rounded-lg border border-red-300 px-3 py-2 text-xs font-bold text-red-700';
+  button.onclick=()=>g329DeleteArchived(store,id);
+  return button;
+}
+
+function g329DeletionPlan(data,store,id) {
+  const key=RESTORE_STORE_KEYS[store];
+  const record=data[store].find(row=>row[key]===id);
+  if (record?.status!=='ARCHIVED') throw Error('El registro ya no está archivado.');
+  if (store==='schedule') return {removed:{schedule:[record]},updated:{teacher_journal:data.teacher_journal
+    .filter(row=>row.schedule_id===id).map(row=>({...row,schedule_id:''}))}};
+  const removed={groups:[record]}, updated={settings:[]};
+  const ids=(name,field,rows)=>new Set(rows[name].map(row=>row[field]));
+  for (const name of ['students','activities','schedule']) removed[name]=data[name].filter(row=>row.group_id===id);
+  const students=ids('students','student_id',removed), activities=ids('activities','activity_id',removed);
+  const schedule=ids('schedule','schedule_id',removed);
+  const belongs=row=>row.group_id===id;
+  const references=row=>belongs(row)||students.has(row.student_id)||activities.has(row.activity_id)||schedule.has(row.schedule_id);
+  removed.assessment_instruments=data.assessment_instruments.filter(references);
+  const instruments=ids('assessment_instruments','instrument_id',removed);
+  for (const name of Object.keys(g329Labels)) {
+    if (name==='settings'||Object.hasOwn(removed,name)) continue;
+    removed[name]=data[name].filter(row=>references(row)||instruments.has(row.instrument_id));
+  }
+  const directKeys=new Set(['classroom_board::','classroom_topics::','classroom_activity_topics::','classroom_materials::',
+    'evaluation_config::','g116_classroom_','g122_seating::','g127_seating_layouts::','g189_resource_links::',
+    'g213_roster_expected::','classroom_activity_links::','g142_attendance_filters::'].map(prefix=>prefix+id));
+  const recoveryKeys=new Set(removed.recovery_plans.map(row=>'g193_recovery_followups::'+row.recovery_id));
+  removed.settings=data.settings.filter(({key})=>directKeys.has(key)||recoveryKeys.has(key)||
+    key.startsWith('g121_report_filters::'+id+'::')||['T1','T2','T3'].some(period=>key===presentationOrderKey('activities',id,period)));
+  for (const row of data.settings) {
+    const {key,value}=row;
+    if (key.startsWith('group_order::')&&Array.isArray(value?.ids)&&value.ids.includes(id)) {
+      updated.settings.push({...row,value:{...value,ids:value.ids.filter(item=>item!==id)}});
+    } else if (key==='g200_home_preferences'&&Array.isArray(value?.favorites)&&value.favorites.includes(id)) {
+      updated.settings.push({...row,value:{...value,favorites:value.favorites.filter(item=>item!==id)}});
+    }
+  }
+  return {removed,updated};
+}
+
+async function g329CommitDeletion(store,id,plan) {
+  const db=await openDatabase();
+  const names=store==='schedule'?['schedule','teacher_journal']:Object.keys(plan.removed);
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(names,'readwrite'),data={};
+    let pending=names.length,failure;
+    tx.oncomplete=resolve;
+    tx.onabort=()=>reject(failure||tx.error||Error('El borrado se canceló.'));
+    for (const name of names) {
+      const request=tx.objectStore(name).getAll();
+      request.onsuccess=()=>{
+        data[name]=request.result;
+        if (--pending) return;
+        try {
+          const current=g329DeletionPlan(data,store,id);
+          if (g124Stable(current)!==g124Stable(plan)) throw Error('Los registros cambiaron. Revisa nuevamente antes de eliminar.');
+          for (const [name,rows] of Object.entries(current.removed)) {
+            const key=name==='settings'?'key':RESTORE_STORE_KEYS[name];
+            for (const row of rows) tx.objectStore(name).delete(row[key]);
+          }
+          for (const [name,rows] of Object.entries(current.updated)) {
+            for (const row of rows) tx.objectStore(name).put(row);
+          }
+        } catch(error) {failure=error;tx.abort();}
+      };
+    }
+  });
+}
+
+async function g329DeleteArchived(store,id) {
+  if (g329Busy || g254Busy || scheduleArchiveBusy) return;
+  if (store==='groups' && (g134Saving || g134Pending())) return showToast('Guarda o descarta los cambios del cuaderno antes de eliminar un grupo.');
+  g329Busy=true;
+  let committed=false;
+  try {
+    const data=await g124Snapshot();
+    const plan=g329DeletionPlan(data,store,id);
+    const record=plan.removed[store][0];
+    const group=store==='groups'?record:data.groups.find(row=>row.group_id===record.group_id);
+    const school=data.schools.find(row=>row.school_id===group?.school_id);
+    const label=group?formatGroupLabelWithShift(group,school)+' · '+getGroupSchoolYear(group):'Grupo no disponible';
+    const count=Object.entries(plan.removed).filter(([name,rows])=>name!=='groups'&&rows.length)
+      .map(([name,rows])=>rows.length+' '+g329Labels[name]).join(', ');
+    const prompt=store==='schedule'?
+      '¿Eliminar definitivamente del horario: '+label+' · '+(DAY_NAMES[record.day_of_week]||'')+' '+record.start_time+'-'+record.end_time+'?\n\n'
+        +'Se borrará esta clase. Sus bitácoras se conservarán sin el vínculo al horario ('+plan.updated.teacher_journal.length+').':
+      '¿Eliminar definitivamente el grupo '+label+'?\n\nSe borrará el grupo'+(count?' y sus registros: '+count:'.');
+    if (!confirm(prompt+'\n\nEsta operación es permanente en este dispositivo.')) return;
+    await g329CommitDeletion(store,id,plan);
+    committed=true;
+    await refreshLocalCache();
+    if (store==='groups') {populateGroupDropdowns();renderGroups();}
+    renderSchedule();renderTodaySchedule();
+    showToast(store==='schedule'?'Clase archivada eliminada definitivamente.':'Grupo archivado eliminado definitivamente.');
+  } catch(error) {
+    showToast(committed?'Se eliminó el registro. Recarga la aplicación para actualizar la vista.':error.message);
+  } finally {g329Busy=false;}
+}
 </script><script id="g254-group-management">/* Group identity remains fixed; removal archives the group and retains all history. */
 function g254Plan(existing,patch,groups){if(!existing?.group_id)throw Error('Grupo no disponible.');const next={...existing,...patch,group_id:existing.group_id,school_id:existing.school_id,created_at:existing.created_at};if(![1,2,3].includes(Number(next.grade))||!String(next.group_name||'').trim()||!String(next.subject||'').trim()||!String(next.shift||'').trim()||!/^\d{4}-\d{4}$/.test(next.school_year||''))throw Error('Revisa grado, grupo, asignatura, turno y ciclo.');next.grade=Number(next.grade);for(const key of ['group_name','subject','shift','school_year'])next[key]=String(next[key]).trim();if(!['ACTIVE','ARCHIVED'].includes(next.status))throw Error('Estado de grupo inválido.');const norm=value=>String(value??'').trim().toLocaleUpperCase('es-MX');if(next.status==='ACTIVE'&&groups.some(group=>group.group_id!==next.group_id&&group.status!=='ARCHIVED'&&['school_id','grade','group_name','subject','shift','school_year'].every(key=>norm(group[key])===norm(next[key]))))throw Error('Ya existe un grupo activo con esos datos.');next.updated_at=new Date().toISOString();return next;}
 async function g254Write(baseline,patch){const db=await openDatabase();return new Promise((resolve,reject)=>{const tx=db.transaction('groups','readwrite');let output,failure;tx.oncomplete=()=>resolve(output);tx.onabort=()=>reject(failure||tx.error||Error('No se guardó el cambio.'));const store=tx.objectStore('groups'),request=store.getAll();request.onsuccess=()=>{try{const existing=request.result.find(group=>group.group_id===baseline.group_id);if(JSON.stringify(existing)!==JSON.stringify(baseline))throw Error('El grupo cambió. Cierra y vuelve a abrir su edición.');output=g254Plan(existing,patch,request.result);store.put(output);}catch(error){failure=error;tx.abort();}};});}
@@ -19874,7 +19987,22 @@ document.getElementById('g254-cancel').onclick=()=>{if(!g254Busy)g254Dialog.clos
 async function g254Remove(groupId,restore=false){if(g254Busy)return;const group=localData.groups.find(item=>item.group_id===groupId);if(!group)return;const students=localData.students.filter(item=>item.group_id===groupId).length,attendance=localData.attendance.filter(item=>item.group_id===groupId).length,activities=localData.activities.filter(item=>item.group_id===groupId).length;const message=restore?'¿Restaurar este grupo a sus listas activas?':'¿Eliminar '+formatGradeDisplay(group.grade,group.group_name)+' de las listas activas?\n\nSe archivará el grupo. No se borrarán alumnos ni registros académicos.\nSe conservan '+students+' alumnos, '+attendance+' asistencias y '+activities+' actividades, además de sus calificaciones, participaciones y demás historial.\nPodrás restaurarlo desde Grupos archivados.';if(!confirm(message))return;g254Busy=true;try{await g254Apply(structuredClone(group),{status:restore?'ACTIVE':'ARCHIVED',school_year:group.school_year||getCurrentSchoolYear()});showToast(restore?'Grupo restaurado.':'Grupo archivado; historial conservado.');}catch(error){showToast(error.message);}finally{g254Busy=false;}}
 function g254Decorate(){for(const gridId of ['group-grid','all-group-grid'])for(const card of document.getElementById(gridId)?.querySelectorAll('.group-card')||[]){if(card.querySelector('.g254-actions'))continue;const trigger=card.querySelector('button[onclick*="g65OpenClassroom"]'),match=trigger?.getAttribute('onclick')?.match(/g65OpenClassroom\('([^']+)'\)/);if(!match)continue;const actions=document.createElement('div');actions.className='g254-actions';for(const [text,handler] of [['Editar grupo',()=>g254Open(match[1])],['Eliminar grupo',()=>g254Remove(match[1])]]){const button=document.createElement('button');button.type='button';button.textContent=text;button.onclick=handler;actions.append(button);}card.append(actions);}g254RenderArchived();}
 const g254Archived=document.createElement('details');g254Archived.id='g254-archived';const g254ArchiveTitle=document.createElement('summary');g254ArchiveTitle.textContent='Grupos archivados';const g254ArchivedBody=document.createElement('div');g254Archived.append(g254ArchiveTitle,g254ArchivedBody);document.getElementById('all-group-grid').after(g254Archived);
-function g254RenderArchived(){g254ArchivedBody.replaceChildren();const groups=localData.groups.filter(group=>group.status==='ARCHIVED');for(const group of groups){const line=document.createElement('p');line.textContent=[localData.schools.find(school=>school.school_id===group.school_id)?.school_name,formatGradeDisplay(group.grade,group.group_name),group.subject,group.school_year].filter(Boolean).join(' · ');const button=document.createElement('button');button.type='button';button.textContent='Restaurar grupo';button.onclick=()=>g254Remove(group.group_id,true);line.append(button);g254ArchivedBody.append(line);}if(!groups.length)g254ArchivedBody.textContent='No hay grupos archivados.';}
+function g254RenderArchived(){
+  g254ArchivedBody.replaceChildren();
+  const groups=localData.groups.filter(group=>group.status==='ARCHIVED');
+  for (const group of groups) {
+    const line=document.createElement('p');
+    line.className='flex flex-wrap items-center gap-3 py-2';
+    const label=document.createElement('span');
+    const school=localData.schools.find(row=>row.school_id===group.school_id);
+    label.textContent=[formatGroupLabelWithShift(group,school),getGroupSchoolYear(group)].filter(Boolean).join(' · ');
+    const button=document.createElement('button');
+    button.type='button';button.textContent='Restaurar grupo';button.onclick=()=>g254Remove(group.group_id,true);
+    line.append(label,button,g329DeleteButton('groups',group.group_id));
+    g254ArchivedBody.append(line);
+  }
+  if(!groups.length)g254ArchivedBody.textContent='No hay grupos archivados.';
+}
 const g254OriginalRender=renderGroups;renderGroups=function(...args){const result=g254OriginalRender(...args);g254Decorate();return result;};g254Decorate();
 </script><script id="g255-group-view-refresh">/* Refresh operational schedule views after a confirmed group mutation. */
 function g255Refresh(){const errors=[];for(const [name,render] of [['Horario',renderSchedule],['Clases de hoy',renderTodaySchedule]])try{render();}catch(error){errors.push(name+': '+error.message);}return errors;}
@@ -20982,7 +21110,9 @@ function g325RenderStudentGrades() {
   if (students.some(student => student.student_id === previous)) select.value = previous;
   const student = students.find(row => row.student_id === select.value);
   const closed = isTrimesterClosed(groupId,period);
-  const activities = student ? orderedActivities(groupId,period) : [];
+  const activities = student
+    ? applyPresentationOrder(getOrderedReportActivities(groupId,period),'activity_id',presentationOrderKey('activities',groupId,period))
+    : [];
   document.getElementById('student-grade-fields').disabled = closed;
   const message = document.getElementById('student-grade-message');
   message.textContent = closed ? 'Trimestre cerrado. Las calificaciones se muestran en modo de consulta.'
