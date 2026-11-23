@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G311 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G312 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -100,6 +100,8 @@
       main { padding-bottom: 7rem; }
     }
     
+    @media screen { #report-group-tbody .report-student-no-match { display: none; } }
+
     @media print {
       .desktop-nav, .mobile-bottom, header, .fixed, button, select, input, .no-print { display:none !important; }
       .app-shell, main { background:#fff !important; max-width:none !important; padding:0 !important; }
@@ -2358,6 +2360,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
 
             <section id="g120-academic-charts" class="g118-report g120-charts" hidden></section><section id="g118-academic-report" class="g118-report" hidden></section><div id="report-group-section" class="hidden">
               <h3 class="font-bold text-lg mb-3">Concentrado de calificaciones</h3>
+              <div class="no-print mb-3">
+                <label class="block text-xs font-bold text-[#66767a]" for="report-group-student-search">Buscar alumno por nombre o número de lista</label>
+                <input id="report-group-student-search" type="search" class="mt-1 w-full max-w-md rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" aria-controls="report-group-tbody" autocomplete="off" oninput="applyGroupReportStudentSearch()">
+                <p id="report-group-student-search-status" role="status" class="mt-1 text-xs text-[#526267]"></p>
+              </div>
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm border-collapse">
                   <thead id="report-group-thead"></thead>
@@ -13942,7 +13949,28 @@ function renderSchedule() {
 
     function renderGroupReportStudentCell(student, listNumber) {
       const label = 'Ver reporte de ' + (student.full_name || 'alumno') + ', número ' + listNumber;
-      return `<td class="p-2 font-bold">${escapeHTML(student.full_name)}<button type="button" class="no-print block mt-1 text-xs font-semibold text-[#145b4b] underline" data-report-student="${escapeHTML(String(student.student_id))}" aria-label="${escapeHTML(label)}">Ver reporte</button></td>`;
+      return `<td class="p-2 font-bold"><span data-report-student-name>${escapeHTML(student.full_name)}</span><button type="button" class="no-print block mt-1 text-xs font-semibold text-[#145b4b] underline" data-report-student="${escapeHTML(String(student.student_id))}" aria-label="${escapeHTML(label)}">Ver reporte</button></td>`;
+    }
+
+    function applyGroupReportStudentSearch() {
+      const search = document.getElementById('report-group-student-search');
+      const status = document.getElementById('report-group-student-search-status');
+      const rows = document.getElementById('report-group-tbody').rows;
+      const terms = normalizeStudentName(search.value).split(/\s+/).filter(Boolean);
+      let matched = 0;
+      for (const row of rows) {
+        const name = normalizeStudentName(row.querySelector('[data-report-student-name]')?.textContent);
+        const listNumber = Number(row.cells[0].textContent.trim());
+        const matches = terms.every(term => /^\d+$/.test(term) ? Number(term) === listNumber : name.includes(term));
+        row.classList.toggle('report-student-no-match', !matches);
+        if (matches) matched++;
+      }
+      if (!rows.length) {
+        status.textContent = 'No hay alumnos en el concentrado.';
+        return;
+      }
+      const count = matched ? matched + ' de ' + rows.length + ' alumnos' : 'Sin coincidencias';
+      status.textContent = terms.length ? count + ' · El CSV y la impresión incluyen todo el grupo.' : '';
     }
 
     function renderGroupReportTable(groupId,period) {
@@ -13958,6 +13986,11 @@ function renderSchedule() {
         const cfg=getEvaluationConfig(groupId);
         tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); return `<td class="p-2 text-center">${r && r.grade!==null && r.grade!==undefined && r.grade!=='' ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
       }
+      const search = document.getElementById('report-group-student-search');
+      const scope = JSON.stringify([resolveReportCycleYear(), groupId]);
+      if (search.dataset.scope !== scope) search.value = '';
+      search.dataset.scope = scope;
+      applyGroupReportStudentSearch();
     }
 
 
