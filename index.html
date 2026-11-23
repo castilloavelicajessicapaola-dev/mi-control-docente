@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G314 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G317 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2361,8 +2361,36 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
             <section id="g120-academic-charts" class="g118-report g120-charts" hidden></section><section id="g118-academic-report" class="g118-report" hidden></section><div id="report-group-section" class="hidden">
               <h3 class="font-bold text-lg mb-3">Concentrado de calificaciones</h3>
               <div class="no-print mb-3">
-                <label class="block text-xs font-bold text-[#66767a]" for="report-group-student-search">Buscar alumno por nombre o número de lista</label>
-                <input id="report-group-student-search" type="search" class="mt-1 w-full max-w-md rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" aria-controls="report-group-tbody" autocomplete="off" oninput="applyGroupReportStudentSearch()">
+                <div class="grid gap-2 sm:grid-cols-2 max-w-2xl">
+                  <div>
+                    <label class="block text-xs font-bold text-[#66767a]" for="report-group-student-search">Buscar alumno por nombre o número de lista</label>
+                    <input id="report-group-student-search" type="search" class="mt-1 w-full max-w-md rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" aria-controls="report-group-tbody" autocomplete="off" oninput="applyGroupReportStudentSearch()">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-[#66767a]" for="report-group-status-filter">Estatus</label>
+                    <select id="report-group-status-filter" class="mt-1 w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" aria-controls="report-group-tbody" onchange="applyGroupReportStudentSearch()">
+                      <option value="">Todos los estatus</option>
+                      <option value="Aprobado">Aprobado</option>
+                      <option value="Requiere seguimiento">Requiere seguimiento</option>
+                      <option value="Pendiente">Pendiente</option>
+                    </select>
+                  </div>
+                  <div id="report-group-missing-activity-panel" class="sm:col-span-2" hidden>
+                    <div class="grid gap-2 sm:grid-cols-2">
+                      <div>
+                        <label class="block text-xs font-bold text-[#66767a]" for="report-group-missing-activity">Actividad del trimestre</label>
+                        <select id="report-group-missing-activity" class="mt-1 w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm" aria-controls="report-group-tbody" onchange="applyGroupReportStudentSearch()"></select>
+                      </div>
+                      <div>
+                        <label class="block text-xs font-bold text-[#66767a]" for="report-group-activity-condition">Condición de la actividad</label>
+                        <select id="report-group-activity-condition" class="mt-1 w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm disabled:opacity-50" aria-controls="report-group-tbody" onchange="applyGroupReportStudentSearch()" disabled>
+                          <option value="data-missing-grade">Sin calificación</option>
+                          <option value="data-missing-delivery">Sin entregar</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div class="mt-2 flex flex-wrap gap-2">
                   <button id="report-group-export-matches" type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] enabled:hover:bg-[#eef5ef] disabled:opacity-50" onclick="exportCurrentReportCSV(true)" disabled>Exportar coincidencias (CSV)</button>
                   <button id="report-group-print-matches" type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] enabled:hover:bg-[#eef5ef] disabled:opacity-50" onclick="printGroupReportMatches()" disabled>Imprimir coincidencias / PDF</button>
@@ -13967,26 +13995,33 @@ function renderSchedule() {
 
     function applyGroupReportStudentSearch() {
       const search = document.getElementById('report-group-student-search');
+      const selectedStatus = document.getElementById('report-group-status-filter').value;
+      const activity = document.getElementById('report-group-missing-activity');
+      const condition = document.getElementById('report-group-activity-condition');
+      condition.disabled = !activity.value;
+      // The table starts with list number and student. Select index 0 means all activities.
+      const activityColumn = activity.value ? activity.selectedIndex + 1 : -1;
       const status = document.getElementById('report-group-student-search-status');
       const rows = document.getElementById('report-group-tbody').rows;
       const terms = groupReportSearchTerms(search.value);
-      let matched = 0;
+      const filtered = Boolean(terms.length || selectedStatus || activityColumn >= 0);
+      const matchingIds = new Set();
       for (const row of rows) {
         const name = row.querySelector('[data-report-student-name]')?.textContent;
-        const listNumber = Number(row.cells[0].textContent.trim());
-        const matches = matchesGroupReportStudent(name, listNumber, terms);
+        const listNumber = row.cells[0].textContent.trim();
+        const matches = (!selectedStatus || row.dataset.reportStatus === selectedStatus)
+          && (activityColumn < 0 || row.cells[activityColumn]?.hasAttribute(condition.value))
+          && matchesGroupReportStudent(name, listNumber, terms);
         row.classList.toggle('report-student-no-match', !matches);
-        if (matches) matched++;
+        if (filtered && matches) matchingIds.add(row.querySelector('button[data-report-student]').dataset.reportStudent);
       }
-      const disableActions = !terms.length || !matched;
+      const disableActions = !matchingIds.size;
       document.getElementById('report-group-export-matches').disabled = disableActions;
       document.getElementById('report-group-print-matches').disabled = disableActions;
-      if (!rows.length) {
-        status.textContent = 'No hay alumnos en el concentrado.';
-        return;
-      }
-      const count = matched ? matched + ' de ' + rows.length + ' alumnos' : 'Sin coincidencias';
-      status.textContent = terms.length ? count : '';
+      if (!rows.length) status.textContent = 'No hay alumnos en el concentrado.';
+      else if (!filtered) status.textContent = '';
+      else status.textContent = matchingIds.size ? matchingIds.size + ' de ' + rows.length + ' alumnos' : 'Sin coincidencias';
+      return filtered ? matchingIds : null;
     }
 
     function printGroupReportMatches() {
@@ -13998,6 +14033,9 @@ function renderSchedule() {
       const count = table.tBodies[0].rows.length;
       const context = document.getElementById('report-context-line').textContent;
       const date = document.getElementById('report-generated-date').textContent;
+      const activity = document.getElementById('report-group-missing-activity');
+      const condition = document.getElementById('report-group-activity-condition');
+      const activityLabel = activity.value ? condition.selectedOptions[0].textContent + ' · ' + activity.selectedOptions[0].textContent : '';
       const countLabel = count + (count === 1 ? ' alumno' : ' alumnos');
       document.getElementById('report-group-matches-print-frame')?.remove();
       const frame = document.createElement('iframe');
@@ -14025,7 +14063,7 @@ function renderSchedule() {
           th:nth-child(2), td:nth-child(2) { min-width: 28mm; text-align: left; }
         </style></head><body>
         <h1>Concentrado de calificaciones · Coincidencias</h1>
-        <p>${escapeHTML(context)} · ${escapeHTML(countLabel)}<br>${escapeHTML(date)}</p>
+        <p>${escapeHTML(context)} · ${escapeHTML(countLabel)}<br>${escapeHTML(date)}${activityLabel ? '<br>' + escapeHTML(activityLabel) : ''}</p>
         ${table.outerHTML}</body></html>`;
       document.body.appendChild(frame);
     }
@@ -14033,20 +14071,32 @@ function renderSchedule() {
     function renderGroupReportTable(groupId,period) {
       const thead=document.getElementById('report-group-thead'), tbody=document.getElementById('report-group-tbody'); if(!thead||!tbody) return;
       const students=localData.students.filter(s=>s.group_id===groupId && s.status!=='INACTIVE').sort((a,b)=>(a.student_number||999)-(b.student_number||999));
+      const acts = period === 'ANNUAL' ? [] : getOrderedReportActivities(groupId,period);
       if(period==='ANNUAL'){
         thead.innerHTML='<tr class="border-b bg-slate-100"><th class="p-2">#</th><th class="p-2">Alumno</th><th class="p-2 text-center">T1</th><th class="p-2 text-center">T2</th><th class="p-2 text-center">T3</th><th class="p-2 text-center">Promedio anual</th><th class="p-2">Estatus</th></tr>';
         const cfg=getEvaluationConfig(groupId);
-        tbody.innerHTML=students.map((s,i)=>{const vals=['T1','T2','T3'].map(t=>getStudentTrimesterEvaluation(s.student_id,groupId,t,false).average); const annual=getAnnualAverageForStudent(s.student_id,groupId); const status=annual===null?'Pendiente':(annual>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); return `<tr class="border-b"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${vals.map(v=>`<td class="p-2 text-center">${reportGradeDisplay(v)}</td>`).join('')}<td class="p-2 text-center font-bold">${reportGradeDisplay(annual)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
+        tbody.innerHTML=students.map((s,i)=>{const vals=['T1','T2','T3'].map(t=>getStudentTrimesterEvaluation(s.student_id,groupId,t,false).average); const annual=getAnnualAverageForStudent(s.student_id,groupId); const status=annual===null?'Pendiente':(annual>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); return `<tr class="border-b" data-report-status="${status}"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${vals.map(v=>`<td class="p-2 text-center">${reportGradeDisplay(v)}</td>`).join('')}<td class="p-2 text-center font-bold">${reportGradeDisplay(annual)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
       } else {
-        const acts=getOrderedReportActivities(groupId,period);
         thead.innerHTML=`<tr class="border-b bg-slate-100"><th class="p-2">#</th><th class="p-2">Alumno</th>${acts.map(a=>`<th class="p-2 text-center">${escapeHTML(a.activity_code||a.activity_name)}</th>`).join('')}<th class="p-2 text-center">Promedio</th><th class="p-2">Estatus</th></tr>`;
         const cfg=getEvaluationConfig(groupId);
-        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); return `<td class="p-2 text-center">${r && r.grade!==null && r.grade!==undefined && r.grade!=='' ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
+        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); const hasGrade = r && r.grade!==null && r.grade!==undefined && r.grade!==''; return `<td class="p-2 text-center"${hasGrade ? '' : ' data-missing-grade'}${r?.delivery_status === 'SE' ? ' data-missing-delivery' : ''}>${hasGrade ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b" data-report-status="${status}"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
       }
       const search = document.getElementById('report-group-student-search');
       const scope = JSON.stringify([resolveReportCycleYear(), groupId]);
-      if (search.dataset.scope !== scope) search.value = '';
+      const changedGroup = search.dataset.scope !== scope;
+      if (changedGroup) {
+        search.value = '';
+        document.getElementById('report-group-status-filter').value = '';
+      }
       search.dataset.scope = scope;
+      const activity = document.getElementById('report-group-missing-activity');
+      const previousActivity = changedGroup ? '' : activity.value;
+      const activityOptions = acts.map(item => [String(item.activity_id),
+        [item.activity_code, item.activity_name].filter(Boolean).join(' · ') || 'Actividad sin título']);
+      renderSelectOptions(activity, [['', 'Sin filtro por actividad'], ...activityOptions]);
+      activity.value = activityOptions.some(([id]) => id === previousActivity) ? previousActivity : '';
+      if (!activity.value) document.getElementById('report-group-activity-condition').value = 'data-missing-grade';
+      document.getElementById('report-group-missing-activity-panel').hidden = !acts.length;
       applyGroupReportStudentSearch();
     }
 
@@ -14104,8 +14154,9 @@ function renderSchedule() {
 
     function exportCurrentReportCSV(onlyMatches = false) {
       const type=document.getElementById('report-type-select')?.value||'GROUP'; const groupId=document.getElementById('report-group-select')?.value||activeGroupId; const period=document.getElementById('report-trimester-select')?.value||'T1'; const group=localData.groups.find(g=>g.group_id===groupId);
-      const searchTerms = onlyMatches ? groupReportSearchTerms(document.getElementById('report-group-student-search')?.value) : [];
-      if (onlyMatches && (type !== 'GROUP' || !searchTerms.length)) return;
+      if (onlyMatches && type !== 'GROUP') return;
+      const matchingIds = onlyMatches ? applyGroupReportStudentSearch() : null;
+      if (onlyMatches && !matchingIds?.size) return showToast('Sin coincidencias para exportar.');
       if(type==='STUDENT'){
         const sid=document.getElementById('report-student-select')?.value; const s=localData.students.find(x=>x.student_id===sid); if(!s) return showToast('Seleccione un alumno'); const rows=[['Alumno','Grupo','Periodo','Actividad','Tipo','Entrega','Calificación']];
         getOrderedReportActivities(groupId,period).forEach(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===sid); rows.push([s.full_name,group?formatGradeDisplay(group.grade,group.group_name):'',period,a.activity_name,a.activity_type,r?.delivery_status||'',r&&r.grade!==null&&r.grade!==undefined&&r.grade!==''?r.grade:'']);}); g119DownloadAcademicCSV(`reporte_${(s.full_name||'alumno').replace(/\s+/g,'_')}_${resolveReportCycleYear()}_${period}.csv`,rows); return;
@@ -14127,9 +14178,9 @@ function renderSchedule() {
       }
       if(!group) return showToast('Seleccione un grupo'); const students=localData.students.filter(s=>s.group_id===groupId&&s.status!=='INACTIVE').sort((a,b)=>(a.student_number||999)-(b.student_number||999));
       if(period==='ANNUAL'){
-        const rows=[['Número','Alumno','T1','T2','T3','Promedio anual','Estatus']]; const cfg=getEvaluationConfig(groupId); students.forEach((s,i)=>{const vals=['T1','T2','T3'].map(t=>getStudentTrimesterEvaluation(s.student_id,groupId,t,false).average); const ann=getAnnualAverageForStudent(s.student_id,groupId); rows.push([s.student_number||i+1,s.full_name,...vals.map(v=>v===null?'':v.toFixed(1)),ann===null?'':ann.toFixed(1),ann===null?'Pendiente':(ann>=cfg.passing_grade?'Aprobado':'Requiere seguimiento')]);}); g119DownloadAcademicCSV(`concentrado_${formatGradeDisplay(group.grade,group.group_name).replace(/\s+/g,'_')}_${resolveReportCycleYear()}_ANUAL.csv`,rows,searchTerms);
+        const rows=[['Número','Alumno','T1','T2','T3','Promedio anual','Estatus']]; const cfg=getEvaluationConfig(groupId); students.forEach((s,i)=>{const vals=['T1','T2','T3'].map(t=>getStudentTrimesterEvaluation(s.student_id,groupId,t,false).average); const ann=getAnnualAverageForStudent(s.student_id,groupId); rows.push([s.student_number||i+1,s.full_name,...vals.map(v=>v===null?'':v.toFixed(1)),ann===null?'':ann.toFixed(1),ann===null?'Pendiente':(ann>=cfg.passing_grade?'Aprobado':'Requiere seguimiento')]);}); g119DownloadAcademicCSV(`concentrado_${formatGradeDisplay(group.grade,group.group_name).replace(/\s+/g,'_')}_${resolveReportCycleYear()}_ANUAL.csv`,rows,matchingIds);
       } else {
-        const acts=getOrderedReportActivities(groupId,period); const rows=[['Número','Alumno',...acts.map(a=>a.activity_code||a.activity_name),'Promedio']]; students.forEach((s,i)=>{const vals=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); return r&&r.grade!==null&&r.grade!==undefined&&r.grade!==''?r.grade:'';}); const avg=getStudentTrimesterEvaluation(s.student_id,groupId,period,false).average; rows.push([s.student_number||i+1,s.full_name,...vals,avg===null?'':avg.toFixed(1)]);}); g119DownloadAcademicCSV(`concentrado_${formatGradeDisplay(group.grade,group.group_name).replace(/\s+/g,'_')}_${resolveReportCycleYear()}_${period}.csv`,rows,searchTerms);
+        const acts=getOrderedReportActivities(groupId,period); const rows=[['Número','Alumno',...acts.map(a=>a.activity_code||a.activity_name),'Promedio']]; students.forEach((s,i)=>{const vals=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); return r&&r.grade!==null&&r.grade!==undefined&&r.grade!==''?r.grade:'';}); const avg=getStudentTrimesterEvaluation(s.student_id,groupId,period,false).average; rows.push([s.student_number||i+1,s.full_name,...vals,avg===null?'':avg.toFixed(1)]);}); g119DownloadAcademicCSV(`concentrado_${formatGradeDisplay(group.grade,group.group_name).replace(/\s+/g,'_')}_${resolveReportCycleYear()}_${period}.csv`,rows,matchingIds);
       }
     }
 
@@ -17801,7 +17852,7 @@ function g119RenderRows(hostId){const c=g119Context(hostId),rows=g119FilteredRow
 g118Export=function(hostId){const c=g119Context(hostId);if(c.from&&c.to&&c.from>c.to)return;const group=localData.groups.find(g=>g.group_id===c.groupId),rows=[['Grupo','Desde','Hasta','Número','Alumno','Participaciones individuales','Participaciones en equipo','Total participaciones']];for(const r of g119FilteredRows(hostId))rows.push([group?formatGradeDisplay(group.grade,group.group_name):c.groupId,c.from||'Todas',c.to||'Todas',r.student.student_number,r.student.full_name,r.individual,r.team,r.total]);downloadCSV('participaciones_reporte_aula.csv',rows);};
 function g119PrintHTML(hostId){const c=g119Context(hostId),group=localData.groups.find(g=>g.group_id===c.groupId),school=localData.schools.find(s=>s.school_id===group?.school_id),rows=g119FilteredRows(hostId);return '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte de participaciones del aula</title><style>body{font:12px Arial,sans-serif;color:#172226;padding:20px}h1{font-size:21px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #bbb;text-align:center}th:first-child{text-align:left}thead{display:table-header-group}tr{break-inside:avoid}@page{margin:15mm}</style></head><body><h1>Reporte de participaciones del aula</h1><p>'+escapeHTML(school?.school_name||'')+' · '+escapeHTML(group?formatGradeDisplay(group.grade,group.group_name):'')+' · '+escapeHTML(group?.subject||'')+'</p><p>'+escapeHTML(c.host.querySelector('[data-caption]').textContent)+'</p><table><thead><tr><th>Alumno</th><th>Individuales</th><th>En equipo</th><th>Total</th></tr></thead><tbody>'+rows.map(r=>'<tr><th>'+escapeHTML('#'+(r.student.student_number||'-')+' '+r.student.full_name)+'</th><td>'+r.individual+'</td><td>'+r.team+'</td><td>'+r.total+'</td></tr>').join('')+'</tbody></table><p>Las participaciones no modifican automáticamente las calificaciones.</p></body></html>';}
 function g119Print(hostId){const c=g119Context(hostId);if(c.from&&c.to&&c.from>c.to)return;document.getElementById('g119-print-frame')?.remove();const frame=document.createElement('iframe');frame.id='g119-print-frame';frame.title='Impresión del reporte de participaciones';frame.style.cssText='position:fixed;width:1px;height:1px;left:-10000px;border:0';frame.onload=()=>{frame.contentWindow.focus();frame.contentWindow.print();};frame.srcdoc=g119PrintHTML(hostId);document.body.appendChild(frame);}
-function g119DownloadAcademicCSV(filename, rows, searchTerms = []) {
+function g119DownloadAcademicCSV(filename, rows, matchingIds = null) {
   const type = document.getElementById('report-type-select')?.value;
   if (!['GROUP', 'STUDENT'].includes(type)) return downloadCSV(filename, rows);
   const groupId = document.getElementById('report-group-select')?.value || activeGroupId;
@@ -17816,11 +17867,11 @@ function g119DownloadAcademicCSV(filename, rows, searchTerms = []) {
   let data = rows.slice(1);
   if (type === 'STUDENT' && !data.length && student) data = [[student.full_name, ...Array(rows[0].length - 1).fill('')]];
   data.forEach((row, index) => {
-    if (searchTerms.length && !matchesGroupReportStudent(row[1], row[0], searchTerms)) return;
+    if (matchingIds && !matchingIds.has(String(students[index]?.student_id))) return;
     const participation = totals.get(type === 'STUDENT' ? sid : students[index]?.student_id) || {individual:0, team:0, total:0};
     result.push(row.concat([participation.individual, participation.team, participation.total], identity));
   });
-  if (searchTerms.length) {
+  if (matchingIds) {
     if (result.length === 1) return showToast('Sin coincidencias para exportar.');
     filename = filename.replace(/\.csv$/, '_coincidencias.csv');
   }
