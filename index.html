@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G317 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G319 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -2386,6 +2386,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
                         <select id="report-group-activity-condition" class="mt-1 w-full rounded-xl border border-[#c7d3c8] bg-white px-3 py-2 text-sm disabled:opacity-50" aria-controls="report-group-tbody" onchange="applyGroupReportStudentSearch()" disabled>
                           <option value="data-missing-grade">Sin calificación</option>
                           <option value="data-missing-delivery">Sin entregar</option>
+                          <option value="data-unrecorded-delivery">Sin registro de entrega</option>
                         </select>
                       </div>
                     </div>
@@ -2394,6 +2395,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #25
                 <div class="mt-2 flex flex-wrap gap-2">
                   <button id="report-group-export-matches" type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] enabled:hover:bg-[#eef5ef] disabled:opacity-50" onclick="exportCurrentReportCSV(true)" disabled>Exportar coincidencias (CSV)</button>
                   <button id="report-group-print-matches" type="button" class="rounded-xl border border-[#145b4b] px-3 py-2 text-sm font-semibold text-[#145b4b] enabled:hover:bg-[#eef5ef] disabled:opacity-50" onclick="printGroupReportMatches()" disabled>Imprimir coincidencias / PDF</button>
+                  <button id="report-group-clear-filters" type="button" class="rounded-xl border border-[#c7d3c8] px-3 py-2 text-sm font-semibold text-[#145b4b] enabled:hover:bg-[#eef5ef] disabled:opacity-50" onclick="clearGroupReportFilters()" disabled>Limpiar filtros</button>
                 </div>
                 <p id="report-group-student-search-status" role="status" class="mt-1 text-xs text-[#526267]"></p>
               </div>
@@ -14006,15 +14008,29 @@ function renderSchedule() {
       const terms = groupReportSearchTerms(search.value);
       const filtered = Boolean(terms.length || selectedStatus || activityColumn >= 0);
       const matchingIds = new Set();
+      const conditions = Array.from(condition.options);
+      const counts = new Map(conditions.map(option => [option.value, 0]));
       for (const row of rows) {
         const name = row.querySelector('[data-report-student-name]')?.textContent;
         const listNumber = row.cells[0].textContent.trim();
-        const matches = (!selectedStatus || row.dataset.reportStatus === selectedStatus)
-          && (activityColumn < 0 || row.cells[activityColumn]?.hasAttribute(condition.value))
+        const matchesStudent = (!selectedStatus || row.dataset.reportStatus === selectedStatus)
           && matchesGroupReportStudent(name, listNumber, terms);
+        const cell = row.cells[activityColumn];
+        if (cell && matchesStudent) {
+          for (const option of conditions) {
+            if (cell.hasAttribute(option.value)) counts.set(option.value, counts.get(option.value) + 1);
+          }
+        }
+        const matches = matchesStudent && (activityColumn < 0 || cell?.hasAttribute(condition.value));
         row.classList.toggle('report-student-no-match', !matches);
         if (filtered && matches) matchingIds.add(row.querySelector('button[data-report-student]').dataset.reportStudent);
       }
+      for (const option of conditions) {
+        const label = option.dataset.conditionLabel ??= option.textContent;
+        const text = activityColumn < 0 ? label : label + ' (' + counts.get(option.value) + ')';
+        if (option.textContent !== text) option.textContent = text;
+      }
+      document.getElementById('report-group-clear-filters').disabled = !filtered;
       const disableActions = !matchingIds.size;
       document.getElementById('report-group-export-matches').disabled = disableActions;
       document.getElementById('report-group-print-matches').disabled = disableActions;
@@ -14022,6 +14038,16 @@ function renderSchedule() {
       else if (!filtered) status.textContent = '';
       else status.textContent = matchingIds.size ? matchingIds.size + ' de ' + rows.length + ' alumnos' : 'Sin coincidencias';
       return filtered ? matchingIds : null;
+    }
+
+    function clearGroupReportFilters() {
+      const search = document.getElementById('report-group-student-search');
+      search.value = '';
+      document.getElementById('report-group-status-filter').value = '';
+      document.getElementById('report-group-missing-activity').value = '';
+      document.getElementById('report-group-activity-condition').value = 'data-missing-grade';
+      search.focus();
+      applyGroupReportStudentSearch();
     }
 
     function printGroupReportMatches() {
@@ -14035,7 +14061,7 @@ function renderSchedule() {
       const date = document.getElementById('report-generated-date').textContent;
       const activity = document.getElementById('report-group-missing-activity');
       const condition = document.getElementById('report-group-activity-condition');
-      const activityLabel = activity.value ? condition.selectedOptions[0].textContent + ' · ' + activity.selectedOptions[0].textContent : '';
+      const activityLabel = activity.value ? condition.selectedOptions[0].dataset.conditionLabel + ' · ' + activity.selectedOptions[0].textContent : '';
       const countLabel = count + (count === 1 ? ' alumno' : ' alumnos');
       document.getElementById('report-group-matches-print-frame')?.remove();
       const frame = document.createElement('iframe');
@@ -14079,7 +14105,7 @@ function renderSchedule() {
       } else {
         thead.innerHTML=`<tr class="border-b bg-slate-100"><th class="p-2">#</th><th class="p-2">Alumno</th>${acts.map(a=>`<th class="p-2 text-center">${escapeHTML(a.activity_code||a.activity_name)}</th>`).join('')}<th class="p-2 text-center">Promedio</th><th class="p-2">Estatus</th></tr>`;
         const cfg=getEvaluationConfig(groupId);
-        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); const hasGrade = r && r.grade!==null && r.grade!==undefined && r.grade!==''; return `<td class="p-2 text-center"${hasGrade ? '' : ' data-missing-grade'}${r?.delivery_status === 'SE' ? ' data-missing-delivery' : ''}>${hasGrade ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b" data-report-status="${status}"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
+        tbody.innerHTML=students.map((s,i)=>{const ev=getStudentTrimesterEvaluation(s.student_id,groupId,period,false); const status=ev.average===null?'Pendiente':(ev.average>=cfg.passing_grade?'Aprobado':'Requiere seguimiento'); const cells=acts.map(a=>{const r=localData.activity_results.find(x=>x.activity_id===a.activity_id&&x.student_id===s.student_id); const hasGrade = r && r.grade!==null && r.grade!==undefined && r.grade!==''; return `<td class="p-2 text-center"${hasGrade ? '' : ' data-missing-grade'}${r?.delivery_status === 'SE' ? ' data-missing-delivery' : ''}${String(r?.delivery_status ?? '').trim() ? '' : ' data-unrecorded-delivery'}>${hasGrade ? Number(r.grade).toFixed(1) : '—'}</td>`;}).join(''); return `<tr class="border-b" data-report-status="${status}"><td class="p-2">${String(s.student_number||i+1).padStart(2,'0')}</td>${renderGroupReportStudentCell(s,s.student_number||i+1)}${cells}<td class="p-2 text-center font-bold">${reportGradeDisplay(ev.average)}</td><td class="p-2 font-bold">${status}</td></tr>`;}).join('');
       }
       const search = document.getElementById('report-group-student-search');
       const scope = JSON.stringify([resolveReportCycleYear(), groupId]);
