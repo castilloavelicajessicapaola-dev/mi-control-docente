@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#145b4b">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png" type="image/png">
-  <title>Mi Control Docente G332 - Sistema Integral de Gestión Escolar Local</title>
+  <title>Mi Control Docente G335 - Sistema Integral de Gestión Escolar Local</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -10112,16 +10112,16 @@ function renderGradebook(preserveDraft = false) {
       }
     }
 
-    function getActivityDependencyCounts(activityId){
-      const groupId=localData.activities.find(row=>row.activity_id===activityId)?.group_id;
-      const materials=groupId?(localData.settings?.[g189Key(groupId)]?.links||[]):[];
+    function getActivityDependencyCounts(activityId,data=localData){
+      const groupId=data.activities.find(row=>row.activity_id===activityId)?.group_id;
+      const materials=groupId?(data.settings?.[g189Key(groupId)]?.links||[]):[];
       return {
-        resultados:(localData.activity_results||[]).filter(x=>x.activity_id===activityId).length,
-        instrumentos:(localData.assessment_instruments||[]).filter(x=>x.activity_id===activityId).length,
-        evaluaciones_instrumento:(localData.instrument_results||[]).filter(x=>x.activity_id===activityId).length,
-        evidencias:(localData.portfolio_evidence||[]).filter(x=>x.activity_id===activityId).length,
-        bitacoras:(localData.teacher_journal||[]).filter(x=>x.activity_id===activityId).length,
-        planeaciones:(localData.plans||[]).filter(x=>x.activity_id===activityId).length,
+        resultados:(data.activity_results||[]).filter(x=>x.activity_id===activityId).length,
+        instrumentos:(data.assessment_instruments||[]).filter(x=>x.activity_id===activityId).length,
+        evaluaciones_instrumento:(data.instrument_results||[]).filter(x=>x.activity_id===activityId).length,
+        evidencias:(data.portfolio_evidence||[]).filter(x=>x.activity_id===activityId).length,
+        bitacoras:(data.teacher_journal||[]).filter(x=>x.activity_id===activityId).length,
+        planeaciones:(data.plans||[]).filter(x=>x.activity_id===activityId).length,
         materiales:materials.filter(link=>link.activity_id===activityId).length
       };
     }
@@ -10158,13 +10158,13 @@ function renderGradebook(preserveDraft = false) {
       }
       if (!confirm(`¿Eliminar definitivamente “${activity.activity_code||''} ${activity.activity_name||'Actividad'}”?\n\nEsta acción solo es posible porque no tiene historial vinculado.`)) return;
       try {
-        await dbDelete('activities', activityId);
+        await g335DeleteActivity(activity);
         await refreshLocalCache();
         renderGradebook();
         showToast('Actividad eliminada definitivamente');
       } catch (err) {
         console.error(err);
-        showToast('Error al eliminar actividad');
+        showToast(err.message || 'Error al eliminar actividad');
       }
     }
 
@@ -18179,17 +18179,23 @@ const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const count
 </script><div id="modal-g128-reconcile" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="g128-title"><div class="g128-modal-box"><div class="g116-heading"><h3 id="g128-title" class="serif">Comparar respaldos entre dispositivos</h3><button type="button" onclick="g128Close()">Cerrar</button></div><p id="g128-source"></p><p id="g128-summary"></p><p>Solo se actualizarán los registros que marques. Los demás módulos del respaldo se conservan sin cambios. Las referencias deben existir en este dispositivo.</p>
  <details id="g332-structure" class="my-3 rounded-xl border p-3">
   <summary class="cursor-pointer font-bold">Diferencias en grupos, horarios y actividades</summary>
-  <p class="mt-2">Esta consulta compara los identificadores de los registros. Un registro presente en una sola copia puede haberse creado o eliminado entre respaldos.</p>
+  <p class="mt-2">Puedes actualizar registros coincidentes y agregar clases o actividades a un grupo que ya existe en este dispositivo. Revisa los registros que solo aparecen en el respaldo antes de agregarlos.</p>
   <div class="g128-toolbar">
     <label>Tipo de registro<select id="g332-type" onchange="g332Render(true)"><option value="all">Todos los tipos</option><option value="groups">Grupos</option><option value="schedule">Horario</option><option value="activities">Actividades</option></select></label>
     <label>Buscar grupo o actividad<input id="g332-search" type="search" oninput="g332Render(true)"></label>
   </div>
   <p id="g332-status" role="status"></p>
   <div class="g128-scroll"><table>
-    <thead><tr><th scope="col">Registro</th><th scope="col">En este dispositivo</th><th scope="col">En el respaldo</th><th scope="col">Comparación</th></tr></thead>
+    <thead><tr><th scope="col">Marcar</th><th scope="col">Registro</th><th scope="col">En este dispositivo</th><th scope="col">En el respaldo</th><th scope="col">Comparación</th></tr></thead>
     <tbody id="g332-rows"></tbody>
   </table></div>
   <button id="g332-more" type="button" onclick="g332ShowMore()" hidden>Mostrar más diferencias</button>
+  <div class="g128-toolbar">
+    <button id="g333-review" type="button" onclick="g333Review(true)" disabled>Revisar cambios marcados</button>
+    <button id="g333-back" type="button" onclick="g333Review(false)" hidden>Volver a la lista</button>
+    <button id="g333-apply" type="button" onclick="g333Apply()" hidden>Confirmar cambios marcados</button>
+  </div>
+  <p id="g333-status" role="status"></p>
  </details>
  <div id="g128-browser"><div class="g128-toolbar"><label>Buscar alumno, grupo o actividad<input id="g128-search" type="search" oninput="g128ChangeFilters()"></label><label>Grupo<select id="g128-group" onchange="g128ChangeFilters()"><option value="">Todos los grupos</option></select></label><label>Tipo de registro<select id="g128-record-type" onchange="g128ChangeFilters()"><option value="all">Todos los tipos</option><option value="attendance">Asistencias</option><option value="activity_results">Calificaciones</option></select></label><label>Mostrar<select id="g128-mode" onchange="g128ChangeFilters()"><option value="changes">Cambios y bloqueados</option><option value="new">Solo nuevos</option><option value="different">Solo diferentes</option><option value="blocked">Solo bloqueados</option><option value="selected">Solo marcados</option><option value="all">Todos</option></select></label><button type="button" onclick="g128SelectNew()">Marcar nuevos del filtro</button><button type="button" onclick="g128ClearSelection()">Desmarcar todos</button></div>
  <p id="g128-selection" role="status"></p><div class="g128-scroll"><table><thead><tr><th>Actualizar</th><th>Alumno y registro</th><th>En este dispositivo</th><th>En el respaldo</th><th>Comparación</th></tr></thead><tbody id="g128-rows"></tbody></table></div><button type="button" id="g128-more" onclick="g128ShowMore()">Mostrar más registros</button><div class="g128-toolbar"><button type="button" onclick="g128Close()">Cancelar</button><button type="button" id="g128-apply" onclick="g128ReviewSelected()">Revisar registros marcados</button></div></div>
@@ -18208,6 +18214,19 @@ const g127OldCounts=g124AulaCounts;g124AulaCounts=function(settings){const count
 <script id="g332-backup-structure">
 const g332Types = {groups:'Grupo',schedule:'Horario',activities:'Actividad'};
 let g332Rows = [], g332Limit = 100;
+
+function g334DeletionKey(store,id) {
+  return 'g334_deleted::'+JSON.stringify([store,id]);
+}
+
+function g334DeletionDate(value) {
+  return typeof value?.at==='string' && Number.isFinite(Date.parse(value.at)) ? value.at : '';
+}
+
+function g334DeletionMarkers(removed,at) {
+  return Object.keys(g332Types).flatMap(store=>
+    (removed[store]||[]).map(row=>({key:g334DeletionKey(store,row[RESTORE_STORE_KEYS[store]]),value:{at}})));
+}
 
 function g332Compare(local, backup) {
   const describe = data => {
@@ -18231,10 +18250,13 @@ function g332Compare(local, backup) {
       return [group,['Clave',row.activity_code],['Actividad',row.activity_name],['Trimestre',row.trimester||'T1'],
         ['Tipo',row.activity_type,activityTypeLabel(row.activity_type)],['Fecha de entrega',row.due_date],['Escala máxima',String(row.max_grade??10)],...common];
     };
-    return {groupLabel,fields};
+    return {groupLabel,fields,groups};
   };
   const left = describe(local), right = describe(backup), rows = [];
+  const localSettings = new Map((local.settings||[]).map(row=>[row.key,row.value]));
+  const backupSettings = backup.settings||{};
   for (const [store,type] of Object.entries(g332Types)) {
+    if (!Array.isArray(backup[store])) continue;
     const pk = RESTORE_STORE_KEYS[store];
     const current = new Map((local[store]||[]).map(record=>[record[pk],record]));
     const incoming = new Map((backup[store]||[]).map(record=>[record[pk],record]));
@@ -18250,7 +18272,18 @@ function g332Compare(local, backup) {
       if (changes && !changes.length) continue;
       const asText = (fields) => fields ? fields.filter((_,i)=>!changes||changes.includes(i))
         .map(([label,value,display])=>label+' · '+((display??value)||'—')).join('\n') : '—';
-      rows.push({store,title,before:asText(a),after:asText(b),kind:a&&b?'Diferente':a?'Solo en este dispositivo':'Solo en el respaldo'});
+      const deletionKey = g334DeletionKey(store,id);
+      const localDeletion = before ? '' : g334DeletionDate(localSettings.get(deletionKey));
+      const backupDeletion = after ? '' : g334DeletionDate(backupSettings[deletionKey]);
+      const displayDeletion = date => 'Eliminado el '+new Date(date).toLocaleString('es-MX');
+      const kind = localDeletion ? 'Eliminado en este dispositivo' : backupDeletion ? 'Eliminado en el respaldo' :
+        a&&b?'Diferente':a?'Solo en este dispositivo':'Solo en el respaldo';
+      const addIssue = after && !before ? g335AddIssue(store,after,localDeletion,left.groups.get(after.group_id),
+        right.groups.get(after.group_id),localSettings.get('school_year'),backupSettings.school_year) : '';
+      rows.push({key:JSON.stringify([store,id]),store,id,original:before,incoming:after,title,kind,addIssue,
+        sourceGroup:after && right.groups.get(after.group_id), sourceYear:backupSettings.school_year,
+        before:localDeletion ? displayDeletion(localDeletion) : asText(a),
+        after:backupDeletion ? displayDeletion(backupDeletion) : asText(b)});
     }
   }
   return rows;
@@ -18258,6 +18291,9 @@ function g332Compare(local, backup) {
 
 function g332Open(snapshot, records) {
   g332Rows = g332Compare(snapshot,records);
+  g333Selected.clear();
+  g333Reviewing = false;
+  document.getElementById('g333-status').textContent = '';
   document.getElementById('g332-type').value = 'all';
   document.getElementById('g332-search').value = '';
   document.getElementById('g332-structure').open = false;
@@ -18268,15 +18304,218 @@ function g332Render(reset=false) {
   if (reset) g332Limit=100;
   const type=document.getElementById('g332-type').value;
   const terms=normalizeStudentName(document.getElementById('g332-search').value).split(/\s+/).filter(Boolean);
-  const rows=g332Rows.filter(row=>(type==='all'||row.store===type) &&
-    terms.every(term=>normalizeStudentName([row.title,row.before,row.after].join(' ')).includes(term)));
-  document.getElementById('g332-status').textContent=rows.length ? 'Diferencias encontradas: '+rows.length : 'Sin diferencias en esta consulta.';
-  document.getElementById('g332-rows').innerHTML=rows.slice(0,g332Limit).map(row=>
-    '<tr><th scope="row">'+escapeHTML(row.title)+'</th><td style="white-space:pre-line">'+escapeHTML(row.before)+'</td><td style="white-space:pre-line">'+escapeHTML(row.after)+'</td><td>'+escapeHTML(row.kind)+'</td></tr>').join('');
+  const rows=g332Rows.filter(row=>{
+    if (g333Reviewing) return g333Selected.has(row.key);
+    const text=normalizeStudentName([row.title,row.before,row.after].join(' '));
+    return (type==='all'||row.store===type) && terms.every(term=>text.includes(term));
+  });
+  document.getElementById('g332-status').textContent=g333Reviewing ? rows.length+' cambios para aplicar' :
+    rows.length ? 'Diferencias encontradas: '+rows.length : 'Sin diferencias en esta consulta.';
+  document.getElementById('g332-rows').innerHTML=rows.slice(0,g332Limit).map(row=>{
+    const reason=g333ScopeIssue(row);
+    const checkbox=g333Reviewing||reason ? '' : '<input type="checkbox" aria-label="Marcar '+escapeHTML(row.title)+'" data-key="'+escapeHTML(row.key)+'" '+(g333Selected.has(row.key)?'checked ':'')+'onchange="g333Mark(this)">';
+    return '<tr><td>'+checkbox+'</td><th scope="row">'+escapeHTML(row.title)+'</th><td style="white-space:pre-line">'+escapeHTML(row.before)+'</td><td style="white-space:pre-line">'+escapeHTML(row.after)+'</td><td>'+escapeHTML(!row.original && !reason ? 'Agregar desde el respaldo' : row.kind)+(reason&&row.incoming?'<p>'+escapeHTML(reason)+'</p>':'')+'</td></tr>';
+  }).join('');
   document.getElementById('g332-more').hidden = rows.length <= g332Limit;
+  g333RefreshActions();
 }
 
 function g332ShowMore() { g332Limit += 100; g332Render(); }
+</script>
+<script id="g333-selective-structure">
+const g333Selected = new Set();
+let g333Reviewing = false;
+
+async function g335DeleteActivity(activity) {
+  const db=await openDatabase(), id=activity.activity_id;
+  const names=['activities','settings','activity_results','assessment_instruments','instrument_results','portfolio_evidence','teacher_journal','plans'];
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(names,'readwrite'), data={};
+    let pending=names.length, failure;
+    tx.oncomplete=resolve;
+    tx.onabort=()=>reject(failure||tx.error||Error('El borrado se canceló.'));
+    for (const name of names) {
+      const request=tx.objectStore(name).getAll();
+      request.onsuccess=()=>{
+        data[name]=request.result;
+        if (--pending) return;
+        try {
+          data.settings=Object.fromEntries(data.settings.map(row=>[row.key,row.value]));
+          const current=data.activities.find(row=>row.activity_id===id);
+          if (g124Stable(current)!==g124Stable(activity) || Object.values(getActivityDependencyCounts(id,data)).some(Boolean)) throw Error('La actividad o su historial cambiaron. Revisa antes de eliminar.');
+          tx.objectStore('activities').delete(id);
+          tx.objectStore('settings').put({key:g334DeletionKey('activities',id),value:{at:new Date().toISOString()}});
+        } catch(error) {failure=error;tx.abort();}
+      };
+    }
+  });
+}
+
+function g335AddIssue(store,record,deletion,localGroup,sourceGroup,localYear,sourceYear) {
+  if (deletion) return 'Este registro tiene un borrado confirmado en este dispositivo.';
+  if (!['schedule','activities'].includes(store)) return 'Solo consulta. La incorporación de grupos se revisa por separado.';
+  if (!localGroup || localGroup.status === 'ARCHIVED') return 'El grupo de destino debe existir y estar activo.';
+  if (!sourceGroup || sourceGroup.school_id !== localGroup.school_id) return 'No se pudo comprobar la escuela del grupo en ambas copias.';
+  const from = sourceGroup.school_year || sourceYear, to = localGroup.school_year || localYear;
+  if (from && to && from !== to) return 'El grupo pertenece a otro ciclo escolar.';
+  if (record.status && record.status !== 'ACTIVE') return 'La incorporación requiere un registro activo en el respaldo.';
+  return '';
+}
+
+function g333ScopeIssue(row) {
+  const {original:a,incoming:b,store} = row;
+  if (!b) return 'Solo consulta';
+  if (!a) return row.addIssue;
+  if (store==='groups' && ((a.school_id||'')!==(b.school_id||'') || (a.school_year||'')!==(b.school_year||''))) return 'El respaldo cambia la escuela o el ciclo del grupo.';
+  if (store!=='groups' && a.group_id!==b.group_id) return 'El respaldo asigna el registro a otro grupo.';
+  if (store==='activities' && (a.trimester||'T1')!==(b.trimester||'T1')) return 'El respaldo asigna la actividad a otro trimestre.';
+  return '';
+}
+
+function g333RefreshActions() {
+  document.getElementById('g333-review').hidden=g333Reviewing;
+  document.getElementById('g333-review').disabled=!g333Selected.size||g128Busy;
+  document.getElementById('g333-review').textContent='Revisar cambios marcados ('+g333Selected.size+')';
+  document.getElementById('g333-back').hidden=!g333Reviewing;
+  document.getElementById('g333-apply').hidden=!g333Reviewing;
+  document.getElementById('g332-type').disabled=g333Reviewing||g128Busy;
+  document.getElementById('g332-search').disabled=g333Reviewing||g128Busy;
+}
+
+function g333Mark(input) {
+  if (g128Busy || g333Reviewing) return;
+  const row=g332Rows.find(item=>item.key===input.dataset.key);
+  if (!row||g333ScopeIssue(row)) return;
+  if (input.checked) g333Selected.add(row.key);
+  else g333Selected.delete(row.key);
+  g333RefreshActions();
+}
+
+function g333Review(reviewing) {
+  if (g128Busy || (reviewing&&!g333Selected.size)) return;
+  g333Reviewing=reviewing;
+  document.getElementById('g333-status').textContent=reviewing?'Se usarán los valores del respaldo para estos registros.':'';
+  g332Render(true);
+  document.getElementById(reviewing?'g333-apply':'g333-review').focus();
+}
+
+function g333Plan(snapshot, rows, now) {
+  const writes={groups:[],schedule:[],activities:[]};
+  const settings=new Map(snapshot.settings.map(row=>[row.key,row.value]));
+  const year=settings.get('school_year');
+  for (const row of rows) {
+    const {store,id,incoming} = row;
+    const key=RESTORE_STORE_KEYS[store];
+    let current=snapshot[store].find(item=>item[key]===id);
+    if (g124Stable(current)!==g124Stable(row.original)) throw Error('Un registro cambió en este dispositivo. Abre nuevamente el respaldo.');
+    const issue=g333ScopeIssue({...row,original:current});
+    if(issue) throw Error(issue);
+    if (!current) {
+      const group=snapshot.groups.find(item=>item.group_id===incoming.group_id);
+      const blocked=g335AddIssue(store,incoming,g334DeletionDate(settings.get(g334DeletionKey(store,id))),group,row.sourceGroup,year,row.sourceYear);
+      if (blocked) throw Error(blocked);
+      if (!snapshot.schools.some(school=>school.school_id===group.school_id)) throw Error('Falta la escuela del grupo de destino.');
+      if (rows.some(item=>item.store==='groups'&&item.id===group.group_id&&item.incoming?.status==='ARCHIVED')) throw Error('La selección archiva el grupo de destino.');
+      current={[key]:id,group_id:group.group_id,school_id:group.school_id,created_at:now};
+      if (store==='activities') {
+        current.trimester=incoming.trimester || 'T1';
+        if (!['T1','T2','T3'].includes(current.trimester)) throw Error('Trimestre inválido en '+row.title+'.');
+      }
+    }
+    const status=incoming.status||'ACTIVE';
+    if (!['ACTIVE','ARCHIVED'].includes(status)) throw Error('Estado inválido en '+row.title+'.');
+    const next={...current,status,updated_at:now};
+    if (store==='groups') {
+      if (!snapshot.schools.some(school=>school.school_id===current.school_id)) throw Error('Falta la escuela de '+row.title+'.');
+      const patch={grade:incoming.grade,group_name:incoming.group_name,subject:incoming.subject,shift:incoming.shift,status,school_year:current.school_year||year};
+      const validated=g254Plan(current,patch,[]);
+      writes.groups.push({...validated,school_year:current.school_year,updated_at:now});
+      continue;
+    }
+    if (!snapshot.groups.some(group=>group.group_id===current.group_id)) throw Error('Falta el grupo de '+row.title+'.');
+    if (store==='schedule') {
+      const day=Number(incoming.day_of_week);
+      const {start_time:start,end_time:end}=incoming;
+      if (!DAY_NAMES[day] || ![start,end].every(time=>/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) || start>=end) throw Error('Horario inválido en '+row.title+'.');
+      writes.schedule.push({...next,day_of_week:day,start_time:start,end_time:end});
+      continue;
+    }
+    const term=current.trimester||'T1';
+    if (snapshot.academic_closures.some(row=>row.group_id===current.group_id&&row.trimester===term&&row.status==='CLOSED')) throw Error('El trimestre de '+row.title+' está cerrado.');
+    const code=String(incoming.activity_code??'').trim(), name=String(incoming.activity_name??'').trim();
+    const max=Number(incoming.max_grade??10), due=incoming.due_date||'', type=incoming.activity_type||'ACTIVITY';
+    if (!code||!name||!Number.isFinite(max)||max<=0||(due&&!g125DateValid(due))||!['ACTIVITY','PROJECT','EVALUATION','RECOVERY'].includes(type)) throw Error('Actividad inválida en '+row.title+'.');
+    if (snapshot.activity_results.some(result=>result.activity_id===id&&result.grade!==null&&result.grade!==''&&Number(result.grade)>max)) throw Error('La escala del respaldo es menor que una nota guardada en '+row.title+'.');
+    writes.activities.push({...next,activity_code:code,activity_name:name,activity_type:type,due_date:due,max_grade:max});
+  }
+  const groups=new Map(snapshot.groups.map(row=>[row.group_id,row]));
+  for (const row of writes.groups) groups.set(row.group_id,row);
+  for (const row of writes.groups) g254Plan(row,{school_year:row.school_year||year},[...groups.values()]);
+  const activities=new Map(snapshot.activities.map(row=>[row.activity_id,row]));
+  for (const row of writes.activities) activities.set(row.activity_id,row);
+  for (const row of writes.activities) if (row.status!=='ARCHIVED'&&[...activities.values()].some(other=>
+    other.activity_id!==row.activity_id&&other.status!=='ARCHIVED'&&other.group_id===row.group_id&&
+    (other.trimester||'T1')===(row.trimester||'T1')&&normalizeActivityToken(other.activity_code)===normalizeActivityToken(row.activity_code)))
+    throw Error('Hay una actividad con la misma clave: '+row.activity_code+'.');
+  return writes;
+}
+
+async function g333Write(writes, expected) {
+  const db=await openDatabase(), names=Object.keys(expected);
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(names,'readwrite'), current={};
+    let remaining=names.length, failure;
+    tx.oncomplete=resolve;
+    tx.onabort=()=>reject(failure||tx.error||Error('La actualización se canceló.'));
+    for (const name of names) {
+      const request=tx.objectStore(name).getAll();
+      request.onsuccess=()=>{
+        current[name]=request.result;
+        if (--remaining) return;
+        try {
+          if (g124StateSignature(current)!==g124StateSignature(expected)) throw Error('Los datos cambiaron antes del guardado. Revisa nuevamente.');
+          for(const [store,rows] of Object.entries(writes)) for (const row of rows) tx.objectStore(store).put(row);
+        } catch(error) {failure=error;tx.abort();}
+      };
+    }
+  });
+}
+
+async function g333Apply() {
+  if (g128Busy||!g333Reviewing||!g128Model||!g333Selected.size) return;
+  const status=document.getElementById('g333-status');
+  if (g134Saving||g134Pending()) {status.textContent='Guarda o descarta los borradores del cuaderno antes de continuar.';return;}
+  const rows=g332Rows.filter(row=>g333Selected.has(row.key)), model=g128Model;
+  const controls=[...document.querySelectorAll('#modal-g128-reconcile button,#modal-g128-reconcile input,#modal-g128-reconcile select')].map(control=>[control,control.disabled]);
+  g128Busy=true;
+  controls.forEach(([control])=>control.disabled=true);
+  status.textContent='Validando los registros seleccionados.';
+  let committed=false;
+  try {
+    const snapshot=await g124Snapshot(), writes=g333Plan(snapshot,rows,new Date().toISOString());
+    if (model.source?.verifyBeforeApply) await model.source.verifyBeforeApply();
+    downloadBackupObject(g124Backup(snapshot),'respaldo_antes_conciliar_estructura_G333');
+    await g333Write(writes,snapshot);
+    committed=true;
+    const saved=await g124Snapshot();
+    for (const [name,records] of Object.entries(writes)) {
+      const key=RESTORE_STORE_KEYS[name], actual=new Map(saved[name].map(row=>[row[key],row]));
+      if (records.some(row=>g124Stable(actual.get(row[key]))!==g124Stable(row))) throw Error('No se pudo verificar el lote completo.');
+    }
+    await refreshLocalCache();
+    populateGroupDropdowns();renderGroups();g255Refresh();
+    g333Selected.clear();g333Reviewing=false;
+    g128Selected.clear();g128Model=null;g128SetReview(null);
+    closeModal('modal-g128-reconcile');
+    document.getElementById('g128-card-status').textContent=rows.length+' cambios de grupos, horarios o actividades guardados y verificados.';
+    showToast('Cambios guardados y verificados.');
+  } catch(error) {
+    status.textContent=(committed ? 'El lote se guardó. Revisa el estado actual antes de repetir. ' : '')+error.message;
+  } finally {
+    g128Busy=false;
+    controls.forEach(([control,disabled])=>control.disabled=disabled);
+  }
+}
 </script>
 <script id="g128-reconcile-backups">/* G305: opt-in reconciliation of attendance and activity results; never automatic sync. */
 let g128Model=null,g128Selected=new Set(),g128Busy=false,g128Limit=100,g128Review=null;
@@ -20057,7 +20296,7 @@ function g329DeletionPlan(data,store,id) {
 
 async function g329CommitDeletion(store,id,plan) {
   const db=await openDatabase();
-  const names=store==='schedule'?['schedule','teacher_journal']:Object.keys(plan.removed);
+  const names=store==='schedule'?['schedule','teacher_journal','settings']:Object.keys(plan.removed);
   return new Promise((resolve,reject)=>{
     const tx=db.transaction(names,'readwrite'),data={};
     let pending=names.length,failure;
@@ -20074,6 +20313,9 @@ async function g329CommitDeletion(store,id,plan) {
           for (const [name,rows] of Object.entries(current.removed)) {
             const key=name==='settings'?'key':RESTORE_STORE_KEYS[name];
             for (const row of rows) tx.objectStore(name).delete(row[key]);
+          }
+          for (const marker of g334DeletionMarkers(current.removed,new Date().toISOString())) {
+            tx.objectStore('settings').put(marker);
           }
           for (const [name,rows] of Object.entries(current.updated)) {
             for (const row of rows) tx.objectStore(name).put(row);
